@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="au.gov.nsw.railcorp.rtta.refint"/>
+
+    <import resource="classpath:rtta-refdata-properties-appcontext.xml"/>
+
+
+    <bean id="stopsBootManager"
+          class="au.gov.nsw.railcorp.rtta.refint.boot.StopsBootManager" >
+        <property name="dirPath" value="${dirPath}"/>
+        <property name="fileName" value="${rttaStopsFileName}"/>
+    </bean>
+    <bean id="gtfsTopologyBootManager"
+          class="au.gov.nsw.railcorp.rtta.refint.boot.GtfsTopologyBootManager" >
+        <property name="dirPath" value="${dirPath}"/>
+        <property name="fileName" value="${rttaGtfsTopologyFileName}"/>
+    </bean>
+    <bean id="nodeBootManager"
+          class="au.gov.nsw.railcorp.rtta.refint.boot.NodeBootManager" >
+        <property name="dirPath" value="${dirPath}"/>
+        <property name="fileName" value="${rttaNodesFileName}"/>
+    </bean>
+    <bean id="nodalGeographyBootManager"
+          class="au.gov.nsw.railcorp.rtta.refint.boot.NodalGeographyBootManager" >
+        <property name="dirPath" value="${dirPath}"/>
+        <property name="fileName" value="${nodalGeographyFileName}"/>
+    </bean>
+</beans>

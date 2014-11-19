@@ -1,0 +1,42 @@
+// rtta-configuration gradle setup:
+
+subprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse-wtp'
+
+    // Ignore the /build directory which is created by Gradle
+    eclipse.project.file.withXml {
+        def node = it.asNode()
+
+        // Add node to ignore Gradle build directory
+        def filter = node.appendNode('filteredResources').appendNode('filter')
+        filter.appendNode('id', '1347509495609')
+        filter.appendNode('name')
+        filter.appendNode('type', '30')
+        def matcher = filter.appendNode('matcher')
+        matcher.appendNode('id', 'org.eclipse.ui.ide.multiFilter')
+        matcher.appendNode('arguments', '1.0-name-matches-false-false-build')
+
+        // Add build command for Checkstyle
+        def buildCommand = node.buildSpec[0].appendNode('buildCommand')
+        buildCommand.appendNode('name', 'net.sf.eclipsecs.core.CheckstyleBuilder')
+        buildCommand.appendNode('arguments')
+
+        // Add nature for Checkstyle
+        node.natures[0].appendNode('nature', 'net.sf.eclipsecs.core.CheckstyleNature')
+    }
+}
+
+project(':rtta-refdata-config') {
+
+    dependencies {
+        testCompile group: 'org.apache.commons', name: 'commons-dbcp2', version: commonsDbcp2Version
+
+    }
+    jar {
+        manifest {
+            attributes 'Implementation-Title': 'RTTA RefData Configuration', 'Implementation-Version': projectVersion
+        }
+    }
+
+}

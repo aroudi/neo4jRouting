@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:stops="http://www.railcorp.nsw.gov.au/RTTA/reference"
+			xmlns:reference="http://www.railcorp.nsw.gov.au/RTTA/reference" 
+			targetNamespace="http://www.railcorp.nsw.gov.au/RTTA/reference" 
+			elementFormDefault="qualified">
+			
+<!--
+//
+//	types
+//
+<-->
+
+ <!-- Stops -->
+ <xs:complexType name="refStop">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refStop type represents a stop on the network</xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="StopId" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique TSNID of the stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Name" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique short name of this stop &quot;CE23&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="LongName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique long name of this stop &quot;Central Station Platform 23&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="ParentStopId" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Optional stop id of the parent stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Source" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The data source of this stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="StationStop" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Is a station stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Latitude" type="xs:double" default="0.0"/>
+  <xs:attribute name="Longitude" type="xs:double" default="0.0"/>
+ </xs:complexType>
+
+ <xs:complexType name="refStops">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refStops type represents the stops on the network</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+   <xs:element name="Stop" type="stops:refStop" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <!-- StopLinks -->
+ <xs:complexType name="refStopLink">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refStopLink type represents a linked triplet of stops</xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="InStopId" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The incoming stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="StopId" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="OutStopId" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The outgoing stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="InStopName" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The incoming stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="StopName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="OutStopName" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The outgoing stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Reversible" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Is link reversible</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Electric" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Is line electric</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Diesel" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Is line diesel</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+ </xs:complexType>
+
+ <xs:complexType name="refStopLinks">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refStopLinks type represents the set of stop links used to augment links not present in nodal geography</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+   <xs:element name="Link" type="stops:refStopLink" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+  
+<!-- StopsV01 -->
+ <xs:complexType name="StopsV01">
+  <xs:sequence>
+   <xs:element name="Stops" type="stops:refStops"/>
+   <xs:element name="StopLinks" type="stops:refStopLinks"/>
+  </xs:sequence>
+ </xs:complexType>
+
+</xs:schema>

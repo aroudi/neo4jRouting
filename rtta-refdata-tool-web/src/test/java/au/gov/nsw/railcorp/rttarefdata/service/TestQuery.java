@@ -1,0 +1,112 @@
+package au.gov.nsw.railcorp.rttarefdata.service;
+
+import au.gov.nsw.railcorp.rttarefdata.domain.*;
+import au.gov.nsw.railcorp.rttarefdata.manager.ServiceTest;
+import au.gov.nsw.railcorp.rttarefdata.repositories.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+/**
+ * Created by arash on 7/11/14.
+ */
+public class TestQuery {
+    static StationTripletRepository tripletRepository;
+    static NodeLinkRepository nodelinkRepository;
+    static ServiceTest serviceTest;
+    static RuningTimeRepository runingTimeRepository;
+    static NodeLinkageRepository nodeLinkageRepository;
+    static NodeRepository nodeRepository;
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("rttaDataRefContext.xml");
+        tripletRepository = context.getBean(StationTripletRepository.class);
+        nodelinkRepository = context.getBean(NodeLinkRepository.class);
+        runingTimeRepository = context.getBean(RuningTimeRepository.class);
+        nodeLinkageRepository = context.getBean(NodeLinkageRepository.class);
+        nodeRepository = context.getBean(NodeRepository.class);
+        serviceTest = context.getBean(ServiceTest.class);
+        //createStationTriplet();
+        //queryStationTriplet();
+
+        //createNodeLink();
+        //removeNodeLink();
+        //removeNodeLinkage();
+        queryNodeLinkage();
+
+
+
+
+    }
+    public static void queryStationTriplet() {
+
+
+
+        StationTriplet stationTriplet = tripletRepository.getTriplet(234012,23521,23541);
+        stationTriplet = tripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(234012, 23521, 23541);
+        
+        System.out.println("isReversible: " + stationTriplet.isReversible());
+        System.out.println("fromStation : " + stationTriplet.getFromStation().getGtfsStopId());
+        System.out.println("toStation : " + stationTriplet.getToStation().getGtfsStopId());
+
+        stationTriplet = tripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(233610,233710,23381);
+        System.out.println("isReversible: " + stationTriplet.isReversible());
+        System.out.println("fromStation : " + stationTriplet.getFromStation().getGtfsStopId());
+        System.out.println("toStation : " + stationTriplet.getToStation().getGtfsStopId());
+
+        //tripletRepository.delete(stationTriplet);
+
+
+    }
+    public static void createStationTriplet() {
+        // Triplets
+        String[] powerTypes = {"AC","Diesel"};
+        serviceTest.createTriplet(233610, 233710, 23381, true, powerTypes);
+        System.out.println("station triplets inserted.");
+
+    }
+
+    public static void removeNodeLink() {
+
+
+        NodeLink nodeLink = nodelinkRepository.getNodeLink("BTN1", "BTJB");
+        //NodeLink nodeLink = nodelinkRepository.findByFromNodeNameAndToNodeName("BTN1", "BTJB");
+        //System.out.println(nodeLink.getFromNode().getName());
+        if (nodeLink !=null ){
+            System.out.println("nodeLink.getRunningTime :" +nodeLink.getRunningTimes());
+            if (nodeLink.getRunningTimes() !=null ) {
+                for (RuningTime runingTime:nodeLink.getRunningTimes()) {
+                    System.out.println("running time :"+ runingTime);
+                    //runingTimeRepository.delete(runingTime);
+                }
+            }
+            runingTimeRepository.delete(nodeLink.getRunningTimes());
+        }
+        nodelinkRepository.delete(nodeLink);
+    }
+
+    public static void createNodeLink() {
+        String[] powerTypes3 = {"AC","Diesel"};
+        String[] gauges = {"StandardGauge"};
+        final NodeLink nodeLink = serviceTest.createNodeLink("BTN1", "BTJB", 200, false, false, true, 1553, powerTypes3, gauges);
+        serviceTest.createRuningTime(nodeLink, 18, null, null);
+        serviceTest.createRuningTime(nodeLink, 1, null, null);
+
+    }
+    public static void removeNodeLinkage() {
+        Node node = nodeRepository.findBySchemaPropertyValue("name", "BTN1");
+        if (node.getNodeLinkages() != null) {
+            for (NodeLinkage nodeLinkage: node.getNodeLinkages()) {
+                System.out.println("node linkage object = " + nodeLinkage );
+            }
+
+        }
+        if (node != null) {
+            nodeLinkageRepository.delete(node.getNodeLinkages());
+        }
+    }
+    public static void queryNodeLinkage(){
+        NodeLinkage nodeLinkage= nodeLinkageRepository.getNodeLinkage("GRDA", "GRDC");
+        if (nodeLinkage != null) {
+            System.out.println("nodeLinkage =" + nodeLinkage.getLength());
+        }
+    }
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:nodal="http://www.railcorp.nsw.gov.au/RTTA/reference"
+			xmlns:reference="http://www.railcorp.nsw.gov.au/RTTA/reference" 
+			targetNamespace="http://www.railcorp.nsw.gov.au/RTTA/reference" 
+			elementFormDefault="qualified">
+			
+<!--
+//
+//	types
+//
+<-->
+
+ <!-- Nodes -->
+ <xs:complexType name="refNode">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refNode type represents a node on the network</xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="NodeName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique short name of this node &quot;ABC1&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="LongName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The long name of this node &quot;ABC North Platform 1&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="PlatformName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The platform name of this node &quot;#1&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Source" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The data source of this node</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="PlatformStop" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Is a platform stop</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="Latitude" type="xs:double" default="0.0"/>
+  <xs:attribute name="Longitude" type="xs:double" default="0.0"/>
+ </xs:complexType>
+
+ <xs:complexType name="refNodes">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The refNodes type represents the nodes on the network</xs:documentation>
+   </xs:annotation>
+  <xs:sequence>
+   <xs:element name="Node" type="nodal:refNode" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+<!-- NodesV01 -->
+ <xs:complexType name="NodesV01">
+  <xs:sequence>
+   <xs:element name="Nodes" type="nodal:refNodes"/>
+  </xs:sequence>
+ </xs:complexType>
+
+</xs:schema>

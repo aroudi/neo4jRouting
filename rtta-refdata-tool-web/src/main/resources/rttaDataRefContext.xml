@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+       	http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/neo4j
+		http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:spring-configured/>
+    <context:annotation-config/>
+    <context:component-scan base-package="au.gov.nsw.railcorp.rttarefdata" />
+
+    <import resource="classpath:rtta-refdata-properties-appcontext.xml"/>
+    <import resource="classpath:rtta-refdata-core-appcontext.xml"/>
+    <!-- uncomment this if you want to connect to the neo4j file base db -->
+    <!--
+    <neo4j:config storeDirectory="${storeDirectory}"
+                  base-package="au.gov.nsw.railcorp.rttarefdata.domain"/>
+    -->
+    <neo4j:repositories base-package="au.gov.nsw.railcorp.rttarefdata.repositories"/>
+    <!-- uncomment this if you want to connect to the neo4j server -->
+    <neo4j:config graphDatabaseService="graphDatabaseService" base-package="au.gov.nsw.railcorp.rttarefdata.domain"/>
+    <bean id="graphDatabaseService" class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
+        <constructor-arg index="0" value="http://${host}:${port}${db}" />
+    </bean>
+    <tx:annotation-driven />
+</beans>
+

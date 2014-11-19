@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:gtfs="http://www.railcorp.nsw.gov.au/RTTA/reference"
+			xmlns:reference="http://www.railcorp.nsw.gov.au/RTTA/reference"
+			targetNamespace="http://www.railcorp.nsw.gov.au/RTTA/reference"
+			elementFormDefault="qualified">
+
+<!--
+//
+//	types
+//
+<-->
+
+ <!-- ServiceType -->
+ <xs:simpleType name="eGtfsServiceType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="None"/>
+    <xs:enumeration value="HighSpeed"/>
+    <xs:enumeration value="InterCity"/>
+ 	<xs:enumeration value="Suburban"/>
+ 	<xs:enumeration value="OuterSuburban"/>
+ 	<xs:enumeration value="FastFreight"/>
+ 	<xs:enumeration value="SlowFreight"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <!-- Networks -->
+ <xs:complexType name="refGtfsNetwork">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refGtfsNetwork type represents a network, for example &quot;Sydney Trains&quot;</xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="NetworkName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique short name of the network &quot;SydneyTrains&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="LongName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The long name of the network</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+ </xs:complexType>
+
+ <xs:complexType name="refGtfsNetworks">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refGtfsNetworks type represents networks</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+   <xs:element name="Network" type="gtfs:refGtfsNetwork" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <!-- Line Paths -->
+ <xs:complexType name="refGtfsPathStation">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The refGtfsPathStation type repesents a path station</xs:documentation>
+   </xs:annotation>
+   <xs:attribute name="StationTSNID" type="xs:string" use="required">
+    <xs:annotation>
+     <xs:documentation xml:lang="en">The station TSNID</xs:documentation>
+    </xs:annotation>
+   </xs:attribute>
+   <xs:attribute name="ShortName" type="xs:string" use="required">
+    <xs:annotation>
+     <xs:documentation xml:lang="en">The station short name</xs:documentation>
+    </xs:annotation>
+   </xs:attribute>
+ </xs:complexType>
+
+ <xs:complexType name="refGtfsLinePath">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refGtfsLinePath type represents a station path</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+   <xs:element name="Station" type="gtfs:refGtfsPathStation" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="LinePathName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique short name of this line path - equivalent to GTFS route_id</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="LongName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The long name of this line path - equivalent to GTFS route_long_name</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="InterchangePoints" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Interchange points for line path</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="ElectricPath" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">If true, is electric line path</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="DieselPath" type="xs:boolean" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">If true, is diesel line path</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>  <xs:attribute name="StationPath" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The station path</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="PathMatchInclude" type="xs:string" use="optional">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">Path matching stations - at least 2 stations from this path must match for a journey to match</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+ </xs:complexType>
+
+ <xs:complexType name="refGtfsLinePaths">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refGtfsLinePaths type represents a set of station paths</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+   <xs:element name="LinePath" type="gtfs:refGtfsLinePath" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+  <!-- NetworkLines -->
+ <xs:complexType name="refGtfsNetworkLine">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refGtfsNetworkLine type represents a network line, for example &quot;Eastern Suburbs and Illawarra Line&quot;</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+    <xs:element name="LinePaths" type="gtfs:refGtfsLinePaths"/>
+  </xs:sequence>
+  <xs:attribute name="NetworkLineName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The unique short name of the network line &quot;ESIL&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="LongName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The long name of the network line &quot;Eastern Suburbs and Illawarra Line&quot;</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="NetworkName" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The identifier of the parent network</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="eServiceType" type="gtfs:eGtfsServiceType" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The identifier of the parent service type</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="LineColourHex" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The network line background colour HEX value</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="TextColourHex" type="xs:string" use="required">
+   <xs:annotation>
+    <xs:documentation xml:lang="en">The network line text colour HEX value</xs:documentation>
+   </xs:annotation>
+  </xs:attribute>
+ </xs:complexType>
+
+ <xs:complexType name="refGtfsNetworkLines">
+  <xs:annotation>
+   <xs:documentation xml:lang="en">The refGtfsNetworkLines type represents network lines</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+   <xs:element name="NetworkLine" type="gtfs:refGtfsNetworkLine" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+
+ <!-- GtfsTopologyV01 -->
+ <xs:complexType name="GtfsTopologyV01">
+  <xs:sequence>
+   <xs:element name="Networks" type="gtfs:refGtfsNetworks"/>
+   <xs:element name="NetworkLines" type="gtfs:refGtfsNetworkLines"/>
+  </xs:sequence>
+ </xs:complexType>
+
+</xs:schema>

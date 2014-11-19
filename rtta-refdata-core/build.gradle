@@ -1,0 +1,60 @@
+// rtta-configuration gradle setup:
+// Maven Repo - Local File System
+project.ext["depsDir"] = 'file://V:/repository'
+
+subprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse-wtp'
+
+    repositories {
+
+        maven {
+            // For now look in a fixed place Maven Repository - File Share
+            url project["depsDir"]
+        }
+    }
+    dependencies {
+        // Any changes here will require updates to the jars specified in
+        //Spring Data Neo4j 3.2.0 Release
+        compile group:'org.slf4j', name:'slf4j-api', version :'1.6.6'
+    }
+
+
+
+    // Ignore the /build directory which is created by Gradle
+    eclipse.project.file.withXml {
+        def node = it.asNode()
+
+        // Add node to ignore Gradle build directory
+        def filter = node.appendNode('filteredResources').appendNode('filter')
+        filter.appendNode('id', '1347509495609')
+        filter.appendNode('name')
+        filter.appendNode('type', '30')
+        def matcher = filter.appendNode('matcher')
+        matcher.appendNode('id', 'org.eclipse.ui.ide.multiFilter')
+        matcher.appendNode('arguments', '1.0-name-matches-false-false-build')
+
+
+        // Add build command for Checkstyle
+        def buildCommand = node.buildSpec[0].appendNode('buildCommand')
+        buildCommand.appendNode('name', 'net.sf.eclipsecs.core.CheckstyleBuilder')
+        buildCommand.appendNode('arguments')
+
+        // Add nature for Checkstyle
+        node.natures[0].appendNode('nature', 'net.sf.eclipsecs.core.CheckstyleNature')
+
+    }
+}
+
+project(':rtta-refdata-core') {
+
+    dependencies {
+        compile project(':rtta-refdata-config')
+    }
+    jar {
+        manifest {
+            attributes 'Implementation-Title': 'RTTA RefdataCore', 'Implementation-Version': projectVersion
+        }
+    }
+
+}
