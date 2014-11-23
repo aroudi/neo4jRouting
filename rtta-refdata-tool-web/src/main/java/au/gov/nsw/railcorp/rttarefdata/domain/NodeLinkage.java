@@ -28,8 +28,6 @@ public class NodeLinkage {
     private boolean broadGauge;
     @Indexed
     private String direction;
-    @Indexed
-    private String penaltyBan= "PT6S";
 
     @StartNode
     private Node fromNode;
@@ -163,14 +161,6 @@ public class NodeLinkage {
 
     public void setToNode(Node toNode) {
         this.toNode = toNode;
-    }
-
-    public String getPenaltyBan() {
-        return penaltyBan;
-    }
-
-    public void setPenaltyBan(String penaltyBan) {
-        this.penaltyBan = penaltyBan;
     }
 
     public String getDirection() {

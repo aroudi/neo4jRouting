@@ -311,45 +311,29 @@ public class NodalGeographyManager implements INodalGeographyManager {
 
     /**
      * Create TurnPenaltyBan Record.
+     * @param viaNodeName viaNodeName
      * @param fromNodeName fromNodeName
      * @param toNodeName toNodeName
      * @param penaltyBan penaltyBan
      * @return TurnPenaltyBan turnPenaltyBan
      */
-    public TurnPenaltyBan createTurnPenaltyBan(String fromNodeName, String toNodeName, String penaltyBan) {
+    public TurnPenaltyBan createTurnPenaltyBan(String viaNodeName, String fromNodeName, String toNodeName, String penaltyBan) {
         final Node fromNode = nodeRepository.findBySchemaPropertyValue("name", fromNodeName);
         final Node toNode = nodeRepository.findBySchemaPropertyValue("name", toNodeName);
         if (fromNode == null || toNode == null) {
             return null;
         }
-        /*
-        TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(fromNodeName, toNodeName);
-        if (turnPenaltyBan == null) {
 
+        TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(fromNodeName, viaNodeName, toNodeName);
+        if (turnPenaltyBan == null) {
+            turnPenaltyBan = new TurnPenaltyBan();
         }
-        */
-        final TurnPenaltyBan turnPenaltyBan = new TurnPenaltyBan();
+        turnPenaltyBan.setViaNodeName(viaNodeName);
         turnPenaltyBan.setFromNode(fromNode);
         turnPenaltyBan.setToNode(toNode);
         turnPenaltyBan.setPenalty(penaltyBan);
         turnPenaltyBanRepository.save(turnPenaltyBan);
-        updateNodeLinkagePenaltyBan(fromNodeName, toNodeName, penaltyBan);
         return turnPenaltyBan;
     }
-
-    /**
-     * update node linkage penalty ban based on NodePenaltyBans.
-     * @param fromNode fromNode
-     * @param toNode toNode
-     * @param penalty penalty
-     */
-    public void updateNodeLinkagePenaltyBan(String fromNode, String toNode, String penalty) {
-        final NodeLinkage nodeLinkage = nodeLinkageRepository.getNodeLinkage(fromNode, toNode);
-        if (nodeLinkage != null) {
-            nodeLinkage.setPenaltyBan(penalty);
-            nodeLinkageRepository.save(nodeLinkage);
-        }
-    }
-
 
 }

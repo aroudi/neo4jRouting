@@ -105,7 +105,7 @@ public class NodalGeographyService {
                     if (nodeTurnPenaltyBan == null) {
                         continue;
                     }
-                    nodalGeographyManager.createTurnPenaltyBan(nodeTurnPenaltyBan.getFromNodeName(), nodeTurnPenaltyBan.getToNodeName(), nodeTurnPenaltyBan.getPenalty().toString());
+                    nodalGeographyManager.createTurnPenaltyBan(node.getName(), nodeTurnPenaltyBan.getFromNodeName(), nodeTurnPenaltyBan.getToNodeName(), nodeTurnPenaltyBan.getPenalty().toString());
                 }
             }
         }

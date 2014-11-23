@@ -12,10 +12,11 @@ public interface TurnPenaltyBanRepository extends GraphRepository<TurnPenaltyBan
     /**
      * Return Node Turning penalty ban.
      * @param fromNode fromNode
+     * @param viaNodeName viaNodeName
      * @param toNode toNode
      * @return TurnPenaltyBan
      */
-    @Query("MATCH (fromNode:Node{name:{0}})-[turnPenaltyBan:TURN_PENALTY_BAN]->(toNode:Node{name:{1}}) "
+    @Query("MATCH (fromNode:Node{name:{0}})-[turnPenaltyBan:TURN_PENALTY_BAN{viaNodeName:{1}}]->(toNode:Node{name:{2}}) "
             + "RETURN turnPenaltyBan")
-    TurnPenaltyBan getNodeTurnPenaltyBan(String fromNode, String toNode);
+    TurnPenaltyBan getNodeTurnPenaltyBan(String fromNode, String viaNodeName, String toNode);
 }

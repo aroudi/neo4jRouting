@@ -88,12 +88,13 @@ public interface INodalGeographyManager {
 
     /**
      * Create TurnPenaltyBan Record.
+     * @param viaNodeName viaNodeName
      * @param fromNodeName fromNodeName
      * @param toNodeName toNodeName
      * @param penaltyBan penaltyBan
      * @return TurnPenaltyBan turnPenaltyBan
      */
-    TurnPenaltyBan createTurnPenaltyBan(String fromNodeName, String toNodeName, String penaltyBan);
+    TurnPenaltyBan createTurnPenaltyBan(String viaNodeName, String fromNodeName, String toNodeName, String penaltyBan);
 
     /**
      * create Node Linkage.

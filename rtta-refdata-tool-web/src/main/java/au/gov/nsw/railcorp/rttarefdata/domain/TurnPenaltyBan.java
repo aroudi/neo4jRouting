@@ -20,6 +20,8 @@ public class TurnPenaltyBan {
     private Node toNode;
 
     private String penalty;
+    @Indexed
+    private String viaNodeName;
 
     /**
      * Constructor.
@@ -61,5 +63,21 @@ public class TurnPenaltyBan {
 
     public void setPenalty(String penalty) {
         this.penalty = penalty;
+    }
+
+    public Long getTurnPenaltyBanId() {
+        return turnPenaltyBanId;
+    }
+
+    public void setTurnPenaltyBanId(Long turnPenaltyBanId) {
+        this.turnPenaltyBanId = turnPenaltyBanId;
+    }
+
+    public String getViaNodeName() {
+        return viaNodeName;
+    }
+
+    public void setViaNodeName(String viaNodeName) {
+        this.viaNodeName = viaNodeName;
     }
 }
