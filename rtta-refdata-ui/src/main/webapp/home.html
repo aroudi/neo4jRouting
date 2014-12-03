@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en" ng-app="rttaRefDataUi">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+    <title>Rtta Reference Data Tool</title>
+
+    <link rel="stylesheet" type="text/css"
+          href="Resources/CSS/refDataUI.css">
+    <link rel="stylesheet" type="text/css"
+          href="Resources/CSS/ui-grid/ui-grid-unstable.css">
+    <link rel="stylesheet" type="text/css"
+          href="Resources/CSS/ui-grid/font-awesome.css">
+    <link rel="stylesheet" type="text/css"
+          href="Resources/CSS/ui-grid/grid.css">
+    <link rel="stylesheet" type="text/css"
+          href="Resources/CSS/loadDisplay.css">
+
+    <!--script src="Resources/js/angular/angular.min.js" type="text/javascript"></script-->
+    <script src="Resources/js/angular/angular.js" type="text/javascript"></script>
+    <script src="Resources/js/angular/angular-route.js" type="text/javascript"></script>
+    <script src="Resources/js/angular/angular-touch.js" type="text/javascript"></script>
+    <script src="Resources/js/angular/angular-animate.js" type="text/javascript"></script>
+    <script src="Resources/js/datatool/angularModules.js" type="text/javascript"></script>
+    <script src="Resources/js/datatool/angularConfig.js" type="text/javascript"></script>
+    <script src="Resources/js/datatool/angularControllers.js" type="text/javascript"></script>
+    <script src="Resources/js/datatool/loadDisplay.js" type="text/javascript"></script>
+    <script src="Resources/js/ui-grid/csv.js" type="text/javascript"></script>
+    <script src="Resources/js/ui-grid/pdfmake.js" type="text/javascript"></script>
+    <script src="Resources/js/ui-grid/vfs_fonts.js" type="text/javascript"></script>
+    <script src="Resources/js/ui-grid/ui-grid-unstable.js" type="text/javascript"></script>
+
+</head>
+<body ng-controller="NetworkController">
+<div class="wrapper">
+    <div class="headingsContainer">
+        <div class="headings">
+            <div class="logoDiv">
+                <img src="Resources/images/logos.jpg"
+                     class="logo"/>
+            </div>
+            <div class="title">
+                <h1 class="theWord">RTTA DATA TOOL</h1> </br>
+                <h1 class="theWord" style="text-align:center; font-size:12px;">(Ver. 1.0.0)</h1>
+            </div>
+        </div>
+    </div>
+    <div class="actionBar">
+        <div class="actionTools">
+            <!-- Menu tool-->
+            <a  class="actionText" href="#/network"> Network </a>
+            <a  class="actionText" href="/network"> NetworkLine </a>
+            <a  class="actionText" href=""> Line Path </a>
+            <a  class="actionText" href="#/station"> Station </a>
+            <a  class="actionText" href=""> Platform </a>
+        </div>
+    </div>
+    <div ng-view class="appWindow"></div>
+</div>
+<div class="footer">
+    <p class="footerText">
+        <img alt="A true ninja is not seen" src="Resources/ninjaSmall.png"
+             hieght="15" width="20"/>
+    </p>
+</div>
+
+</body>
+</html>

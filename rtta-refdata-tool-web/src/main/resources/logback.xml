@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <property name="importDestination" value="${catalina.base:-./temp}/logs/rtta-refdata-tool-common}" />
-  <property name="commonDestination" value="${catalina.base:-./temp}/logs/rtta-refdata-tool-import}" />
+  <property name="commonDestination" value="${catalina.base:-./temp}/logs/rtta-refdata-tool-common}" />
+  <property name="importDestination" value="${catalina.base:-./temp}/logs/rtta-refdata-tool-import}" />
   <appender name="IMPORT-RESULT" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${importDestination}.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

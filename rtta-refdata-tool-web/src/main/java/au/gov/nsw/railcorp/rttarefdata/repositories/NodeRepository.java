@@ -2,8 +2,6 @@
 package au.gov.nsw.railcorp.rttarefdata.repositories;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.Node;
-import au.gov.nsw.railcorp.rttarefdata.domain.TurnPenaltyBan;
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
 /**

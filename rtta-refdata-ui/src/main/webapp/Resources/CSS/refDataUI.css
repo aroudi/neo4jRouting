@@ -1,0 +1,332 @@
+@CHARSET "ISO-8859-1";
+
+/*Main html*/
+html, body, div {
+    margin: 0;
+    border: 0 none;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    min-height: 100%;
+    width: 100%;
+    min-width: 100%;
+}
+
+html {
+    background-color: #71c5e8;
+}
+
+body {
+    font-family: Helvetica, Arial;
+    color: #00205b;
+}
+
+ul {
+    list-style-type: none;
+    list-style: none;
+    list-style-image: none;
+    padding: 0px;
+    display: inline;
+}
+
+div {
+    float: left;
+    position: relative;
+}
+
+a {
+    text-decoration: none;
+}
+
+textarea {
+    width: 80%;
+}
+
+h1 {
+    font-size: 1.75em;
+}
+
+.wrapper {
+    margin: 0 auto;
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+    min-width: 100%;
+}
+
+.footer {
+    bottom: 0%;
+    right: 0%;
+    position: fixed;
+    z-index: -1;
+}
+
+.footerText {
+    font: 10px sans-serif;
+    font-style: italic;
+    margin-right: 20px;
+    text-align: right;
+}
+
+.noFloat {
+    float: none;
+}
+
+.rightFloat {
+    float: right;
+}
+
+/*The title bar*/
+.headingsContainer {
+    float: left;
+    width: 100%;
+    background-color: #00205b;
+    height: 10%;
+}
+
+.headings {
+    float: left;
+    width: 100%;
+    background-color: #ffffff;
+    height: 98%;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 0px 3px 1px 0px;
+    border-color: #00205b;
+    position: relative;
+}
+
+.logoDiv {
+    float: left;
+    height: 80%;
+}
+
+.logo {
+    height: 100%;
+    margin: 0.2em 0em 0em 0.5em;
+}
+
+.title {
+    float: right;
+}
+
+.theWord {
+    margin: 0.2em 0.5em 0em 0em;
+}
+
+/*Choice of clans on the left*/
+.selectionsBar {
+    float: left;
+    width: 15%;
+    background-color: #00205b;
+    height: 90%;
+    overflow: hidden;
+}
+
+.clans .selected {
+    background-color: #a6192e;
+    border-color: #c81b2e;
+}
+
+.clans li {
+    background-color: #00a3e0;
+    font-weight: bold;
+    cursor: pointer;
+    color: #ffffff;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 0px 3px 1px 0px;
+    border-color: #71c5e8;
+    margin: 5px;
+    text-align: center;
+    padding: 5px;
+}
+
+/*admin and search bar*/
+.actionBar {
+    float: left;
+    border: 0px;
+    height: 3%;
+    width: 100%;
+    background-color: #00205b;
+    position: relative;
+}
+
+.actionTools {
+    margin: 0.2em;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.userName {
+    margin: 0.2em;
+    padding: 3px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.actionText {
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+}
+
+.actionButton {
+    font-weight: bold;
+    cursor: pointer;
+    color: #ffffff;
+    border-radius: 10px;
+    background-color: #00a3e0;
+    padding: 3px;
+    margin: 5px;
+    border-style: solid;
+    border-width: 0px 3px 1px 0px;
+    border-color: #71c5e8;
+}
+
+.selected {
+    background-color: #a6192e;
+    border-color: #c81b2e;
+}
+
+.appWindow {
+    float: left;
+    border: 0px;
+    height: 84%;
+    width: 85%;
+    overflow: auto;
+    z-index: 0;
+}
+.menuBar {
+    float: left;
+    border: 0px;
+    height: 10%;
+    width: 100%;
+    overflow: auto;
+    z-index: 0;
+}
+
+.ninjits li {
+    float: left;
+    width: 98%;
+    background-color: #ffffff;
+    cursor: pointer;
+    color: #00205b;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 0px 3px 1px 0px;
+    border-color: #00205b;
+    margin: 4px;
+}
+
+.shortWidth {
+    width: 85%;
+    display: inline-block;
+}
+
+.deleteable {
+    width: 13%;
+    display: inline-block;
+}
+
+.status {
+    background-color: #00cc00;
+    color: #00cc00;
+    margin: 5px;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 0px 3px 1px 0px;
+    border-color: #00205b;
+    display: inline;
+}
+
+.red {
+
+    background-color: #ff0000;
+    color: #ff0000;
+}
+
+.ninjitName {
+    width: 30%;
+    float: left;
+    padding: 5px;
+}
+
+.ninjitStatus {
+    float: left;
+    width: 15%;
+    padding: 5px;
+}
+
+.ninjitMission {
+    width: 48%;
+    float: left;
+    padding: 5px;
+}
+
+.redWritting {
+    color: #a6192e;
+}
+
+.editButton {
+    font-weight: bold;
+    cursor: pointer;
+    color: #ffffff;
+    border-radius: 10px;
+    text-align: right;
+    background-color: #a6192e;
+    padding: 5px;
+    margin: 5px;
+    border-style: solid;
+    border-width: 0px 3px 1px 0px;
+    border-color: #00205b;
+}
+
+.editSection {
+    background-color: #ffffff;
+    border-radius: 10px;
+    margin: 5px;
+    float: none;
+    border-style: solid;
+    border-width: 0px 3px 0px 0px;
+    border-color: #00205b;
+}
+
+.editValues {
+    float: none;
+    border-style: solid;
+    border-width: 1px 10px;
+    border-color: transparent;
+}
+
+/*Group edit*/
+.grouplist {
+    float: left;
+    width: 100%;
+}
+
+.grouplistSection {
+    float: left;
+    width: 50%;
+}
+
+/*put on the bottom*/
+.hide {
+    display: none;
+}
+
+.colSelected {
+    background-color: #020849;
+    border-color: #1486c8;
+}
+.warnText {
+    font-weight:bold;
+    text-align: left;
+    color:#B40404;
+}
+

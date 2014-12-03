@@ -111,7 +111,7 @@ public class Node {
     protected Collection<NodeLink> incomingNodeLinks;
 
     /**
-     * node linkages
+     * node linkages.
      */
     @RelatedToVia(type = Links.NODE_LINKAGE, direction = Direction.OUTGOING)
     protected Collection<NodeLinkage> nodeLinkages;

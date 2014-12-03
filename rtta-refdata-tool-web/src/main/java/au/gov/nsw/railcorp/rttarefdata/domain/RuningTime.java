@@ -6,7 +6,6 @@ import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedTo;
 
-import javax.xml.datatype.Duration;
 
 /**
  * Created by arash on 3/11/14.

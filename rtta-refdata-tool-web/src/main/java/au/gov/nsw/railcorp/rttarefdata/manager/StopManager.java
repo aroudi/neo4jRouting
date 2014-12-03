@@ -5,12 +5,10 @@ import au.gov.nsw.railcorp.rttarefdata.domain.PowerType;
 import au.gov.nsw.railcorp.rttarefdata.domain.Station;
 import au.gov.nsw.railcorp.rttarefdata.domain.StationTriplet;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PlatformRepository;
-import au.gov.nsw.railcorp.rttarefdata.repositories.PowerTypeRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationTripletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;

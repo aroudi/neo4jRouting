@@ -1,6 +1,5 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
-import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
@@ -191,7 +190,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
             return null;
         }
         NodeLinkage nodeLinkage;
-        if (trackSectionId < 0){
+        if (trackSectionId < 0) {
             nodeLinkage = nodeLinkageRepository.getNodeLinkageNonTrackSection(fromNodeName, toNodeName);
             if (nodeLinkage != null) {
                 //no need to create a linkage between 2 nodes cause there is already a path
@@ -217,7 +216,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         nodeLinkage.setRunningLine(isRunningLine);
         nodeLinkage.setTrackSectionId(trackSectionId);
         if (trackSection != null) {
-            nodeLinkage.setDirection(trackSection.isUpDirection()? IConstants.TRACK_UP_DIRECTION : IConstants.TRACK_DOWN_DIRECTION);
+            nodeLinkage.setDirection(trackSection.isUpDirection() ? IConstants.TRACK_UP_DIRECTION : IConstants.TRACK_DOWN_DIRECTION);
         } else {
             nodeLinkage.setDirection(IConstants.TRACK_NON_DIRECTION);
         }
@@ -253,7 +252,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
             if (node.getOutgoingTurnPenalties() != null) {
                 turnPenaltyBanRepository.delete(node.getOutgoingTurnPenalties());
             }
-            if (node.getNodeLinkages() != null){
+            if (node.getNodeLinkages() != null) {
                 nodeLinkageRepository.delete(node.getNodeLinkages());
             }
         }

@@ -1,3 +1,4 @@
 include 'rtta-refdata-config'
 include 'rtta-refdata-tool-web'
 include 'rtta-refdata-core'
+include 'rtta-refdata-ui'

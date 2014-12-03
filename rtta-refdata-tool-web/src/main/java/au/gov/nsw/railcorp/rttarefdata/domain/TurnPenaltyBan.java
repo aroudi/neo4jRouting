@@ -3,7 +3,6 @@ package au.gov.nsw.railcorp.rttarefdata.domain;
 
 import org.springframework.data.neo4j.annotation.*;
 
-import javax.xml.datatype.Duration;
 
 /**
  * Created by arash on 3/11/14.

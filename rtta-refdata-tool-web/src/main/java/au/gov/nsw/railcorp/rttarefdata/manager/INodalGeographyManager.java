@@ -2,7 +2,6 @@ package au.gov.nsw.railcorp.rttarefdata.manager;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 
-import javax.xml.datatype.Duration;
 import java.util.List;
 
 /**

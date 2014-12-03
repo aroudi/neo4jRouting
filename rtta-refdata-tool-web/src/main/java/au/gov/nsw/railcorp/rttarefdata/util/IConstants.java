@@ -57,4 +57,13 @@ public interface IConstants {
      * no Direction.
      */
     String TRACK_NON_DIRECTION = "none";
+
+    /**
+     * SUCCESS RESPONSE STATUS.
+     */
+    int RESPONSE_SUCCESS = 1;
+    /**
+     * FAILURE RESPONSE STATUS.
+     */
+    int RESPONSE_FAILURE = 0;
 }
