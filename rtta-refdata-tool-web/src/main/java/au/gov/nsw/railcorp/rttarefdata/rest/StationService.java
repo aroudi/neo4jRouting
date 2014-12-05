@@ -4,20 +4,23 @@ package au.gov.nsw.railcorp.rttarefdata.rest;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.Station;
 import au.gov.nsw.railcorp.rttarefdata.manager.EntitySequenceManager;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.IRefData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.RefData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.StationData;
 import au.gov.nsw.railcorp.rttarefdata.request.StationModel;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.response.StationResponse;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.stereotype.Component;
 
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,9 +57,30 @@ public class StationService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllStations3() {
+        final List<StationData> result = new ArrayList<StationData>();
+        final List<IStationData> stations;
+        StationData stationData;
         try {
-            final Result result = stationRepository.findAll();
-            return Lists.newArrayList(result.iterator());
+            stations = stationRepository.getAllStations();
+            for (IStationData station: stations) {
+                stationData = new StationData();
+                stationData.setStationId(station.getStationId());
+                stationData.setShortName(station.getShortName());
+                stationData.setLongName(station.getLongName());
+                stationData.setGtfsStopId(station.getGtfsStopId());
+                try {
+                    stationData.setLongtitude(station.getLongtitude());
+                } catch (NullPointerException e1) {
+                    stationData.setLongtitude(0);
+                }
+                try {
+                    stationData.setLatitude(station.getLatitude());
+                } catch (NullPointerException e2) {
+                    stationData.setLatitude(0);
+                }
+                result.add(stationData);
+            }
+            return result;
         } catch (Exception e) {
             logger.error("Exception in returning station list ", e);
             return null;
@@ -87,8 +111,16 @@ public class StationService {
             station.setShortName(stationModel.getShortName());
             station.setLongName(stationModel.getLongName());
             station.setGtfsStopId(stationModel.getGtfsStopId());
-            station.setLatitude(stationModel.getLatitude());
-            station.setLongtitude(stationModel.getLongtitude());
+            if (stationModel.getLatitude() == null) {
+                station.setLatitude(0.0);
+            } else {
+                station.setLatitude(stationModel.getLatitude());
+            }
+            if (stationModel.getLongtitude() == null) {
+                station.setLongtitude(0.0);
+            } else {
+                station.setLongtitude(stationModel.getLongtitude());
+            }
             station.setInterchangePoint(stationModel.isInterchangePoint());
             stationRepository.save(station);
             response.setStationId(stationId);
@@ -162,4 +194,32 @@ public class StationService {
         }
         return response;
     }
+
+    /**
+     * Return station list in Json format.
+     * @return Station List
+     */
+    @GET
+    @Path("/stationsRef")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List getStationsAsRefData() {
+        List<IRefData> refDataList;
+        final List<RefData> result = new ArrayList<RefData>();
+        RefData refData;
+        try {
+            refDataList = stationRepository.getStationsAsRefData();
+            for (IRefData data: refDataList) {
+                refData = new RefData();
+                refData.setRefDataId(data.getRefDataId());
+                refData.setRefDataCode(data.getRefDataCode());
+                refData.setRefDataName(data.getRefDataName());
+                result.add(refData);
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Exception in returning stations as ref data ", e);
+            return null;
+        }
+    }
+
 }

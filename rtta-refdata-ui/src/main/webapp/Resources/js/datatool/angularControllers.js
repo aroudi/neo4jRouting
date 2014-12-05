@@ -1,8 +1,8 @@
-function NetworkController($scope, stationService) {
+function NetworkController($scope) {
 
 }
 
-function StationController($scope, stationService, generalService, SUCCESS, FAILURE) {
+function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION_URI, ADD_STATION_URI, EDIT_STATION_URI, DEL_STATION_URI) {
 
     generalService.initBottons();
     /**
@@ -54,7 +54,7 @@ function StationController($scope, stationService, generalService, SUCCESS, FAIL
      */
     getAllStations();
     function getAllStations() {
-        stationService.getAllStations().then(function(response){
+        generalService.getAllRows(ALL_STATION_URI).then(function(response){
             $scope.gridOptions.data = angular.copy(response.data);
         });
 
@@ -79,8 +79,8 @@ function StationController($scope, stationService, generalService, SUCCESS, FAIL
 
     function populateFormField(row) {
 
-        stationService.setStation(row.entity);
-        stationService.setSelectedRow(row.entity);
+        generalService.setRow(row.entity);
+        generalService.setSelectedRow(row.entity);
         generalService.setRowSelected(true);
     }
 
@@ -99,7 +99,7 @@ function StationController($scope, stationService, generalService, SUCCESS, FAIL
         if (generalService.getAddBottonLabel() =='Save') {
 
             stationObject.stationId = -1;
-            stationService.addStation(stationObject).then(function(response) {
+            generalService.addRow(stationObject, ADD_STATION_URI).then(function(response) {
                 addResponse = response.data;
                 if (addResponse.status == SUCCESS ) {
                     stationObject.stationId = addResponse.stationId;
@@ -123,24 +123,24 @@ function StationController($scope, stationService, generalService, SUCCESS, FAIL
     $scope.editStationRow = function(stationObject)
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
-            $scope.station = angular.copy(stationService.getStation());
+            $scope.station = angular.copy(generalService.getRow());
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
         }
         if (generalService.getEditBottonLabel() == 'Save') {
 
-            stationService.editStation(stationObject).then(function(response) {
+            generalService.editRow(stationObject,EDIT_STATION_URI).then(function(response) {
                 serviceResponse = response.data;
                 if (serviceResponse.status == SUCCESS ) {
-                    selectedRow = stationService.getSelectedRow();
+                    selectedRow = generalService.getSelectedRow();
                     selectedRow.shortName = stationObject.shortName;
                     selectedRow.longName = stationObject.longName;
                     selectedRow.gtfsStopId = stationObject.gtfsStopId;
                     selectedRow.latitude = stationObject.latitude;
                     selectedRow.longtitude = stationObject.longtitude;
                     selecteRow.interchangePoint =stationObject.interchangePoint;
-                    stationService.setStation(stationObject);
+                    generalService.setRow(stationObject);
                 } else {
                     alert('edit failed:'+serviceResponse.message);
                 }
@@ -153,11 +153,11 @@ function StationController($scope, stationService, generalService, SUCCESS, FAIL
 
     $scope.deleteStationRow = function()
     {
-        stationObject = stationService.getSelectedRow();
+        stationObject = generalService.getSelectedRow();
         if (!confirm('Are you sure you want to delete station: '+stationObject.longName +'?')) {
             return;
         }
-        stationService.deleteStation(stationObject.stationId).then(function(response){
+        generalService.deleteRow(stationObject.stationId,DEL_STATION_URI).then(function(response){
             serviceResponse = response.data;
             if (serviceResponse.status == SUCCESS ) {
                 rowIndex = $scope.gridOptions.data.indexOf(stationObject);

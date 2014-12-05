@@ -39,7 +39,10 @@ myApp.service('configService', function (SERVER,PORT,WEBAPP) {
     };
 });
 
-myApp.service('generalService', function () {
+myApp.service('generalService', function ($location, $http, $q, configService, loadDisplay) {
+
+    var row;
+    var selectedRow;
     var addBottonLabel ='Add' ;
     var editBottonLabel ='Edit' ;
     var rowSelected = false;
@@ -93,21 +96,12 @@ myApp.service('generalService', function () {
                 return false;
             }
             return true;
-        }
-    }
-});
-
-myApp.service('stationService', function ($location, $http, $q, configService, ALL_STATION_URI, ADD_STATION_URI,DEL_STATION_URI, EDIT_STATION_URI, SUCCESS, FAILURE, loadDisplay) {
-
-    var station;
-    var selectedRow;
-    return {
-
-        setStation: function (rowStation) {
-            station = angular.copy(rowStation);
         },
-        getStation: function () {
-            return station;
+        setRow: function (myRow) {
+            row = angular.copy(myRow);
+        },
+        getRow: function () {
+            return row;
         },
         setSelectedRow: function (rowStation) {
             selectedRow = rowStation;
@@ -115,8 +109,8 @@ myApp.service('stationService', function ($location, $http, $q, configService, A
         getSelectedRow: function () {
             return selectedRow;
         },
-        getAllStations: function () {
-            serviceUrl = configService.getAddress() + ALL_STATION_URI;
+        getAllRows: function (allRowUri) {
+            serviceUrl = configService.getAddress() + allRowUri;
             var div = $q.defer();
             loadDisplay.addDisplay(div.promise, "Please Wait ...");
             var promise = $http({
@@ -130,14 +124,14 @@ myApp.service('stationService', function ($location, $http, $q, configService, A
             });
             return promise;
         },
-        addStation: function (stationObject) {
-            serviceUrl = configService.getAddress() + ADD_STATION_URI;
+        addRow: function (rowObject, addRowUri) {
+            serviceUrl = configService.getAddress() + addRowUri;
             var div = $q.defer();
             loadDisplay.addDisplay(div.promise, "Please Wait ...");
             var promise = $http({
                 url: serviceUrl ,
                 method: 'POST',
-                data : stationObject,
+                data : rowObject,
                 headers : {
                     "Content-Type" : "application/json; charset=utf-8",
                     "Accept" : "application/json"
@@ -150,14 +144,14 @@ myApp.service('stationService', function ($location, $http, $q, configService, A
             });
             return promise;
         },
-        editStation: function (stationObject) {
-            serviceUrl = configService.getAddress() + EDIT_STATION_URI;
+        editRow: function (rowObject, editRowUri) {
+            serviceUrl = configService.getAddress() + editRowUri;
             var div = $q.defer();
             loadDisplay.addDisplay(div.promise, "Please Wait ...");
             var promise = $http({
                 url: serviceUrl ,
                 method: 'POST',
-                data : stationObject,
+                data : rowObject,
                 headers : {
                     "Content-Type" : "application/json; charset=utf-8",
                     "Accept" : "application/json"
@@ -170,8 +164,8 @@ myApp.service('stationService', function ($location, $http, $q, configService, A
             });
             return promise;
         },
-        deleteStation: function (stationId) {
-            serviceUrl = configService.getAddress() + DEL_STATION_URI + '/' + stationId;
+        deleteRow: function (rowId, delRowUri) {
+            serviceUrl = configService.getAddress() + delRowUri + '/' + rowId;
             var div = $q.defer();
             loadDisplay.addDisplay(div.promise, "Please Wait ...");
             var promise = $http({
@@ -186,7 +180,6 @@ myApp.service('stationService', function ($location, $http, $q, configService, A
             return promise;
         }
 
-
     }
-
 });
+

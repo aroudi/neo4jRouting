@@ -2,9 +2,13 @@ package au.gov.nsw.railcorp.rttarefdata.service;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 import au.gov.nsw.railcorp.rttarefdata.manager.ServiceTest;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationPlatformData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
 
 /**
  * Created by arash on 7/11/14.
@@ -16,6 +20,7 @@ public class TestQuery {
     static RuningTimeRepository runingTimeRepository;
     static NodeLinkageRepository nodeLinkageRepository;
     static NodeRepository nodeRepository;
+    static PlatformRepository platformRepository;
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("rttaDataRefContext.xml");
         tripletRepository = context.getBean(StationTripletRepository.class);
@@ -23,6 +28,7 @@ public class TestQuery {
         runingTimeRepository = context.getBean(RuningTimeRepository.class);
         nodeLinkageRepository = context.getBean(NodeLinkageRepository.class);
         nodeRepository = context.getBean(NodeRepository.class);
+        platformRepository = context.getBean(PlatformRepository.class);
         serviceTest = context.getBean(ServiceTest.class);
         //createStationTriplet();
         //queryStationTriplet();
@@ -30,7 +36,8 @@ public class TestQuery {
         //createNodeLink();
         //removeNodeLink();
         //removeNodeLinkage();
-        queryNodeLinkage();
+        //queryNodeLinkage();
+        queryPlatforms();
 
 
 
@@ -107,6 +114,15 @@ public class TestQuery {
         NodeLinkage nodeLinkage= nodeLinkageRepository.getNodeLinkage("GRDA", "GRDC");
         if (nodeLinkage != null) {
             System.out.println("nodeLinkage =" + nodeLinkage.getLength());
+        }
+    }
+    public static void queryPlatforms(){
+        List<IStationPlatformData> platformDataList= platformRepository.getAllPlatforms();
+        if (platformDataList == null) {
+            System.out.println("list is null");
+        }
+        for (IStationPlatformData platformData:platformDataList) {
+            System.out.println("platform ="+ platformData.getPlatformName());
         }
     }
 }

@@ -1,0 +1,70 @@
+
+<h1 style="text-align: center">Station List</h1>
+<!--div ng-controller="StationController" style="height:80%; width: 80%"-->
+    <div id="platforms" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:60%; width: 80%"></div>
+<!--/div-->
+
+<form name="stationForm">
+<table style="width: 80%" >
+    <tr>
+    </tr>
+    <tr>
+        <td style="width: 30%">
+            <b>Short Name:</b>
+            <input type="text" maxlength="10" size="10" name="shortName" data-ng-model="station.shortName" ng-disabled="formFieldDisabled()" required>
+            <span class="warnText" ng-show="stationForm.shortName.$error.required&&!formFieldDisabled()">
+                Required!
+            </span>
+        </td>
+        <td style="width: 30%">
+            <b>Long Name:</b>
+            <input type="text" maxlength="20" size="20" name="longName" data-ng-model="station.longName" ng-disabled="formFieldDisabled()" required="">
+            <span class="warnText" ng-show="stationForm.longName.$error.required&&!formFieldDisabled()">
+                Required!
+            </span>
+        </td>
+        <td style="width: 30%">
+            <b>Interchange Point:</b>
+            <input type="checkbox" maxlength="10" size="10" data-ng-model="station.interchangePoint" ng-disabled="formFieldDisabled()">
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 30%">
+            <b>Latitude:</b>
+            <input type="text" maxlength="30" size="30" data-ng-model="station.latitude" name="latitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
+            <span class="warnText" ng-show="stationForm.latitude.$error.pattern&&!formFieldDisabled()">
+                Not valid number!
+            </span>
+        </td>
+        <td style="width: 30%">
+            <b>Longtitude:</b>
+            <input type="text" maxlength="30" size="30" name="longtitude" data-ng-model="station.longtitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
+            <span class="error" ng-show="stationForm.longtitude.$error.pattern&&!formFieldDisabled()">
+                Not valid number!
+            </span>
+        </td>
+        <td style="width: 30%">
+            <b>Gtfs Stop Id:</b>
+            <input type="text" maxlength="10" size="10" name="gtfsStopId" data-ng-model="station.gtfsStopId" ng-disabled="formFieldDisabled()" ng-pattern="/^\d{0,9}$/" required>
+            <span class="error" ng-show="stationForm.gtfsStopId.$error.required&&!formFieldDisabled()">
+                Required!
+            </span>
+            <span class="error" ng-show="stationForm.gtfsStopId.$error.pattern&&!formFieldDisabled()">
+                Not valid number!
+            </span>
+        </td>
+    </tr>
+</table>
+</br>
+<table>
+    <tr>
+        <td>
+            <button ng-click="addStationRow(station)" ng-disabled="isAddBottonDisable() || (!formFieldDisabled() && !stationForm.$valid)">{{addBottonLabel}}</button>
+            <button ng-click="editStationRow(station)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !stationForm.$valid)">{{editBottonLabel}}</button>
+            <button ng-click="deleteStationRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
+            <button ng-click="cancelStationRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+        </td>
+    </tr>
+</table>
+</form>
+
