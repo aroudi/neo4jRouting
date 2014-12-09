@@ -9,7 +9,12 @@ var service_uri = {
     'ALL_STATION_URI' : 'stations/all',
     'ADD_STATION_URI' : 'stations/add',
     'EDIT_STATION_URI' : 'stations/edit',
-    'DEL_STATION_URI' : 'stations/delete'
+    'DEL_STATION_URI' : 'stations/delete',
+    'ALL_PLATFORM_URI' : 'platforms/all',
+    'ADD_PLATFORM_URI' : 'platforms/add',
+    'EDIT_PLATFORM_URI' : 'platforms/edit',
+    'DEL_PLATFORM_URI' : 'platforms/delete',
+    'GET_STATION_REF_URI' : 'stations/stationsRef'
 }
 
 var response_status = {
@@ -178,7 +183,22 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
                 div.resolve();
             });
             return promise;
+        },
+        populateSelectList: function (refDataId, sourceData) {
+            selectedItem = sourceData[0];
+            if (refDataId==undefined )
+                return selectedItem;
+            arr=sourceData;
+            if (angular.isArray(arr)) {
+                for (var i = 0; i < arr.length; i++) {
+                    if ( arr[i].refDataId==refDataId  ) {
+                        return arr[i];
+                    }
+                }
+            }
+            return selectedItem
         }
+
 
     }
 });

@@ -106,7 +106,7 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
                     $scope.gridOptions.data.push(angular.copy(stationObject));
                     $scope.scrollTo($scope.gridOptions.data.length-2,0);
                 } else {
-                    alert('Not able to add new station.');
+                    alert('Not able to add new station. ' + addResponse.message);
                 }
             });
 
@@ -220,3 +220,4 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         return generalService.isEditBottonDisable();
     };
 }
+

@@ -8,4 +8,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Station.html',
             controller: StationController
         });
+        $routeProvider.when('/platform', {
+            templateUrl: 'RailNetwork/Platform.html',
+            controller: PlatformController
+        });
     } ]);

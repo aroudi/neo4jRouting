@@ -105,8 +105,14 @@ public class StationService {
                 response.setMessage("received object is null");
                 return response;
             }
+            Station station = stationRepository.findBySchemaPropertyValue("shortName", stationModel.getShortName());
+            if (station != null) {
+                response.setStatus(IConstants.RESPONSE_FAILURE);
+                response.setMessage("station " + stationModel.getShortName() + " already exists");
+                return response;
+            }
             final long stationId = entitySequenceManager.getNextStationSequence();
-            final Station station = new Station();
+            station = new Station();
             station.setStationId(stationId);
             station.setShortName(stationModel.getShortName());
             station.setLongName(stationModel.getLongName());

@@ -39,17 +39,17 @@
         <td style="width: 30%">
             <b>Longtitude:</b>
             <input type="text" maxlength="30" size="30" name="longtitude" data-ng-model="station.longtitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
-            <span class="error" ng-show="stationForm.longtitude.$error.pattern&&!formFieldDisabled()">
+            <span class="warnText" ng-show="stationForm.longtitude.$error.pattern&&!formFieldDisabled()">
                 Not valid number!
             </span>
         </td>
         <td style="width: 30%">
             <b>Gtfs Stop Id:</b>
             <input type="text" maxlength="10" size="10" name="gtfsStopId" data-ng-model="station.gtfsStopId" ng-disabled="formFieldDisabled()" ng-pattern="/^\d{0,9}$/" required>
-            <span class="error" ng-show="stationForm.gtfsStopId.$error.required&&!formFieldDisabled()">
+            <span class="warnText" ng-show="stationForm.gtfsStopId.$error.required&&!formFieldDisabled()">
                 Required!
             </span>
-            <span class="error" ng-show="stationForm.gtfsStopId.$error.pattern&&!formFieldDisabled()">
+            <span class="warnText" ng-show="stationForm.gtfsStopId.$error.pattern&&!formFieldDisabled()">
                 Not valid number!
             </span>
         </td>
