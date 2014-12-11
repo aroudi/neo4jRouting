@@ -1,4 +1,4 @@
-var myApp = angular.module('rttaRefDataUi', ["ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ngRoute","loadDisplay"]);
+var myApp = angular.module('rttaRefDataUi', ["ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ngRoute","loadDisplay"]);
 var config_data = {
     'SERVER' : 'localhost',
     'PORT'   : '8082',
@@ -14,7 +14,17 @@ var service_uri = {
     'ADD_PLATFORM_URI' : 'platforms/add',
     'EDIT_PLATFORM_URI' : 'platforms/edit',
     'DEL_PLATFORM_URI' : 'platforms/delete',
-    'GET_STATION_REF_URI' : 'stations/stationsRef'
+    'GET_STATION_REF_URI' : 'stations/stationsRef',
+    'ALL_NETWORK_URI' : 'networks/all',
+    'ADD_NETWORK_URI' : 'networks/add',
+    'EDIT_NETWORK_URI' : 'networks/edit',
+    'DEL_NETWORK_URI' : 'networks/delete',
+    'ALL_LINE_URI' : 'networkLines/all',
+    'ADD_LINE_URI' : 'networkLines/add',
+    'EDIT_LINE_URI' : 'networkLines/edit',
+    'DEL_LINE_URI' : 'networkLines/delete',
+    'GET_SERVICETYPE_REF_URI' :'refDatas/serviceTypesRef',
+    'GET_NETWORK_REF_URI' : 'refDatas/networksRef'
 }
 
 var response_status = {
@@ -197,7 +207,22 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
                 }
             }
             return selectedItem
+        },
+        populateSelectListPerName: function (refDataName, sourceData) {
+            selectedItem = sourceData[0];
+            if (refDataName==undefined )
+                return selectedItem;
+            arr=sourceData;
+            if (angular.isArray(arr)) {
+                for (var i = 0; i < arr.length; i++) {
+                    if ( arr[i].refDataCode==refDataName  ) {
+                        return arr[i];
+                    }
+                }
+            }
+            return selectedItem
         }
+
 
 
     }

@@ -4,6 +4,10 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Network.html',
             controller: NetworkController
         });
+        $routeProvider.when('/line', {
+            templateUrl: 'RailNetwork/NetworkLine.html',
+            controller: NetworkLineController
+        });
         $routeProvider.when('/station', {
             templateUrl: 'RailNetwork/Station.html',
             controller: StationController

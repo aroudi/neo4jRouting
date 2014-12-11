@@ -1,6 +1,7 @@
 // RailCorp 2014
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
@@ -18,6 +19,7 @@ public class Network {
     /*
      * GraphId for managing internal id's
      */
+    @Indexed
     @GraphId private Long networkId;
 
     @Indexed(unique = true)
@@ -30,6 +32,7 @@ public class Network {
     private String timeZone;
 
 
+    @JsonIgnore
     @RelatedTo (type = Links.NETWORK_LINE, direction = Direction.OUTGOING)
     //@Fetch
     private Set<NetworkLine> networkLines;

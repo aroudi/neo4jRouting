@@ -1,0 +1,66 @@
+
+<h1 style="text-align: center">Network Line List</h1>
+<!--div ng-controller="StationController" style="height:80%; width: 80%"-->
+    <div id="networkLines" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:60%; width: 80%"></div>
+<!--/div-->
+
+<form name="lineForm">
+    <table>
+        <tr>
+            <td>
+                <b>Service Type:</b>
+                <select name="serviceType" data-ng-model="line.serviceType"
+                        ng-options="configData.refDataName for configData in serviceTypeSet" ng-disabled="formFieldDisabled()" required>
+                </select>
+                <span class="warnText" ng-show="lineForm.serviceType.$error.required&&!formFieldDisabled()">
+                    Required!
+                </span>
+            </td>
+            <td>
+                <b>Network:</b>
+                <select name="network" data-ng-model="line.network"
+                        ng-options="configData.refDataName for configData in networkSet" ng-disabled="formFieldDisabled()" required>
+                </select>
+                <span class="warnText" ng-show="lineForm.network.$error.required&&!formFieldDisabled()">
+                    Required!
+                </span>
+            </td>
+            <td>
+                <b>Name:</b>
+                <input type="text" maxlength="20" size="20" name="name" data-ng-model="line.name" ng-disabled="formFieldDisabled()" required>
+            <span class="warnText" ng-show="lineForm.name.$error.required&&!formFieldDisabled()">
+                Required!
+            </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Long Name:</b>
+                <input type="text" maxlength="20" size="20" name="longName" data-ng-model="line.longName" ng-disabled="formFieldDisabled()" required>
+                <span class="warnText" ng-show="lineForm.longName.$error.required&&!formFieldDisabled()">
+                    Required!
+                </span>
+            </td>
+            <td>
+                <b>Background Colour:</b>
+                <input type="text" maxlength="20" size="20" name="backgroundColourHex" data-ng-model="line.backgroundColourHex" ng-disabled="formFieldDisabled()">
+            </td>
+            <td>
+                <b>Text Colour:</b>
+                <input type="text" maxlength="20" size="20" name="textColourHex" data-ng-model="line.textColourHex" ng-disabled="formFieldDisabled()">
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <button ng-click="addLineRow(line)" ng-disabled="isAddBottonDisable() || (!formFieldDisabled() && !lineForm.$valid)">{{addBottonLabel}}</button>
+                <button ng-click="editLineRow(line)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !lineForm.$valid)">{{editBottonLabel}}</button>
+                <button ng-click="deleteLineRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
+                <button ng-click="cancelLineRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+

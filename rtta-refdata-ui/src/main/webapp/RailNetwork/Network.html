@@ -1,0 +1,59 @@
+<h1 style="text-align: center">Network List</h1>
+<!--div ng-controller="StationController" style="height:80%; width: 80%"-->
+<div id="networks" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:60%; width: 80%"></div>
+
+<form name="networkForm">
+    <table>
+        <tr>
+            <td>
+                <b>Name :</b>
+                <input type="text" size="30" name="networkName" data-ng-model="network.name" ng-disabled="formFieldDisabled()" required>
+                <span class="warnText" ng-show="networkForm.networkName.$error.required&&!formFieldDisabled()">
+                    Required!
+                </span>
+            </td>
+            <td>
+                <b>Description:</b>
+                <input type="text" size="50" name="description" data-ng-model="network.description" ng-disabled="formFieldDisabled()" required>
+            <span class="warnText" ng-show="networkForm.description.$error.required&&!formFieldDisabled()">
+                Required!
+            </span>
+            </td>
+            <td>
+                <b>URL:</b>
+                <input type="text" size="40" name="url" data-ng-model="network.url" ng-disabled="formFieldDisabled()">
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Language:</b>
+                <input type="text"  size="10" name="lang" data-ng-model="network.lang" ng-disabled="formFieldDisabled()">
+            </td>
+            <td>
+                <b>Phone:</b>
+                <input type="text" maxlength="20" size="25" data-ng-model="network.phone" name="phone" ng-disabled="formFieldDisabled()" >
+                &nbsp;
+                <b>TimeZone:</b>
+                <input type="text" maxlength="10" size="10" name="timeZone" data-ng-model="network.timeZone" ng-disabled="formFieldDisabled()" >
+            </td>
+            <td>
+                <b>Fare Url:</b>
+                <input type="text" maxlength="50" size="30" name="fareUrl" data-ng-model="network.fareUrl" ng-disabled="formFieldDisabled()" >
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <button ng-click="addNetworkRow(network)" ng-disabled="isAddBottonDisable() || (!formFieldDisabled() && !networkForm.$valid)">{{addBottonLabel}}</button>
+                <button ng-click="editNetworkRow(network)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !networkForm.$valid)">{{editBottonLabel}}</button>
+                <button ng-click="deleteNetworkRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
+                <button ng-click="cancelNetworkRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+            </td>
+        </tr>
+    </table>
+</form>
