@@ -16,4 +16,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Platform.html',
             controller: PlatformController
         });
+    $routeProvider.when('/uploadStops', {
+        templateUrl: 'RailNetwork/FileUpload.html',
+        controller: UploadController
+    });
     } ]);

@@ -89,7 +89,7 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
         generalService.setRow(row.entity);
         generalService.setSelectedRow(row.entity);
         generalService.setRowSelected(true);
-    }
+    };
 
     /**
      * Adding new platform

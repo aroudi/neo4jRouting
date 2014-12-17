@@ -1,4 +1,4 @@
-var myApp = angular.module('rttaRefDataUi', ["ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ngRoute","loadDisplay"]);
+var myApp = angular.module('rttaRefDataUi', ["ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ngRoute","loadDisplay","angularFileUpload"]);
 var config_data = {
     'SERVER' : 'localhost',
     'PORT'   : '8082',
@@ -24,7 +24,11 @@ var service_uri = {
     'EDIT_LINE_URI' : 'networkLines/edit',
     'DEL_LINE_URI' : 'networkLines/delete',
     'GET_SERVICETYPE_REF_URI' :'refDatas/serviceTypesRef',
-    'GET_NETWORK_REF_URI' : 'refDatas/networksRef'
+    'GET_NETWORK_REF_URI' : 'refDatas/networksRef',
+    'UPLOAD_STOPS_URI' : 'upload/stops',
+    'UPLOAD_TOPOLOGY_URI' : 'upload/topology',
+    'UPLOAD_NODES_URI' : 'upload/nodes',
+    'UPLOAD_NODAL_URI' : 'upload/nodalGeography'
 }
 
 var response_status = {
@@ -228,3 +232,83 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
     }
 });
 
+myApp.service('singleFileUploadService', function ($location, $http, $q, configService, loadDisplay) {
+    return {
+        uploadFileToUrl : function (file1, uploadUrl) {
+            serviceUrl = configService.getAddress() + uploadUrl;
+            var fd = new FormData();
+            fd.append('file', file1);
+            var div = $q.defer();
+            loadDisplay.addDisplay(div.promise, "Uploading file ...");
+            var promise = $http.post(serviceUrl,fd,{
+                trnsformRequest:angular.identity,
+                headers: {'Content-Type': multipart/form-data}
+            }).success(function (data) {
+                div.resolve();
+                return data;
+            }).error(function (data) {
+                div.resolve();
+            });
+            return promise;
+        }
+    }
+});
+
+
+myApp.service('fileUploadService', function ($location, $upload, $http, $q, configService, loadDisplay) {
+    return {
+        uploadFileToUrl : function (files, uploadUrl) {
+            serviceUrl = configService.getAddress() + uploadUrl;
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var div = $q.defer();
+                loadDisplay.addDisplay(div.promise, "Uploading file ...");
+                $upload.upload({
+                    url: serviceUrl, // upload.php script, node.js route, or servlet url
+                    method: 'POST',
+                    //headers: {'Authorization': 'xxx'}, // only for html5
+                    //withCredentials: true,
+                    //data: {myObj: $scope.myModelObj},
+                    file: file // single file or a list of files. list is only for html5
+                    //fileName: 'doc.jpg' or ['1.jpg', '2.jpg', ...] // to modify the name of the file(s)
+                    //fileFormDataName: myFile, // file formData name ('Content-Disposition'), server side request form name
+                    // could be a list of names for multiple files (html5). Default is 'file'
+                    //formDataAppender: function(formData, key, val){}  // customize how data is added to the formData.
+                    // See #40#issuecomment-28612000 for sample code
+
+                }).progress(function(evt) {
+                    console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.file.name);
+                }).success(function(data, status, headers, config) {
+                    // file is uploaded successfully
+                    console.log('file ' + config.file.name + 'is uploaded successfully. Response: ' + data);
+                    div.resolve();
+                    return data;
+                })
+                //.error(...)
+                //.then(success, error, progress); // returns a promise that does NOT have progress/abort/xhr functions
+                //.xhr(function(xhr){xhr.upload.addEventListener(...)}) // access or attach event listeners to
+                //the underlying XMLHttpRequest
+                .error(function (data) {
+                        div.resolve();
+                });
+                //return promise;
+            }
+        }
+    }
+});
+
+myApp.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+
+            element.bind('change', function () {
+                scope.$apply(function () {
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+}]);

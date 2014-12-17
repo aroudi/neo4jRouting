@@ -52,4 +52,17 @@ public class GtfsTopologyBootManager {
         return gtfsTopology;
     }
 
+    public RttaGtfsTopology loadTopologyFromInputStream(InputStream stream) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(RttaGtfsTopology.class);
+            Unmarshaller unmarshaller= jaxbContext.createUnmarshaller();
+            gtfsTopology =(RttaGtfsTopology) unmarshaller.unmarshal(stream);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(gtfsTopology, System.out);
+        } catch (Exception e) {
+            commonLogger.error("Exception in reading file:",e);
+        }
+        return gtfsTopology;
+    }
 }

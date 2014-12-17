@@ -3,6 +3,7 @@ package au.gov.nsw.railcorp.rtta.refint.boot;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RttaStops;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBContext;
@@ -15,6 +16,7 @@ import java.io.InputStream;
  * Created by arash on 5/11/14.
  */
 
+@Component
 public class StopsBootManager {
     private String dirPath;
     private String fileName;
@@ -61,4 +63,19 @@ public class StopsBootManager {
         }
         return rttaStops;
     }
+    public RttaStops loadStopsFromInputStream(InputStream stream) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(RttaStops.class);
+            Unmarshaller unmarshaller= jaxbContext.createUnmarshaller();
+            rttaStops =(RttaStops) unmarshaller.unmarshal(stream);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(rttaStops, System.out);
+        } catch (Exception e) {
+            commonLogger.error("Exception in reading inputStream:",e);
+            return null;
+        }
+        return rttaStops;
+    }
+
 }

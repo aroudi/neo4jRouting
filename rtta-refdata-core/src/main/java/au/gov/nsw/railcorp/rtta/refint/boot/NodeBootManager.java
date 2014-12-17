@@ -54,5 +54,18 @@ public class NodeBootManager {
         return rttaNodes;
     }
 
+    public RttaNodes loadNodesFromInputStream(InputStream stream) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(RttaNodes.class);
+            Unmarshaller unmarshaller= jaxbContext.createUnmarshaller();
+            rttaNodes =(RttaNodes) unmarshaller.unmarshal(stream);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(rttaNodes, System.out);
+        } catch (Exception e) {
+            commonLogger.error("Exception in reading file:",e);
+        }
+        return rttaNodes;
+    }
 
 }

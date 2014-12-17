@@ -51,5 +51,18 @@ public class NodalGeographyBootManager {
         return cgGeography;
     }
 
+    public CgGeography loadNodalGeographyFromInputStream(InputStream stream) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(CgGeography.class);
+            Unmarshaller unmarshaller= jaxbContext.createUnmarshaller();
+            cgGeography =(CgGeography) unmarshaller.unmarshal(stream);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(cgGeography, System.out);
+        } catch (Exception e) {
+            commonLogger.error("Exception in reading file:",e);
+        }
+        return cgGeography;
+    }
 
 }
