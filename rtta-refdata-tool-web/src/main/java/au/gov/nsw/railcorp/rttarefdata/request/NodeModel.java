@@ -17,8 +17,8 @@ public class NodeModel {
     private String upRecoveryDuration;
     private String downRecoveryDuration;
     private double length;
-    private double latitude;
-    private double longtitude;
+    private Double latitude;
+    private Double longtitude;
 
     public Long getNodeId() {
         return nodeId;
@@ -124,19 +124,19 @@ public class NodeModel {
         this.length = length;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongtitude() {
+    public Double getLongtitude() {
         return longtitude;
     }
 
-    public void setLongtitude(double longtitude) {
+    public void setLongtitude(Double longtitude) {
         this.longtitude = longtitude;
     }
 }

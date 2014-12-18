@@ -28,7 +28,11 @@ var service_uri = {
     'UPLOAD_STOPS_URI' : 'upload/stops',
     'UPLOAD_TOPOLOGY_URI' : 'upload/topology',
     'UPLOAD_NODES_URI' : 'upload/nodes',
-    'UPLOAD_NODAL_URI' : 'upload/nodalGeography'
+    'UPLOAD_NODAL_URI' : 'upload/nodalGeography',
+    'ALL_NODE_URI' : 'nodes/all',
+    'ADD_NODE_URI' : 'nodes/add',
+    'EDIT_NODE_URI' : 'nodes/edit',
+    'DEL_NODE_URI' : 'nodes/delete'
 }
 
 var response_status = {

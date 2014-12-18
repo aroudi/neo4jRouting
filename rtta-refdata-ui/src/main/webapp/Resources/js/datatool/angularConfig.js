@@ -4,6 +4,10 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Network.html',
             controller: NetworkController
         });
+        $routeProvider.when('/node', {
+            templateUrl: 'RailNetwork/Node.html',
+            controller: NodeController
+        });
         $routeProvider.when('/line', {
             templateUrl: 'RailNetwork/NetworkLine.html',
             controller: NetworkLineController
@@ -16,8 +20,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Platform.html',
             controller: PlatformController
         });
-    $routeProvider.when('/uploadStops', {
-        templateUrl: 'RailNetwork/FileUpload.html',
-        controller: UploadController
-    });
+        $routeProvider.when('/uploadStops', {
+            templateUrl: 'RailNetwork/FileUpload.html',
+            controller: UploadController
+        });
     } ]);

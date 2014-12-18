@@ -12,6 +12,10 @@ public class Response {
      * message.
      */
     protected String message;
+    /**
+     * id of new added record.
+     */
+    protected Long id;
 
     public int getStatus() {
         return status;
@@ -27,5 +31,13 @@ public class Response {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
