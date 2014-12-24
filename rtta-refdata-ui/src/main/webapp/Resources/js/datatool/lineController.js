@@ -39,6 +39,16 @@ function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LIN
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope, function(row) {
             populateFormField(row);
+            rowEntity = angular.copy(generalService.getRow());
+            $scope.line.lineId = rowEntity.lineId;
+            $scope.line.name = rowEntity.name;
+            $scope.line.longName = rowEntity.longName;
+            $scope.line.backgroundColourHex = rowEntity.backgroundColourHex;
+            $scope.line.textColourHex = rowEntity.textColourHex;
+            defaultServiceType= generalService.populateSelectListPerName(generalService.getRow().serviceTypeName,$scope.serviceTypeSet);
+            defaultNetwork= generalService.populateSelectListPerName(generalService.getRow().networkName,$scope.networkSet);
+            $scope.line.serviceType = defaultServiceType;
+            $scope.line.network = defaultNetwork;
         });
         gridApi.cellNav.on.navigate($scope, function(newRowCol, oldRowCol){
         });
@@ -148,8 +158,8 @@ function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LIN
     $scope.editLineRow = function()
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
+            /*
             rowEntity = angular.copy(generalService.getRow());
-
             $scope.line.lineId = rowEntity.lineId;
             $scope.line.name = rowEntity.name;
             $scope.line.longName = rowEntity.longName;
@@ -159,6 +169,7 @@ function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LIN
             defaultNetwork= generalService.populateSelectListPerName(generalService.getRow().networkName,$scope.networkSet);
             $scope.line.serviceType = defaultServiceType;
             $scope.line.network = defaultNetwork;
+            */
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
@@ -220,7 +231,7 @@ function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LIN
             $scope.editBottonLabel = generalService.getEditBottonLabel();
 
         }
-        resetLineForm();
+        //resetLineForm();
     };
 
     /**

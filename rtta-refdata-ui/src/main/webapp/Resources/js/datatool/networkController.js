@@ -1,4 +1,4 @@
-function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK_URI, ADD_NETWORK_URI, EDIT_NETWORK_URI, DEL_NETWORK_URI) {
+function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK_URI, ADD_NETWORK_URI, EDIT_NETWORK_URI, DEL_NETWORK_URI, uiGridConstants) {
 
     $scope.platform = {};
     generalService.initBottons();
@@ -8,11 +8,12 @@ function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK
      * UI-Grid declaration
      */
     $scope.gridOptions = {
+        showFooter: true,
         enableFiltering: true,
         columnDefs: [
             //default
             {field:'networkId', visible:false, enableCellEdit:false},
-            {field:'name'},
+            {field:'name', aggregationType: uiGridConstants.aggregationTypes.count},
             {field:'description'},
             {field:'url'},
             {field:'lang', displayName:'Language'},
@@ -35,6 +36,7 @@ function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope, function(row) {
             populateFormField(row);
+            $scope.network = angular.copy(generalService.getRow());
         });
         gridApi.cellNav.on.navigate($scope, function(newRowCol, oldRowCol){
         });
@@ -123,13 +125,12 @@ function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK
     $scope.editNetworkRow = function(networkObject)
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
-            $scope.network = angular.copy(generalService.getRow());
+            //$scope.network = angular.copy(generalService.getRow());
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
         }
         if (generalService.getEditBottonLabel() == 'Save') {
-            alert('networkId ='+ networkObject.networkId);
             generalService.editRow(networkObject,EDIT_NETWORK_URI).then(function(response) {
                 serviceResponse = response.data;
                 if (serviceResponse.status == SUCCESS ) {

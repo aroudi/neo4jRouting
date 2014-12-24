@@ -1,4 +1,4 @@
-function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_URI, EDIT_NODE_URI, DEL_NODE_URI) {
+function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_URI, EDIT_NODE_URI, DEL_NODE_URI, uiGridConstants) {
     $scope.node = {};
     generalService.initBottons();
     $scope.addBottonLabel = generalService.getAddBottonLabel();
@@ -7,10 +7,11 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
      * UI-Grid declaration
      */
     $scope.gridOptions = {
+        showFooter: true,
         enableFiltering: true,
         columnDefs: [
             {field:'nodeId', visible:false, enableCellEdit:false},
-            {field:'name'},
+            {field:'name', aggregationType: uiGridConstants.aggregationTypes.count},
             {field:'longName'},
             {field:'platformName'},
             {field:'dummy'},
@@ -39,6 +40,7 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope, function(row) {
             populateFormField(row);
+            $scope.node = angular.copy(generalService.getRow());
         });
         gridApi.cellNav.on.navigate($scope, function(newRowCol, oldRowCol){
         });
@@ -112,8 +114,10 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
                 addResponse = response.data;
                 if (addResponse.status == SUCCESS ) {
                     nodeObject.nodeId = addResponse.id;
-                    $scope.gridOptions.data.push(angular.copy(nodeObject));
-                    $scope.scrollTo($scope.gridOptions.data.length-1,0);
+                    newAddedObject=angular.copy(nodeObject);
+                    $scope.gridOptions.data.push(newAddedObject);
+                    rowIndex = $scope.gridOptions.data.indexOf(newAddedObject);
+                    $scope.scrollTo(rowIndex,0);
                 } else {
                     alert('Not able to add new node. ' + addResponse.message);
                 }
@@ -132,7 +136,7 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
     $scope.editNodeRow = function(nodeObject)
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
-            $scope.node = angular.copy(generalService.getRow());
+            //$scope.node = angular.copy(generalService.getRow());
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
@@ -205,7 +209,7 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
             $scope.editBottonLabel = generalService.getEditBottonLabel();
 
         }
-        resetNodeForm();
+        //resetNodeForm();
     };
 
     /**

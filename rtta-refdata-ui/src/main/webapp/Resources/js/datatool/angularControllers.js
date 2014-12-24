@@ -37,6 +37,7 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope, function(row) {
             populateFormField(row);
+            $scope.station = angular.copy(generalService.getRow());
         });
         gridApi.cellNav.on.navigate($scope, function(newRowCol, oldRowCol){
         });
@@ -123,7 +124,8 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
     $scope.editStationRow = function(stationObject)
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
-            $scope.station = angular.copy(generalService.getRow());
+
+            //$scope.station = angular.copy(generalService.getRow());
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
@@ -185,7 +187,7 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
             $scope.editBottonLabel = generalService.getEditBottonLabel();
 
         }
-        resetStationForm();
+        //resetStationForm();
     };
 
     /**

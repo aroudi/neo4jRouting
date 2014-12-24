@@ -1,77 +1,87 @@
 <h1 style="text-align: center">Node List</h1>
 <!--div ng-controller="StationController" style="height:80%; width: 80%"-->
-<div id="nodes" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:60%; width: 100%"></div>
+<div id="nodes" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:500px; width: 100%"></div>
 
 <form name="nodeForm">
     <table>
         <tr>
             <td>
-                <b>Name :</b>
-                <input type="text" size="30" name="nodeName1" data-ng-model="node.name" ng-disabled="formFieldDisabled()" required>
+                <b>Name :</b> <br>
+                <input type="text" size="20" name="nodeName1" data-ng-model="node.name" ng-disabled="formFieldDisabled()" required>
                 <span class="warnText" ng-show="nodeForm.nodeName1.$error.required&&!formFieldDisabled()">
                     Required!
                 </span>
             </td>
             <td>
-                <b>Long Name:</b>
-                <input type="text" size="50" name="longName" data-ng-model="node.longName" ng-disabled="formFieldDisabled()" required>
+                <b>Long Name:</b> <br>
+                <input type="text" size="30" name="longName" data-ng-model="node.longName" ng-disabled="formFieldDisabled()" required>
             <span class="warnText" ng-show="nodeForm.longName.$error.required&&!formFieldDisabled()">
                 Required!
             </span>
             </td>
             <td>
-                <b>Platform Name:</b>
-                <input type="text" size="40" name="platformName" data-ng-model="node.platformName" ng-disabled="formFieldDisabled()">
+                <b>Platform Name:</b> <br>
+                <input type="text" size="20" name="platformName" data-ng-model="node.platformName" ng-disabled="formFieldDisabled()">
             </td>
             <td>
-                <b>Length:</b>
-                <input type="text" size="40" name="length" data-ng-model="node.length" ng-disabled="formFieldDisabled()">
+                <b>Length:</b> <br>
+                <input type="text" size="20" name="length" data-ng-model="node.length" ng-pattern="/^\d{0,9}$/" ng-disabled="formFieldDisabled()">
+                <span class="warnText" ng-show="nodeForm.length.$error.pattern&&!formFieldDisabled()">
+                    Not valid number!
+                </span>
             </td>
             <td>
             </td>
         </tr>
         <tr>
             <td>
-                <b>DWell Duration :</b>
-                <input type="text" size="30" name="wellDuration" data-ng-model="node.wellDuration" ng-disabled="formFieldDisabled()">
+                <b>DWell Duration :</b> <br>
+                <input type="text" size="10" name="wellDuration" data-ng-model="node.wellDuration" ng-disabled="formFieldDisabled()">
             </td>
             <td>
-                <b>UpRecovery Duration :</b>
-                <input type="text" size="30" name="upRecoveryDuration" data-ng-model="node.upRecoveryDuration" ng-disabled="formFieldDisabled()">
+                <b>UpRecovery Duration :</b> <br>
+                <input type="text" size="10" name="upRecoveryDuration" data-ng-model="node.upRecoveryDuration" ng-disabled="formFieldDisabled()">
             </td>
             <td>
-                <b>DownRecovery Duration :</b>
-                <input type="text" size="40" name="downRecoveryDuration" data-ng-model="node.downRecoveryDuration" ng-disabled="formFieldDisabled()">
+                <b>DownRecovery Duration :</b> <br>
+                <input type="text" size="10" name="downRecoveryDuration" data-ng-model="node.downRecoveryDuration" ng-disabled="formFieldDisabled()">
             </td>
             <td>
-                <b>Latitude:</b>
-                <input type="text" size="40" name="latitude" data-ng-model="node.latitude" ng-disabled="formFieldDisabled()">
+                <b>Latitude:</b> <br>
+                <input type="text" size="20" name="latitude" data-ng-model="node.latitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
+                <span class="warnText" ng-show="nodeForm.latitude.$error.pattern&&!formFieldDisabled()">
+                    Not valid number!
+                </span>
             </td>
             <td>
-                <b>Longtitude:</b>
-                <input type="text" size="40" name="longtitude" data-ng-model="node.longtitude" ng-disabled="formFieldDisabled()">
+                <b>Longtitude:</b> <br>
+                <input type="text" size="20" name="longtitude" data-ng-model="node.longtitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
+                <span class="warnText" ng-show="nodeForm.longtitude.$error.pattern&&!formFieldDisabled()">
+                    Not valid number!
+                </span>
+
             </td>
         </tr>
         <tr>
             <td>
                 <b>Is Dummy:</b>
-                <input type="checkbox" maxlength="10" size="10" data-ng-model="node.dummy" ng-disabled="formFieldDisabled()">
+                <input type="checkbox" data-ng-model="node.dummy" ng-disabled="formFieldDisabled()">
             </td>
             <td>
                 <b>Is Junction:</b>
-                <input type="checkbox" maxlength="10" size="10" data-ng-model="node.junction" ng-disabled="formFieldDisabled()">
+                <input type="checkbox" data-ng-model="node.junction" ng-disabled="formFieldDisabled()">
             </td>
             <td>
                 <b>Is Working TimingPoint:</b>
-                <input type="checkbox" maxlength="10" size="10" data-ng-model="node.workingTimingPoint" ng-disabled="formFieldDisabled()">
+                <input type="checkbox" data-ng-model="node.workingTimingPoint" ng-disabled="formFieldDisabled()">
             </td>
             <td>
                 <b>Is Public TimingPoint:</b>
-                <input type="checkbox" maxlength="10" size="10" data-ng-model="node.publicTimingPoint" ng-disabled="formFieldDisabled()">
+                <input type="checkbox" data-ng-model="node.publicTimingPoint" ng-disabled="formFieldDisabled()">
             </td>
             <td>
                 <b>Is EndOfLine:</b>
-                <input type="checkbox" maxlength="10" size="10" data-ng-model="node.endOfLine" ng-disabled="formFieldDisabled()">
+                <input type="checkbox" data-ng-model="node.endOfLine" ng-disabled="formFieldDisabled()">
             </td>
         </tr>
     </table>

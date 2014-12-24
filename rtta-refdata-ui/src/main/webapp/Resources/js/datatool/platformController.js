@@ -36,6 +36,15 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope, function(row) {
             populateFormField(row);
+            rowEntity = angular.copy(generalService.getRow());
+            $scope.platform.platformName = rowEntity.platformName;
+            $scope.platform.platformLongName = rowEntity.platformLongName;
+            $scope.platform.platformNo = rowEntity.platformNo;
+            $scope.platform.latitude = rowEntity.latitude;
+            $scope.platform.longtitude = rowEntity.longtitude;
+            $scope.platform.platformStopId = rowEntity.platformStopId;
+            defaultRow= generalService.populateSelectList(generalService.getRow().stationId,$scope.stationSet);
+            $scope.platform.station = defaultRow;
         });
         gridApi.cellNav.on.navigate($scope, function(newRowCol, oldRowCol){
         });
@@ -142,6 +151,7 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
     $scope.editPlatformRow = function()
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
+            /*
             rowEntity = angular.copy(generalService.getRow());
             $scope.platform.platformName = rowEntity.platformName;
             $scope.platform.platformLongName = rowEntity.platformLongName;
@@ -151,6 +161,7 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
             $scope.platform.platformStopId = rowEntity.platformStopId;
             defaultRow= generalService.populateSelectList(generalService.getRow().stationId,$scope.stationSet);
             $scope.platform.station = defaultRow;
+            */
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
@@ -216,7 +227,7 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
             $scope.editBottonLabel = generalService.getEditBottonLabel();
 
         }
-        resetPlatformForm();
+        //resetPlatformForm();
     };
 
     /**

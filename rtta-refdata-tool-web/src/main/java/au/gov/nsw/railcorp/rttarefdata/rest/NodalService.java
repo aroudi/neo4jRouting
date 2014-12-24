@@ -99,7 +99,13 @@ public class NodalService {
                 response.setMessage("received object is null");
                 return response;
             }
-            Node node = nodeRepository.findBySchemaPropertyValue("name", nodeModel.getName());
+            Node node = nodeRepository.findOne(nodeModel.getNodeId());
+            if (node != null) {
+                response.setStatus(IConstants.RESPONSE_FAILURE);
+                response.setMessage("node " + nodeModel.getNodeId() + " already exists");
+                return response;
+            }
+            node = nodeRepository.findBySchemaPropertyValue("name", nodeModel.getName());
             if (node != null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("node " + nodeModel.getName() + " already exists");

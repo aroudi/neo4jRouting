@@ -1,4 +1,4 @@
-var myApp = angular.module('rttaRefDataUi', ["ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ngRoute","loadDisplay","angularFileUpload"]);
+var myApp = angular.module('rttaRefDataUi', ["stationFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload"]);
 var config_data = {
     'SERVER' : 'localhost',
     'PORT'   : '8082',
@@ -32,7 +32,9 @@ var service_uri = {
     'ALL_NODE_URI' : 'nodes/all',
     'ADD_NODE_URI' : 'nodes/add',
     'EDIT_NODE_URI' : 'nodes/edit',
-    'DEL_NODE_URI' : 'nodes/delete'
+    'DEL_NODE_URI' : 'nodes/delete',
+    'GET_LINE_REF_URI' : 'refDatas/linesRef',
+    'ALL_PATH_URI' : 'linePathStations/all'
 }
 
 var response_status = {
@@ -316,3 +318,18 @@ myApp.directive('fileModel', ['$parse', function ($parse) {
         }
     };
 }]);
+
+angular.module('stationFormatter',[]).filter('linePathStationList', function() {
+    return function (stations) {
+        var arr = stations;
+        var arrayContent = '';
+        for (var j = 0; j < arr.length-1; j++) {
+            arrayContent = arrayContent + arr[j].name +' -> ';
+        }
+        if (arr.length>0) {
+            arrayContent = arrayContent + arr[arr.length - 1].name;
+        }
+        return arrayContent;
+
+    };
+});

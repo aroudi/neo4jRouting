@@ -1,7 +1,10 @@
 package au.gov.nsw.railcorp.rttarefdata.rest;
 
+import au.gov.nsw.railcorp.rttarefdata.mapresult.ILineData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.IRefData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.LineData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.RefData;
+import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkLineRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.ServiceTypeRepository;
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public class RefDataService {
 
     @Autowired
     private NetworkRepository networkRepository;
+    @Autowired
+    private NetworkLineRepository networkLineRepository;
     /**
      * Return network list in Json format.
      * @return network List
@@ -89,4 +94,33 @@ public class RefDataService {
             return null;
         }
     }
+    /**
+     * Return line list in Json format.
+     * @return line List
+     */
+    @GET
+    @Path("/linesRef")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List getLinesAsRefData() {
+        List<ILineData> lineDataList;
+        final List<LineData> result = new ArrayList<LineData>();
+        LineData lineData;
+        try {
+            lineDataList = networkLineRepository.getAllLinesAsRefData();
+            for (ILineData data: lineDataList) {
+                lineData = new LineData();
+                lineData.setLineId(data.getLineId());
+                lineData.setName(data.getName());
+                lineData.setLongName(data.getLongName());
+                lineData.setTextColourHex(data.getTextColourHex());
+                lineData.setBackgroundColourHex(data.getBackgroundColourHex());
+                result.add(lineData);
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Exception in returning lines as ref data ", e);
+            return null;
+        }
+    }
 }
+
