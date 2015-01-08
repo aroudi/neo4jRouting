@@ -53,6 +53,7 @@
                 <button ng-click="editNetworkRow(network)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !networkForm.$valid)">{{editBottonLabel}}</button>
                 <button ng-click="deleteNetworkRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
                 <button ng-click="cancelNetworkRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+                <button ng-click="exportToCsv()">Export To CSV</button>
             </td>
         </tr>
     </table>

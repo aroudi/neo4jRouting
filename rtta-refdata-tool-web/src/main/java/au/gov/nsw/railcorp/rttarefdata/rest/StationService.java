@@ -5,12 +5,11 @@ package au.gov.nsw.railcorp.rttarefdata.rest;
 import au.gov.nsw.railcorp.rttarefdata.domain.Station;
 import au.gov.nsw.railcorp.rttarefdata.manager.EntitySequenceManager;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.IRefData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.RefData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.StationData;
 import au.gov.nsw.railcorp.rttarefdata.request.StationModel;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.response.StationResponse;
+import au.gov.nsw.railcorp.rttarefdata.service.StopService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +41,8 @@ public class StationService {
     @Autowired
     private EntitySequenceManager entitySequenceManager;
 
+    @Autowired
+    private StopService stopService;
     public StationRepository getStationRepository() {
         return stationRepository;
     }
@@ -57,34 +58,7 @@ public class StationService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllStations3() {
-        final List<StationData> result = new ArrayList<StationData>();
-        final List<IStationData> stations;
-        StationData stationData;
-        try {
-            stations = stationRepository.getAllStations();
-            for (IStationData station: stations) {
-                stationData = new StationData();
-                stationData.setStationId(station.getStationId());
-                stationData.setShortName(station.getShortName());
-                stationData.setLongName(station.getLongName());
-                stationData.setGtfsStopId(station.getGtfsStopId());
-                try {
-                    stationData.setLongtitude(station.getLongtitude());
-                } catch (NullPointerException e1) {
-                    stationData.setLongtitude(0);
-                }
-                try {
-                    stationData.setLatitude(station.getLatitude());
-                } catch (NullPointerException e2) {
-                    stationData.setLatitude(0);
-                }
-                result.add(stationData);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error("Exception in returning station list ", e);
-            return null;
-        }
+        return stopService.getAllStations();
     }
 
     /**

@@ -1,4 +1,4 @@
-function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_URI, EDIT_NODE_URI, DEL_NODE_URI, uiGridConstants) {
+function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_URI, EDIT_NODE_URI, DEL_NODE_URI, NODE_CSV_URI, uiGridConstants) {
     $scope.node = {};
     generalService.initBottons();
     $scope.addBottonLabel = generalService.getAddBottonLabel();
@@ -247,6 +247,16 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
     $scope.isInEditMode = function()
     {
         return generalService.getEditBottonLabel()=='Save' ? true : false;
+    };
+    $scope.exportToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(NODE_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'NODE_DATA.csv';
+            hiddenElement.click();
+        });
     };
 
 }

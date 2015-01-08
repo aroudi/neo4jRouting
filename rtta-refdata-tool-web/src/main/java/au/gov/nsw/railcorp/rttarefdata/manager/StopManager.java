@@ -4,14 +4,22 @@ import au.gov.nsw.railcorp.rttarefdata.domain.Platform;
 import au.gov.nsw.railcorp.rttarefdata.domain.PowerType;
 import au.gov.nsw.railcorp.rttarefdata.domain.Station;
 import au.gov.nsw.railcorp.rttarefdata.domain.StationTriplet;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationPlatformData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.StationData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PlatformRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationTripletRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by arash on 6/11/14.
@@ -19,6 +27,8 @@ import java.util.Collection;
 @Component
 @Transactional
 public class StopManager implements IStopManager {
+
+    private final Logger logger = LoggerFactory.getLogger(TopologyManager.class);
 
     /**
      * stationRepository.
@@ -146,4 +156,97 @@ public class StopManager implements IStopManager {
         return stationTriplet;
     }
 
+    /**
+     * return all stations.
+     * @return list of stations
+     */
+    public List getAllStations() {
+        final List<StationData> result = new ArrayList<StationData>();
+        final List<IStationData> stations;
+        StationData stationData;
+        try {
+            stations = stationRepository.getAllStations();
+            for (IStationData station: stations) {
+                stationData = new StationData();
+                stationData.setStationId(station.getStationId());
+                stationData.setShortName(station.getShortName());
+                stationData.setLongName(station.getLongName());
+                stationData.setGtfsStopId(station.getGtfsStopId());
+                try {
+                    stationData.setLongtitude(station.getLongtitude());
+                } catch (NullPointerException e1) {
+                    stationData.setLongtitude(0);
+                }
+                try {
+                    stationData.setLatitude(station.getLatitude());
+                } catch (NullPointerException e2) {
+                    stationData.setLatitude(0);
+                }
+                result.add(stationData);
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Exception in returning station list ", e);
+            return null;
+        }
+    }
+
+    /**
+     * get all platforms.
+     * @return platform list
+     */
+    public List getAllPlatforms() {
+        List<IStationPlatformData> platformList;
+        final List<StationPlatformData> result = new ArrayList<StationPlatformData>();
+        StationPlatformData stationPlatformData;
+        try {
+            platformList = platformRepository.getAllPlatforms();
+            for (IStationPlatformData platformData: platformList) {
+                stationPlatformData = new StationPlatformData();
+                stationPlatformData.setStationId(platformData.getStationId());
+                stationPlatformData.setPlatformLongName(platformData.getPlatformLongName());
+                stationPlatformData.setPlatformName(platformData.getPlatformName());
+                stationPlatformData.setPlatformNo(platformData.getPlatformNo());
+                stationPlatformData.setPlatformStopId(platformData.getPlatformStopId());
+                stationPlatformData.setStationShortName(platformData.getStationShortName());
+                stationPlatformData.setStationStopId(platformData.getStationStopId());
+                stationPlatformData.setLatitude(platformData.getLatitude());
+                stationPlatformData.setLongtitude(platformData.getLongtitude());
+                result.add(stationPlatformData);
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Exception in returning platform list ", e);
+            return null;
+        }
+    }
+
+    /**
+     * return all triplets.
+     * @return list of triplet
+     */
+    public List getAllTriplets() {
+        try {
+            return stationTripletRepository.getAllTriplets();
+        } catch (Exception e) {
+            logger.error("Exception in returning triplet list ", e);
+            return null;
+        }
+    }
+
+    /**
+     * Return powertypes for specific triplet.
+     * @param inSTopId inStopId.
+     * @param stopId stopId.
+     * @param outStopId outStopId.
+     * @return List of power type
+     */
+    public List getTripletPowerTypes(int inSTopId, int stopId, int outStopId) {
+        try {
+            return stationTripletRepository.getTripletPowerTypes(inSTopId, stopId, outStopId);
+        } catch (Exception e) {
+            logger.error("Exception in returning triplet list ", e);
+            return null;
+        }
+    }
 }

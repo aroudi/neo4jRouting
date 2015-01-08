@@ -2,7 +2,7 @@ function NetworkController($scope) {
 
 }
 
-function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION_URI, ADD_STATION_URI, EDIT_STATION_URI, DEL_STATION_URI) {
+function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION_URI, ADD_STATION_URI, EDIT_STATION_URI, DEL_STATION_URI, STATION_CSV_URI, TRIPLET_CSV_URI) {
 
     generalService.initBottons();
     /**
@@ -220,6 +220,27 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
     $scope.isEditBottonDisable = function()
     {
         return generalService.isEditBottonDisable();
+    };
+    $scope.exportStationToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(STATION_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'STATION_DATA.csv';
+            hiddenElement.click();
+        });
+    };
+
+    $scope.exportTripletToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(TRIPLET_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'StopLinks.csv';
+            hiddenElement.click();
+        });
     };
 }
 

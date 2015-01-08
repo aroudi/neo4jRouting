@@ -58,6 +58,7 @@
                 <button ng-click="editLineRow(line)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !lineForm.$valid)">{{editBottonLabel}}</button>
                 <button ng-click="deleteLineRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
                 <button ng-click="cancelLineRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+                <button ng-click="exportToCsv()">Export To CSV</button>
             </td>
         </tr>
     </table>

@@ -1,11 +1,10 @@
 package au.gov.nsw.railcorp.rttarefdata.rest;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.Node;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.NodeData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NodeRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.NodeModel;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
+import au.gov.nsw.railcorp.rttarefdata.service.NodeService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +33,8 @@ public class NodalService {
 
     @Autowired
     private NodeRepository nodeRepository;
+    @Autowired
+    private NodeService nodeService;
     /**
      * Return node list in Json format.
      * @return Node List
@@ -43,43 +43,7 @@ public class NodalService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllNodes() {
-        final List<NodeData> result = new ArrayList<NodeData>();
-        final List<INodeData> nodes;
-        NodeData nodeData;
-        try {
-            nodes = nodeRepository.getAllNodes();
-            for (INodeData node: nodes) {
-                nodeData = new NodeData();
-                nodeData.setNodeId(node.getNodeId());
-                nodeData.setName(node.getName());
-                nodeData.setLongName(node.getLongName());
-                nodeData.setPlatformName(node.getPlatformName());
-                nodeData.setDummy(node.isDummy());
-                nodeData.setJunction(node.isJunction());
-                nodeData.setWorkingTimingPoint(node.isWorkingTimingPoint());
-                nodeData.setPublicTimingPoint(node.isPublicTimingPoint());
-                nodeData.setEndOfLine(node.isEndOfLine());
-                nodeData.setWellDuration(node.getWellDuration());
-                nodeData.setUpRecoveryDuration(node.getUpRecoveryDuration());
-                nodeData.setDownRecoveryDuration(node.getDownRecoveryDuration());
-                nodeData.setLength(node.getLength());
-                try {
-                    nodeData.setLongtitude(node.getLongtitude());
-                } catch (NullPointerException e1) {
-                    nodeData.setLongtitude(0);
-                }
-                try {
-                    nodeData.setLatitude(node.getLatitude());
-                } catch (NullPointerException e2) {
-                    nodeData.setLatitude(0);
-                }
-                result.add(nodeData);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error("Exception in returning node list ", e);
-            return null;
-        }
+        return nodeService.getAllNodes();
     }
 
     /**

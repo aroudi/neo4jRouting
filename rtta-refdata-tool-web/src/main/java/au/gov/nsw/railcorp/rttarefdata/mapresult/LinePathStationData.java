@@ -9,6 +9,7 @@ public class LinePathStationData {
     private String longName;
     private Double latitude;
     private Double longtitude;
+    private boolean interchangePoint;
     private boolean pathMatchInclude;
     private int sequence;
 
@@ -66,5 +67,13 @@ public class LinePathStationData {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    public boolean isInterchangePoint() {
+        return interchangePoint;
+    }
+
+    public void setInterchangePoint(boolean interchangePoint) {
+        this.interchangePoint = interchangePoint;
     }
 }

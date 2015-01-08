@@ -3,6 +3,7 @@ package au.gov.nsw.railcorp.rttarefdata.rest;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.*;
 import au.gov.nsw.railcorp.rttarefdata.repositories.LinePathRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PathStationRepository;
+import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +36,9 @@ public class LinePathStationService {
 
     @Autowired
     private LinePathRepository linePathRepository;
+
+    @Autowired
+    private TopologyService topologyService;
     /**
      * Return path station list in Json format.
      * @return path Station List
@@ -44,40 +47,7 @@ public class LinePathStationService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllPathStation() {
-        final List<LinePathData> result = new ArrayList<LinePathData>();
-        final List<ILinePath> linePathList;
-        List<ILinePathStation> linePathStationList;
-        LinePathData linePathData;
-        LinePathStationData linePathStationData;
-        try {
-            linePathList = linePathRepository.getAllLinePaths();
-            for (ILinePath linePath: linePathList) {
-                linePathData = new LinePathData();
-                linePathData.setPathId(linePath.getPathId());
-                linePathData.setName(linePath.getName());
-                linePathData.setLongName(linePath.getLongName());
-                linePathData.setLineName(linePath.getLongName());
-                linePathData.setLineLongName(linePath.getLineLongName());
-                linePathData.setBackgroundColourHex(linePath.getBackgroundColourHex());
-                linePathData.setTextColourHex(linePath.getTextColourHex());
-                linePathStationList = pathStationRepository.getAllLinePathStations(linePath.getName());
-                for (ILinePathStation pathStation: linePathStationList) {
-                    linePathStationData = new LinePathStationData();
-                    linePathStationData.setStationId(pathStation.getStationId());
-                    linePathStationData.setName(pathStation.getName());
-                    linePathStationData.setLongName(pathStation.getLongName());
-                    linePathStationData.setLatitude(pathStation.getLatitude());
-                    linePathStationData.setLongtitude(pathStation.getLongtitude());
-                    linePathStationData.setPathMatchInclude(pathStation.getPathMatchInclude());
-                    linePathStationData.setSequence(pathStation.getSequence());
-                    linePathData.addStationToPath(linePathStationData);
-                }
-                result.add(linePathData);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error("Exception in returning station list ", e);
-            return null;
-        }
+        return topologyService.getAllPathStation();
     }
 }
+

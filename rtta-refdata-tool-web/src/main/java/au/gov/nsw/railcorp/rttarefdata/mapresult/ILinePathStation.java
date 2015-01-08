@@ -49,6 +49,14 @@ public interface ILinePathStation {
     Double getLongtitude();
 
     /**
+     * interchagePoint.
+     * @return interchangePoint
+     */
+
+    @ResultColumn("interchangePoint")
+    boolean getInterchangePoint();
+
+    /**
      * interchange point.
      * @return interchangePoint
      */

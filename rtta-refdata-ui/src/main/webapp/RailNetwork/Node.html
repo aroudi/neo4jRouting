@@ -92,6 +92,7 @@
                 <button ng-click="editNodeRow(node)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !nodeForm.$valid)">{{editBottonLabel}}</button>
                 <button ng-click="deleteNodeRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
                 <button ng-click="cancelNodeRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+                <button ng-click="exportToCsv()">Export To CSV</button>
             </td>
         </tr>
     </table>

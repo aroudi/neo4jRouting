@@ -81,5 +81,9 @@
     <suppress checks="MethodLength" files="[/\\]TripSegment.java"/>
 	<!-- rtta-trippublisher -->
 	 <suppress checks="NestedIfDepth" files="[/\\]GtfsTripUpdateConverter.java"/>
+    <!--  -->
+    <suppress checks="RedundantThrowsCheck" files="[/\\]TopologyService.java"/>
+    <suppress checks="RedundantThrowsCheck" files="[/\\]StopService.java"/>
+    <suppress checks="RedundantThrowsCheck" files="[/\\]NodeService.java"/>
     <!-- End of suppressions for specfic files -->
 </suppressions>

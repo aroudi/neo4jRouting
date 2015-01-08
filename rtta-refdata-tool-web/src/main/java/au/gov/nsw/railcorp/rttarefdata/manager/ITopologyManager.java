@@ -5,6 +5,7 @@ import au.gov.nsw.railcorp.rttarefdata.domain.Network;
 import au.gov.nsw.railcorp.rttarefdata.domain.NetworkLine;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by arash on 10/11/14.
@@ -44,4 +45,22 @@ public interface ITopologyManager {
      */
     LinePath createLinePath (String lineName, String pathName, String longName, Collection<String> powerTypes,
                                     String[] interchagePoint, String[] stationPath, String[] pathMatchInclude);
-}
+    /**
+     * Retrieve Network list from db.
+     * @return list
+     */
+    List<Network> getAllNetworks();
+
+    /**
+     * get All Network Lines.
+     * @return List of Network Line
+     */
+    List getAllNetworkLines();
+
+    /**
+     * get all path stations.
+     * @return list of path stations
+     */
+    List getAllPathStation();
+
+    }

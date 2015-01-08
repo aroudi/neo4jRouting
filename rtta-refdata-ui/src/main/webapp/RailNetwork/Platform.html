@@ -80,6 +80,7 @@
                 <button ng-click="editPlatformRow(platfrom)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !platformForm.$valid)">{{editBottonLabel}}</button>
                 <button ng-click="deletePlatformRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
                 <button ng-click="cancelPlatformRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+                <button ng-click="exportToCsv()">Export To CSV</button>
             </td>
         </tr>
     </table>

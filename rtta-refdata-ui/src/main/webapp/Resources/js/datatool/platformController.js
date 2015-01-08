@@ -1,4 +1,4 @@
-function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFORM_URI, ADD_PLATFORM_URI, EDIT_PLATFORM_URI, DEL_PLATFORM_URI, GET_STATION_REF_URI) {
+function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFORM_URI, ADD_PLATFORM_URI, EDIT_PLATFORM_URI, DEL_PLATFORM_URI, GET_STATION_REF_URI, PLATFORM_CSV_URI) {
 
     $scope.platform = {};
     generalService.initBottons();
@@ -265,6 +265,16 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
     $scope.isInEditMode = function()
     {
         return generalService.getEditBottonLabel()=='Save' ? true : false;
+    };
+    $scope.exportToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(PLATFORM_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'PLATFORM_DATA.csv';
+            hiddenElement.click();
+        });
     };
 
 }

@@ -1,4 +1,4 @@
-function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LINE_URI, ADD_LINE_URI, EDIT_LINE_URI, DEL_LINE_URI, GET_NETWORK_REF_URI , GET_SERVICETYPE_REF_URI) {
+function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LINE_URI, ADD_LINE_URI, EDIT_LINE_URI, DEL_LINE_URI, GET_NETWORK_REF_URI , GET_SERVICETYPE_REF_URI, LINE_CSV_URI) {
 
     $scope.line = {};
     generalService.initBottons();
@@ -269,6 +269,16 @@ function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LIN
     $scope.isInEditMode = function()
     {
         return generalService.getEditBottonLabel()=='Save' ? true : false;
+    };
+    $scope.exportToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(LINE_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'NetworkLine.csv';
+            hiddenElement.click();
+        });
     };
 
 }

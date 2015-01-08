@@ -1,14 +1,13 @@
 package au.gov.nsw.railcorp.rttarefdata.rest;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.INetworkLineData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.NetworkLineData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkLineRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.ServiceTypeRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.NetworkLineModel;
 import au.gov.nsw.railcorp.rttarefdata.response.NetworkLineResponse;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
+import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,6 +42,8 @@ public class NetworkLineService {
 
     @Autowired
     private ServiceTypeRepository serviceTypeRepository;
+    @Autowired
+    private TopologyService topologyService;
 
     /**
      * get All Network Lines.
@@ -53,27 +53,7 @@ public class NetworkLineService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllNetworkLines() {
-        final List<NetworkLineData> result = new ArrayList<NetworkLineData>();
-        final List<INetworkLineData> lines;
-        NetworkLineData networkLineData;
-        try {
-            lines = networklineRepository.getAllNetworkLines();
-            for (INetworkLineData line: lines) {
-                networkLineData = new NetworkLineData();
-                networkLineData.setLineId(line.getLineId());
-                networkLineData.setNetworkName(line.getNetworkName());
-                networkLineData.setName(line.getName());
-                networkLineData.setLongName(line.getLongName());
-                networkLineData.setBackgroundColourHex(line.getBackgroundColourHex());
-                networkLineData.setTextColourHex(line.getTextColourHex());
-                networkLineData.setServiceTypeName(line.getServiceTypeName());
-                result.add(networkLineData);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error("Exception in returning line list ", e);
-            return null;
-        }
+        return topologyService.getAllNetworkLines();
     }
 
     /**

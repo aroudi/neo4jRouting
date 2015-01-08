@@ -34,7 +34,14 @@ var service_uri = {
     'EDIT_NODE_URI' : 'nodes/edit',
     'DEL_NODE_URI' : 'nodes/delete',
     'GET_LINE_REF_URI' : 'refDatas/linesRef',
-    'ALL_PATH_URI' : 'linePathStations/all'
+    'ALL_PATH_URI' : 'linePathStations/all',
+    'NETWORK_CSV_URI' : 'export/networkToCsv',
+    'LINE_CSV_URI' : 'export/networkLineToCsv',
+    'PATH_CSV_URI' : 'export/linePathsToCsv',
+    'STATION_CSV_URI' : 'export/stationsToCsv',
+    'PLATFORM_CSV_URI' : 'export/platformsToCsv',
+    'NODE_CSV_URI' : 'export/nodesToCsv',
+    'TRIPLET_CSV_URI' : 'export/tripletsToCsv'
 }
 
 var response_status = {

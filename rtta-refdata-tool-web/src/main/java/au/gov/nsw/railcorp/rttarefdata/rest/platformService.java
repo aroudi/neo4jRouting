@@ -2,12 +2,11 @@ package au.gov.nsw.railcorp.rttarefdata.rest;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.Platform;
 import au.gov.nsw.railcorp.rttarefdata.domain.Station;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationPlatformData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PlatformRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.PlatformModel;
 import au.gov.nsw.railcorp.rttarefdata.response.PlatformResponse;
+import au.gov.nsw.railcorp.rttarefdata.service.StopService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +38,8 @@ public class platformService {
     private PlatformRepository platformRepository;
     @Autowired
     private StationRepository stationRepository;
+    @Autowired
+    private StopService stopService;
     /**
      * Return station list in Json format.
      * @return Station List
@@ -48,29 +48,7 @@ public class platformService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllPlatforms() {
-        List<IStationPlatformData> platformList;
-        final List<StationPlatformData> result = new ArrayList<StationPlatformData>();
-        StationPlatformData stationPlatformData;
-        try {
-            platformList = platformRepository.getAllPlatforms();
-            for (IStationPlatformData platformData: platformList) {
-                stationPlatformData = new StationPlatformData();
-                stationPlatformData.setStationId(platformData.getStationId());
-                stationPlatformData.setPlatformLongName(platformData.getPlatformLongName());
-                stationPlatformData.setPlatformName(platformData.getPlatformName());
-                stationPlatformData.setPlatformNo(platformData.getPlatformNo());
-                stationPlatformData.setPlatformStopId(platformData.getPlatformStopId());
-                stationPlatformData.setStationShortName(platformData.getStationShortName());
-                stationPlatformData.setStationStopId(platformData.getStationStopId());
-                stationPlatformData.setLatitude(platformData.getLatitude());
-                stationPlatformData.setLongtitude(platformData.getLongtitude());
-                result.add(stationPlatformData);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error("Exception in returning platform list ", e);
-            return null;
-        }
+        return stopService.getAllPlatforms();
     }
 
     /**

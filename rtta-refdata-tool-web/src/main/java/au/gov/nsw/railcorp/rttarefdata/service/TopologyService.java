@@ -4,12 +4,22 @@ import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RefGtfsLinePath;
 import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RefGtfsNetwork;
 import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RefGtfsNetworkLine;
 import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RttaGtfsTopology;
+import au.gov.nsw.railcorp.rttarefdata.domain.Network;
 import au.gov.nsw.railcorp.rttarefdata.manager.ITopologyManager;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.LinePathData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.LinePathStationData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.NetworkLineData;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +28,8 @@ import java.util.List;
  */
 @Component
 public class TopologyService {
+
+    private final Logger logger = LoggerFactory.getLogger(TopologyService.class);
     @Autowired
     private ITopologyManager topologyManager;
 
@@ -99,4 +111,169 @@ public class TopologyService {
 
         }
     }
+
+    /**
+     * get All Network Lines.
+     * @return List of Network Line
+     */
+    public List getAllNetworkLines() {
+        return topologyManager.getAllNetworkLines();
+    }
+    /**
+     * get All path stations.
+     * @return list of path stations.
+     */
+    public List getAllPathStation() { return topologyManager.getAllPathStation(); }
+
+    /**
+     * Export Network list into csv format and return as StreamingOutput.
+     * @return Streamingoutput
+     */
+    public StreamingOutput exportNetworkToCsv() {
+        StreamingOutput streamingOutput = null;
+        try {
+            streamingOutput = new StreamingOutput() {
+                @Override
+                public void write(OutputStream output) throws IOException, WebApplicationException {
+                    final List<Network> networkList = topologyManager.getAllNetworks();
+                    if (networkList == null) {
+                        return;
+                    }
+                    String line = "NetworkName, LongName";
+                    output.write(line.getBytes());
+                    output.write(System.getProperty("line.separator").getBytes());
+                    for (Network network : networkList) {
+                        line = network.getName() + ", " + network.getDescription();
+                        output.write(line.getBytes());
+                        output.write(System.getProperty("line.separator").getBytes());
+                    }
+                    output.flush();
+                }
+            };
+            return streamingOutput;
+        } catch (Exception e) {
+            logger.error("Exception in writing networks into csv: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * Export Network line list into csv format and return as StreamingOutput.
+     * @return Streamingoutput
+     */
+    public StreamingOutput exportNetworkLinesToCsv() {
+        StreamingOutput streamingOutput = null;
+        try {
+            streamingOutput = new StreamingOutput() {
+                @Override
+                public void write(OutputStream output) throws IOException, WebApplicationException {
+                    final List<NetworkLineData> networkLineList = topologyManager.getAllNetworkLines();
+                    if (networkLineList == null) {
+                        return;
+                    }
+                    String line = "NetworkName, NetworkLineName, LongName, ServiceType, BackgroundColourHex, TextColourHex ";
+                    output.write(line.getBytes());
+                    output.write(System.getProperty("line.separator").getBytes());
+                    for (NetworkLineData networkLineData : networkLineList) {
+                        line = networkLineData.getNetworkName() + ", " + networkLineData.getName() + ", " + networkLineData.getLongName() + ", "
+                                + networkLineData.getServiceTypeName() + ", " + networkLineData.getBackgroundColourHex() + ", " + networkLineData.getTextColourHex();
+                        output.write(line.getBytes());
+                        output.write(System.getProperty("line.separator").getBytes());
+                    }
+                    output.flush();
+                }
+            };
+            return streamingOutput;
+        } catch (Exception e) {
+            logger.error("Exception in writing networks into csv: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * Export path list into csv format and return as StreamingOutput.
+     * @return Streamingoutput
+     */
+    public StreamingOutput exportLinePathsToCsv() {
+        StreamingOutput streamingOutput = null;
+        try {
+            streamingOutput = new StreamingOutput() {
+                @Override
+                public void write(OutputStream output) throws IOException, WebApplicationException {
+                    final List<LinePathData> linePathDataList = getAllPathStation();
+                    ExtractedData extractedData;
+                    if (linePathDataList == null) {
+                        return;
+                    }
+                    String line = "NetworkLineName, LinePathName, LongName, InterchangePoints, StationPath, PathMatchInclude";
+                    output.write(line.getBytes());
+                    output.write(System.getProperty("line.separator").getBytes());
+                    for (LinePathData linePathData : linePathDataList) {
+                        extractedData = extractData(linePathData.getLinePathStationList());
+                        line = linePathData.getLineName() + ", " + linePathData.getName() + ", " + linePathData.getLongName() + ", ";
+                        if (extractedData != null) {
+                            if (!extractedData.extractedInterchangePoint.toString().isEmpty()) {
+                                line = line + extractedData.extractedInterchangePoint.toString() + ", ";
+                            } else {
+                                line = line + "null" + ", ";
+                            }
+                            if (!extractedData.extractedStationPath.toString().isEmpty()) {
+                                line = line + extractedData.extractedStationPath.toString() + ", ";
+                            } else {
+                                line = line + "null" + ", ";
+                            }
+                            if (!extractedData.extractedPathMatchInclude.toString().isEmpty()) {
+                                line = line + extractedData.extractedPathMatchInclude.toString();
+                            } else {
+                                line = line + "null";
+                            }
+                        } else {
+                            line = line + "null" + ", " + "null" + ", " + "null";
+                        }
+                        output.write(line.getBytes());
+                        output.write(System.getProperty("line.separator").getBytes());
+                    }
+                    output.flush();
+                }
+            };
+            return streamingOutput;
+        } catch (Exception e) {
+            logger.error("Exception in writing networks into csv: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * Extracing required data from station data.
+     */
+    public class ExtractedData {
+        private StringBuffer extractedPathMatchInclude = new StringBuffer("");
+        private StringBuffer extractedInterchangePoint = new StringBuffer("");
+        private StringBuffer extractedStationPath = new StringBuffer("");
+
+    }
+
+    /**
+     * extracting InterchangePoints and PathMatchIncludes.
+     * @param linePathStationDatas linePathStationDatas.
+     * @return ExtractedData
+     */
+    public ExtractedData extractData(List<LinePathStationData> linePathStationDatas) {
+        if (linePathStationDatas == null) {
+            return null;
+        }
+        final ExtractedData extractedData = new ExtractedData();
+        for (LinePathStationData stationData: linePathStationDatas) {
+            if (stationData.isInterchangePoint()) {
+                extractedData.extractedInterchangePoint.append(stationData.getName()).append(" ");
+            }
+            if (stationData.isPathMatchInclude()) {
+                extractedData.extractedPathMatchInclude.append(stationData.getName()).append(" ");
+            }
+            extractedData.extractedStationPath.append(stationData.getName()).append(" ");
+        }
+        return extractedData;
+    }
 }
+
+

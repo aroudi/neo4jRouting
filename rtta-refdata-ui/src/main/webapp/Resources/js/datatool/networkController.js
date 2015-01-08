@@ -1,4 +1,4 @@
-function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK_URI, ADD_NETWORK_URI, EDIT_NETWORK_URI, DEL_NETWORK_URI, uiGridConstants) {
+function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK_URI, ADD_NETWORK_URI, EDIT_NETWORK_URI, DEL_NETWORK_URI, NETWORK_CSV_URI, uiGridConstants) {
 
     $scope.platform = {};
     generalService.initBottons();
@@ -229,5 +229,15 @@ function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK
         return generalService.getEditBottonLabel()=='Save' ? true : false;
     };
 
+    $scope.exportToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(NETWORK_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'Network.csv';
+            hiddenElement.click();
+        });
+    };
 }
 

@@ -63,6 +63,8 @@
             <button ng-click="editStationRow(station)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !stationForm.$valid)">{{editBottonLabel}}</button>
             <button ng-click="deleteStationRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
             <button ng-click="cancelStationRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+            <button ng-click="exportStationToCsv()">Export Stations To CSV</button>
+            <button ng-click="exportTripletToCsv()">Export StopLinks To CSV</button>
         </td>
     </tr>
 </table>

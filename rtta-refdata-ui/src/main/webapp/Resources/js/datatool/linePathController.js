@@ -1,4 +1,4 @@
-function LinePathController($scope, generalService, SUCCESS, FAILURE, ALL_PATH_URI, GET_LINE_REF_URI) {
+function LinePathController($scope, generalService, SUCCESS, FAILURE, ALL_PATH_URI, GET_LINE_REF_URI, PATH_CSV_URI) {
 
     $scope.path = {};
     generalService.initBottons();
@@ -36,6 +36,16 @@ function LinePathController($scope, generalService, SUCCESS, FAILURE, ALL_PATH_U
         });
 
     }
+    $scope.exportToCsv = function()
+    {
+        var hiddenElement = document.createElement('a');
+        generalService.getAllRows(PATH_CSV_URI).then(function(response){
+            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
+            hiddenElement.target ='_blank';
+            hiddenElement.download = 'NetworkLinesPaths.csv';
+            hiddenElement.click();
+        });
+    };
 
 }
 
