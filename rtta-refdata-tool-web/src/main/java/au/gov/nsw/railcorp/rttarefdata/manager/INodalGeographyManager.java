@@ -119,4 +119,23 @@ public interface INodalGeographyManager {
                                          boolean isNarrowGauge, boolean isStandardGauge,
                                          boolean isBroadGauge, boolean isSiding, boolean isCrossOver, boolean isRunningLine, int trackSectionId);
 
+
+    /**
+     * Remove all runningtime records.
+     */
+    void emptyRunningTimes ();
+
+    /**
+     * Remove All NodeLinks.
+     */
+    void emptyNodeLinks ();
+    /**
+     * Remove All TurnPenaltyBan.
+     */
+    void emptyNodeTurnPenaltyBan ();
+    /**
+     * Remove All NodeLinkages.
+     */
+    void emptyNodeNodeLinkages ();
+
 }

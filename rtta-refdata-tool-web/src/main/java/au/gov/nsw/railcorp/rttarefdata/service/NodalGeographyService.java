@@ -41,10 +41,10 @@ public class NodalGeographyService {
             if (geov10RC == null) {
                 continue;
             }
-            //importSpeedBands(geov10RC.getSpeedBands());
+            importSpeedBands(geov10RC.getSpeedBands());
             importTrackSections(geov10RC.getTrackSections());
             importNodes(geov10RC.getNodes());
-            //importLinks(geov10RC.getLinks());
+            importLinks(geov10RC.getLinks());
             importNodeLinkages(geov10RC.getLinks());
             importNodeSelfRelations(geov10RC.getNodes());
 
@@ -61,7 +61,9 @@ public class NodalGeographyService {
         if (nodes == null || nodes.getNode() == null) {
             return;
         }
-
+        //remove All TurnPenaltyBans
+        nodalGeographyManager.emptyNodeTurnPenaltyBan();
+        nodalGeographyManager.emptyNodeNodeLinkages();
         for (Node node: nodes.getNode()) {
             if (node == null) {
                 continue;
@@ -154,6 +156,10 @@ public class NodalGeographyService {
         if (links == null || links.getLink() == null) {
             return;
         }
+
+        //empty the current links
+        nodalGeographyManager.emptyRunningTimes();
+        nodalGeographyManager.emptyNodeLinks();
 
         for (Link link : links.getLink()) {
             if (link == null) {

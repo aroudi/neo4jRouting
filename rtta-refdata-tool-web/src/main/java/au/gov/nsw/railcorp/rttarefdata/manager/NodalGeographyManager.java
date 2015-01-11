@@ -124,15 +124,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
 
         final TrackSection trackSection = trackSectionRepository.findBySchemaPropertyValue("id", trackSectionNumber);
 
-        NodeLink nodeLink = nodeLinkRepository.getNodeLink(fromNodeName, toNodeName);
-        if (nodeLink != null) {
-            //running times are part of node link. so we need to delete them with node link
-            if (nodeLink.getRunningTimes() != null) {
-                runingTimeRepository.delete(nodeLink.getRunningTimes());
-            }
-            nodeLinkRepository.delete(nodeLink);
-        }
-        nodeLink = new NodeLink();
+        final NodeLink nodeLink = new NodeLink();
         nodeLink.setLength(length);
         nodeLink.setSliding(isSliding);
         nodeLink.setCrossOver(isCrossOver);
@@ -245,17 +237,6 @@ public class NodalGeographyManager implements INodalGeographyManager {
     {
         Node node;
         node = nodeRepository.findBySchemaPropertyValue("name", name);
-        /*
-            if node is not null then we must remove all linkages and turning penalty bans
-         */
-        if (node != null) {
-            if (node.getOutgoingTurnPenalties() != null) {
-                turnPenaltyBanRepository.delete(node.getOutgoingTurnPenalties());
-            }
-            if (node.getNodeLinkages() != null) {
-                nodeLinkageRepository.delete(node.getNodeLinkages());
-            }
-        }
         if (node == null) {
             node = new Node();
         }
@@ -335,4 +316,30 @@ public class NodalGeographyManager implements INodalGeographyManager {
         return turnPenaltyBan;
     }
 
+    /**
+     * Remove all runningtime records.
+     */
+    public void emptyRunningTimes () {
+        runingTimeRepository.deleteAll();
+    }
+
+    /**
+     * Remove All NodeLinks.
+     */
+    public void emptyNodeLinks () {
+        nodeLinkRepository.deleteAll();
+    }
+
+    /**
+     * Remove All TurnPenaltyBan.
+     */
+    public void emptyNodeTurnPenaltyBan () {
+        turnPenaltyBanRepository.deleteAll();
+    }
+    /**
+     * Remove All NodeLinkages.
+     */
+    public void emptyNodeNodeLinkages () {
+        nodeLinkageRepository.deleteAll();
+    }
 }
