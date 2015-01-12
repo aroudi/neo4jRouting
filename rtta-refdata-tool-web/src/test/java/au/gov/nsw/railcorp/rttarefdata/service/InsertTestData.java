@@ -107,8 +107,8 @@ public class InsertTestData {
 
         // track section ///////////
 
-        serviceTest.createTrackSection(1553, "URIC", false, false);
-        serviceTest.createTrackSection(1554, "URIC", true, false);
+        serviceTest.createTrackSection("1553", "URIC", false, false);
+        serviceTest.createTrackSection("1554", "URIC", true, false);
 
         //gauge
 

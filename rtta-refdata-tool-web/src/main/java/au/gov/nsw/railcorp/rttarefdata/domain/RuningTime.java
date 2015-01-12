@@ -17,6 +17,7 @@ public class RuningTime {
 
     private String stopToStop;
     private String passToPass;
+    private String sbId;
 
     @RelatedTo(type = Links.RUN_TIME_SPEED_BAND, direction = Direction.INCOMING)
     private SpeedBand speedBand;
@@ -72,4 +73,11 @@ public class RuningTime {
         this.nodeLink = nodeLink;
     }
 
+    public String getSbId() {
+        return sbId;
+    }
+
+    public void setSbId(String sbId) {
+        this.sbId = sbId;
+    }
 }

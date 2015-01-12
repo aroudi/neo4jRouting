@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.util.List;
 
 /**
  * Created by arash on 11/11/14.
@@ -49,10 +48,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @return SpeedBand speedBand
      */
     public SpeedBand createSpeedBand(int id, String name, String description) {
-        SpeedBand speedBand = speedBandRepository.findBySchemaPropertyValue("name", name);
-        if (speedBand == null) {
-            speedBand = new SpeedBand();
-        }
+        final SpeedBand speedBand = new SpeedBand();
         speedBand.setId(id);
         speedBand.setName(name);
         speedBand.setDescription(description);
@@ -68,10 +64,9 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param passToPass passToPass
      * @return RuningTime runingTime
      */
-    public RuningTime createRuningTime(NodeLink nodeLink, int speedBandId, String stopToStop, String passToPass) {
-        final SpeedBand speedBand = speedBandRepository.findBySchemaPropertyValue("id", speedBandId);
+    public RuningTime createRuningTime(NodeLink nodeLink, String speedBandId, String stopToStop, String passToPass) {
         final RuningTime runingTime = new RuningTime(stopToStop, passToPass);
-        runingTime.setSpeedBand(speedBand);
+        runingTime.setSbId(speedBandId);
         runingTime.setNodeLink(nodeLink);
         runingTimeRepository.save(runingTime);
         return runingTime;
@@ -85,11 +80,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param isPermissive isPermissive
      * @return TrackSection trackSection
      */
-    public TrackSection createTrackSection(int id, String name, boolean isUp, boolean isPermissive) {
-        TrackSection trackSection = trackSectionRepository.findBySchemaPropertyValue("id", id);
-        if (trackSection == null) {
-            trackSection = new TrackSection();
-        }
+    public TrackSection createTrackSection(String id, String name, boolean isUp, boolean isPermissive) {
+        final TrackSection trackSection = new TrackSection();
         trackSection.setId(id);
         trackSection.setName(name);
         trackSection.setUpDirection(isUp);
@@ -107,47 +99,38 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param isCrossOver isCrossOver
      * @param isRuningLine isRuningLine
      * @param trackSectionNumber trackSectionNumber
-     * @param powerTypes powerTypes
-     * @param gauges gauges
+     * @param isBusEnergy isBusEnergy
+     * @param isAcEnergy isAcEnergy
+     * @param isDcEnergy isDcEnergy
+     * @param isDieselEnergy isDieselEnergy
+     * @param isBusGauge isBusGauge
+     * @param isNarrowGauge isNarrowGauge
+     * @param isStandardGauge isStandardGauge
+     * @param isBroadGauge isBroadGauge
      * @return NodeLink nodeLink
      */
     public NodeLink createNodeLink(String fromNodeName, String toNodeName, long length, boolean isSliding, boolean isCrossOver,
-                                   boolean isRuningLine, int trackSectionNumber, List<String> powerTypes, List<String> gauges)
+                                   boolean isRuningLine, String trackSectionNumber, boolean isBusEnergy, boolean isAcEnergy,
+                                   boolean isDcEnergy, boolean isDieselEnergy, boolean isBusGauge, boolean isNarrowGauge, boolean  isStandardGauge, boolean isBroadGauge)
     {
 
-        final Node fromNode = nodeRepository.findBySchemaPropertyValue("name", fromNodeName);
-        final Node toNode = nodeRepository.findBySchemaPropertyValue("name", toNodeName);
-
-        if (fromNode == null || toNode == null) {
-            return null;
-        }
-
-        final TrackSection trackSection = trackSectionRepository.findBySchemaPropertyValue("id", trackSectionNumber);
 
         final NodeLink nodeLink = new NodeLink();
+        nodeLink.setFromNodeName(fromNodeName);
+        nodeLink.setToNodeName(toNodeName);
         nodeLink.setLength(length);
         nodeLink.setSliding(isSliding);
         nodeLink.setCrossOver(isCrossOver);
         nodeLink.setRunningLine(isRuningLine);
-
-        for (String powertypeName : powerTypes) {
-            final PowerType powerType = dataTypeManager.addPowerType(powertypeName, powertypeName);
-            if (powerType != null) {
-                nodeLink.addPowerType(powerType);
-            }
-        }
-        for (String gaugeName : gauges) {
-            final Gauge gauge = dataTypeManager.addGauge(gaugeName, gaugeName);
-            if (gauge != null) {
-                nodeLink.addGauge(gauge);
-            }
-        }
-
-        nodeLink.setFromNode(fromNode);
-        nodeLink.setToNode(toNode);
-        if (trackSection != null) {
-            nodeLink.setTrackSection(trackSection);
-        }
+        nodeLink.setTrackSectionId(trackSectionNumber);
+        nodeLink.setBusEnergy(isBusEnergy);
+        nodeLink.setAcEnergy(isAcEnergy);
+        nodeLink.setDcEnergy(isDcEnergy);
+        nodeLink.setDieselEnergy(isDieselEnergy);
+        nodeLink.setBusGauge(isBusGauge);
+        nodeLink.setNarrowGauge(isNarrowGauge);
+        nodeLink.setStandardGauge(isStandardGauge);
+        nodeLink.setBroadGauge(isBroadGauge);
         nodeLinkRepository.save(nodeLink);
         return nodeLink;
     }
@@ -341,5 +324,17 @@ public class NodalGeographyManager implements INodalGeographyManager {
      */
     public void emptyNodeNodeLinkages () {
         nodeLinkageRepository.deleteAll();
+    }
+    /**
+     * Remove All SpeedBands.
+     */
+    public void emptySpeedBands () {
+        speedBandRepository.deleteAll();
+    }
+    /**
+     * Remove All TrackSection.
+     */
+    public void emptyTrackSections () {
+        trackSectionRepository.deleteAll();
     }
 }

@@ -2,7 +2,6 @@ package au.gov.nsw.railcorp.rttarefdata.manager;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 
-import java.util.List;
 
 /**
  * Created by arash on 11/11/14.
@@ -25,7 +24,7 @@ public interface INodalGeographyManager {
      * @param passToPass passToPass
      * @return RuningTime runingTime
      */
-    RuningTime createRuningTime(NodeLink nodeLink, int speedBandId, String stopToStop, String passToPass);
+    RuningTime createRuningTime(NodeLink nodeLink, String speedBandId, String stopToStop, String passToPass);
 
     /**
      * Create Track Section Record.
@@ -35,7 +34,7 @@ public interface INodalGeographyManager {
      * @param isPermissive isPermissive
      * @return TrackSection trackSection
      */
-    TrackSection createTrackSection(int id, String name, boolean isUp, boolean isPermissive);
+    TrackSection createTrackSection(String id, String name, boolean isUp, boolean isPermissive);
 
     /**
      * Create NodeLink Record: if nodeLink exists then delete it and recreate it.
@@ -46,12 +45,19 @@ public interface INodalGeographyManager {
      * @param isCrossOver isCrossOver
      * @param isRuningLine isRuningLine
      * @param trackSectionNumber trackSectionNumber
-     * @param powerTypes powerTypes
-     * @param gauges gauges
+     * @param isBusEnergy isBusEnergy
+     * @param isAcEnergy isAcEnergy
+     * @param isDcEnergy isDcEnergy
+     * @param isDieselEnergy isDieselEnergy
+     * @param isBusGauge isBusGauge
+     * @param isNarrowGauge isNarrowGauge
+     * @param isStandardGauge isStandardGauge
+     * @param isBroadGauge isBroadGauge
      * @return NodeLink nodeLink
      */
     NodeLink createNodeLink(String fromNodeName, String toNodeName, long length, boolean isSliding, boolean isCrossOver,
-                                   boolean isRuningLine, int trackSectionNumber, List<String> powerTypes, List<String> gauges);
+                                   boolean isRuningLine, String trackSectionNumber, boolean isBusEnergy, boolean isAcEnergy,
+                                   boolean isDcEnergy, boolean isDieselEnergy, boolean isBusGauge, boolean isNarrowGauge, boolean  isStandardGauge, boolean isBroadGauge);
     /**
      * Create a Node. if node exists then modify it otherwise create it.
      * @param name name
@@ -138,4 +144,12 @@ public interface INodalGeographyManager {
      */
     void emptyNodeNodeLinkages ();
 
+    /**
+     * Remove All SpeedBands.
+     */
+    void emptySpeedBands ();
+    /**
+     * Remove All TrackSection.
+     */
+    void emptyTrackSections ();
 }

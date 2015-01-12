@@ -1,13 +1,9 @@
 // RailCorp 2014
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
-import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.RelatedTo;
-
-import java.util.Collection;
 
 /**
  * Created by arash on 3/11/14.
@@ -21,12 +17,9 @@ public class TrackSection {
     private String name;
 
     @Indexed
-    private int id;
+    private String id;
     private boolean upDirection;
     private boolean permissive;
-
-    @RelatedTo(type = Links.NODE_LINK_TRACK_SECTION, direction = Direction.BOTH)
-    private Collection<NodeLink> nodeLinks;
 
     /**
      * Constructor.
@@ -35,7 +28,7 @@ public class TrackSection {
      * @param upDirection upDirection
      * @param permissive permissive
      */
-    public TrackSection(int id, String name, boolean upDirection, boolean permissive) {
+    public TrackSection(String id, String name, boolean upDirection, boolean permissive) {
         this.id = id;
         this.name = name;
         this.upDirection = upDirection;
@@ -72,19 +65,12 @@ public class TrackSection {
         this.permissive = permissive;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Collection<NodeLink> getNodeLinks() {
-        return nodeLinks;
-    }
-
-    public void setNodeLinks(Collection<NodeLink> nodeLinks) {
-        this.nodeLinks = nodeLinks;
-    }
 }

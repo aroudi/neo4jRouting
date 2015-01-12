@@ -43,6 +43,20 @@ public class StringUtil {
     }
 
     /**
+     * convert int to str.
+     * @param input input
+     * @return int
+     */
+    public static String intToStr(int input) {
+        try {
+            return String.valueOf(input);
+        } catch (Exception e) {
+            COMMON_LOGGER.error("Can't convert int to str :", e);
+            return "";
+        }
+    }
+
+    /**
      * convert String to double.
      * @param str str
      * @return double

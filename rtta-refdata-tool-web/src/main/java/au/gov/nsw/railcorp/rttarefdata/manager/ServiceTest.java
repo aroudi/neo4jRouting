@@ -288,7 +288,7 @@ public class ServiceTest {
      * @param isPermissive isPermissive
      * @return TrackSection trackSection
      */
-    public TrackSection createTrackSection(int id, String name, boolean isUp, boolean isPermissive) {
+    public TrackSection createTrackSection(String id, String name, boolean isUp, boolean isPermissive) {
         final TrackSection trackSection = new TrackSection(id, name, isUp, isPermissive);
         trackSectionRepository.save(trackSection);
         return trackSection;
@@ -319,20 +319,14 @@ public class ServiceTest {
 
         for (String powertypeName : powerTypes) {
             final PowerType powerType = powerTypeRepository.findBySchemaPropertyValue("name", powertypeName);
-            if (powerType != null) {
-                nodeLink.addPowerType(powerType);
-            }
         }
         for (String gaugeName : gauges) {
             final Gauge gauge = gaugeRepository.findBySchemaPropertyValue("name", gaugeName);
-            if (gauge != null) {
-                nodeLink.addGauge(gauge);
-            }
         }
 
         nodeLink.setFromNode(fromNode);
         nodeLink.setToNode(toNode);
-        nodeLink.setTrackSection(trackSection);
+        //nodeLink.setTrackSection(trackSection);
         nodeLinkRepository.save(nodeLink);
         return nodeLink;
     }

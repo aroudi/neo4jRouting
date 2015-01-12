@@ -12,19 +12,19 @@ import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.
 import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeTurnPenaltyBans.NodeTurnPenaltyBan;
 import au.gov.nsw.railcorp.rttarefdata.domain.NodeLink;
 import au.gov.nsw.railcorp.rttarefdata.manager.INodalGeographyManager;
-import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by arash on 11/11/14.
  */
 @Component
 public class NodalGeographyService {
+    private final Logger logger = LoggerFactory.getLogger(NodalGeographyService.class);
     @Autowired
     private INodalGeographyManager nodalGeographyManager;
 
@@ -42,11 +42,17 @@ public class NodalGeographyService {
                 continue;
             }
             importSpeedBands(geov10RC.getSpeedBands());
+            logger.info("importRailNetGeography: importSpeedBands finished");
             importTrackSections(geov10RC.getTrackSections());
+            logger.info("importRailNetGeography: importTrackSections finished");
             importNodes(geov10RC.getNodes());
+            logger.info("importRailNetGeography: importNodes finished");
             importLinks(geov10RC.getLinks());
+            logger.info("importRailNetGeography: importLinks finished");
             importNodeLinkages(geov10RC.getLinks());
+            logger.info("importRailNetGeography: importNodeLinkages finished");
             importNodeSelfRelations(geov10RC.getNodes());
+            logger.info("importRailNetGeography: importNodeSelfRelations finished");
 
         }
 
@@ -118,6 +124,7 @@ public class NodalGeographyService {
      * @param speedBands speedBands
      */
     public void importSpeedBands(SpeedBands speedBands) {
+        nodalGeographyManager.emptySpeedBands();
         if (speedBands == null) {
             return;
         }
@@ -134,6 +141,7 @@ public class NodalGeographyService {
      * @param trackSections trackSections
      */
     public void  importTrackSections(TrackSections trackSections) {
+        nodalGeographyManager.emptyTrackSections();
         if (trackSections == null) {
             return;
         }
@@ -141,7 +149,7 @@ public class NodalGeographyService {
             if (trackSection == null) {
                 continue;
             }
-            nodalGeographyManager.createTrackSection(StringUtil.strToInt(trackSection.getId()), trackSection.getName(), trackSection.isIsUp(), trackSection.isIsPermissive());
+            nodalGeographyManager.createTrackSection(trackSection.getId(), trackSection.getName(), trackSection.isIsUp(), trackSection.isIsPermissive());
         }
     }
 
@@ -150,8 +158,6 @@ public class NodalGeographyService {
      * @param links links
      */
     public void importLinks(Links links) {
-        List<String> linkPowers;
-        List<String> linkGauges;
         NodeLink nodeLink;
         if (links == null || links.getLink() == null) {
             return;
@@ -166,42 +172,15 @@ public class NodalGeographyService {
                 continue;
             }
 
-            linkPowers = new ArrayList<String>();
-            if (link.isIsACEnergy()) {
-                linkPowers.add(IConstants.POWER_TYPE_AC);
-            }
-            if (link.isIsDCEnergy()) {
-                linkPowers.add(IConstants.POWER_TYPE_DC);
-            }
-            if (link.isIsBusEnergy()) {
-                linkPowers.add(IConstants.POWER_TYPE_BUS);
-            }
-            if (link.isIsDieselEnergy()) {
-                linkPowers.add(IConstants.POWER_TYPE_DIESEL);
-            }
-
-            linkGauges = new ArrayList<String>();
-            if (link.isIsBusGauge()) {
-                linkGauges.add(IConstants.GAUGE_BUS);
-            }
-            if (link.isIsNarrowGauge()) {
-                linkGauges.add(IConstants.GAUGE_NARROW);
-            }
-            if (link.isIsStandardGauge()) {
-                linkGauges.add(IConstants.GAUGE_STANDARD);
-            }
-            if (link.isIsBroadGauge()) {
-                linkGauges.add(IConstants.GAUGE_BRAOD);
-            }
             nodeLink = nodalGeographyManager.createNodeLink(link.getFromNodeName(), link.getToNodeName(), link.getLength(),
-                    link.isIsSiding(), link.isIsCrossOver(), link.isIsRunningLine(),
-                    StringUtil.strToInt(link.getTrackSectionId()), linkPowers, linkGauges);
+                    link.isIsSiding(), link.isIsCrossOver(), link.isIsRunningLine(), link.getTrackSectionId(), link.isIsBusEnergy(),
+                    link.isIsACEnergy(), link.isIsDCEnergy(), link.isIsDieselEnergy(), link.isIsBusGauge(), link.isIsNarrowGauge(), link.isIsStandardGauge(), link.isIsBroadGauge());
             if (link.getRunningTimes() != null && link.getRunningTimes().getRunningTime() != null) {
                 for (RunningTime runningTime: link.getRunningTimes().getRunningTime()) {
                     if (runningTime == null) {
                         continue;
                     }
-                    nodalGeographyManager.createRuningTime(nodeLink, StringUtil.strToInt(runningTime.getSBId()), runningTime.getSS().toString(), runningTime.getPP().toString());
+                    nodalGeographyManager.createRuningTime(nodeLink, runningTime.getSBId(), runningTime.getSS().toString(), runningTime.getPP().toString());
                 }
             }
         }

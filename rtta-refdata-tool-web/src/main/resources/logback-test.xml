@@ -51,8 +51,7 @@
     <logger name="au.gov.nsw.railcorp.rttarefdata.*" level="INFO" additivity="true">
         <appernder-ref ref="COMMON-LOG"/>
     </logger>
-
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="COMMON-LOG" />
     </root>
 

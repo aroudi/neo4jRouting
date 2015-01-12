@@ -3,7 +3,6 @@ package au.gov.nsw.railcorp.rttarefdata.service;
 import au.gov.nsw.railcorp.rtta.refint.generated.nodes.RefNode;
 import au.gov.nsw.railcorp.rtta.refint.generated.nodes.RttaNodes;
 import au.gov.nsw.railcorp.rttarefdata.manager.INodeManager;
-import au.gov.nsw.railcorp.rttarefdata.manager.TopologyManager;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.NodeData;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
@@ -22,7 +21,7 @@ import java.util.List;
  */
 @Component
 public class NodeService {
-    private final Logger logger = LoggerFactory.getLogger(TopologyManager.class);
+    private final Logger logger = LoggerFactory.getLogger(NodeService.class);
     @Autowired
     private INodeManager nodeManager;
 
