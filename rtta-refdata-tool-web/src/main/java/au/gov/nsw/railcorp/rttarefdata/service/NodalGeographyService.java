@@ -18,6 +18,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+
 
 /**
  * Created by arash on 11/11/14.
@@ -36,24 +44,28 @@ public class NodalGeographyService {
         if (cgGeography == null) {
             return;
         }
+        try {
+            for (CgGeography.Geov10RC geov10RC : cgGeography.getGeov10RC()) {
+                if (geov10RC == null) {
+                    continue;
+                }
+                importNodalHeader(geov10RC);
+                importSpeedBands(geov10RC.getSpeedBands());
+                logger.info("importRailNetGeography: importSpeedBands finished");
+                importTrackSections(geov10RC.getTrackSections());
+                logger.info("importRailNetGeography: importTrackSections finished");
+                importNodes(geov10RC.getNodes());
+                logger.info("importRailNetGeography: importNodes finished");
+                importLinks(geov10RC.getLinks());
+                logger.info("importRailNetGeography: importLinks finished");
+                importNodeLinkages(geov10RC.getLinks());
+                logger.info("importRailNetGeography: importNodeLinkages finished");
+                importNodeSelfRelations(geov10RC.getNodes());
+                logger.info("importRailNetGeography: importNodeSelfRelations finished");
 
-        for (CgGeography.Geov10RC geov10RC: cgGeography.getGeov10RC()) {
-            if (geov10RC == null) {
-                continue;
             }
-            importSpeedBands(geov10RC.getSpeedBands());
-            logger.info("importRailNetGeography: importSpeedBands finished");
-            importTrackSections(geov10RC.getTrackSections());
-            logger.info("importRailNetGeography: importTrackSections finished");
-            importNodes(geov10RC.getNodes());
-            logger.info("importRailNetGeography: importNodes finished");
-            importLinks(geov10RC.getLinks());
-            logger.info("importRailNetGeography: importLinks finished");
-            importNodeLinkages(geov10RC.getLinks());
-            logger.info("importRailNetGeography: importNodeLinkages finished");
-            importNodeSelfRelations(geov10RC.getNodes());
-            logger.info("importRailNetGeography: importNodeSelfRelations finished");
-
+        } catch (Exception e) {
+            logger.error("Exception in importing nodal geography: ", e);
         }
 
     }
@@ -62,6 +74,7 @@ public class NodalGeographyService {
      * import nodes.
      * @param nodes list of nodes
      */
+    //@Transactional
     public void importNodes(Nodes nodes) {
 
         if (nodes == null || nodes.getNode() == null) {
@@ -70,13 +83,21 @@ public class NodalGeographyService {
         //remove All TurnPenaltyBans
         nodalGeographyManager.emptyNodeTurnPenaltyBan();
         nodalGeographyManager.emptyNodeNodeLinkages();
+        String masterTimingPoint = "";
+        String masterJunction = "";
         for (Node node: nodes.getNode()) {
             if (node == null) {
                 continue;
             }
+            if (node.getNodeMasterJunction() != null && node.getNodeMasterJunction().size() > 0) {
+                masterJunction = node.getNodeMasterJunction().get(0).getNodeName();
+            }
+            if (node.getNodeMasterTimingPoint() != null && node.getNodeMasterTimingPoint().size() > 0) {
+                masterTimingPoint = node.getNodeMasterTimingPoint().get(0).getNodeName();
+            }
             nodalGeographyManager.createNode(node.getName(), node.getLongName(), node.getPlatformName(), node.isIsDummy(),
                     node.isIsJunction(), node.isIsWorkingTimingPoint(), node.isIsPublicTimingPoint(), node.isIsEndOfLine(),
-                    node.getDwellDuration().toString(), node.getUpRecoveryDuration().toString(), node.getDownRecoveryDuration().toString(), node.getLength());
+                    node.getDwellDuration().toString(), node.getUpRecoveryDuration().toString(), node.getDownRecoveryDuration().toString(), node.getLength(), masterTimingPoint, masterJunction);
 
         }
 
@@ -86,6 +107,7 @@ public class NodalGeographyService {
      * create MasterTimingPoint, MaterJunction and TurnPenaltyBan relations between nodes.
      * @param nodes nodes
      */
+    //@Transactional
     public void importNodeSelfRelations(Nodes nodes) {
         if (nodes == null || nodes.getNode() == null) {
             return;
@@ -95,6 +117,7 @@ public class NodalGeographyService {
             if (node == null) {
                 continue;
             }
+            /*
             for (Node.NodeMasterTimingPoint masterTimingPoint: node.getNodeMasterTimingPoint()) {
                 if (masterTimingPoint == null) {
                     continue;
@@ -108,6 +131,7 @@ public class NodalGeographyService {
                 nodalGeographyManager.defineNodeMasterJunction(node.getName(), masterJunction.getNodeName());
 
             }
+            */
             if (node.getNodeTurnPenaltyBans() != null) {
                 for (NodeTurnPenaltyBan nodeTurnPenaltyBan: node.getNodeTurnPenaltyBans().getNodeTurnPenaltyBan()) {
                     if (nodeTurnPenaltyBan == null) {
@@ -123,6 +147,7 @@ public class NodalGeographyService {
      * import speed bands.
      * @param speedBands speedBands
      */
+    //@Transactional
     public void importSpeedBands(SpeedBands speedBands) {
         nodalGeographyManager.emptySpeedBands();
         if (speedBands == null) {
@@ -140,6 +165,7 @@ public class NodalGeographyService {
      * import trackSections.
      * @param trackSections trackSections
      */
+    //@Transactional
     public void  importTrackSections(TrackSections trackSections) {
         nodalGeographyManager.emptyTrackSections();
         if (trackSections == null) {
@@ -157,6 +183,7 @@ public class NodalGeographyService {
      * import links.
      * @param links links
      */
+    //@Transactional
     public void importLinks(Links links) {
         NodeLink nodeLink;
         if (links == null || links.getLink() == null) {
@@ -190,6 +217,7 @@ public class NodalGeographyService {
      * for writing algorithms on graph we create a simple linkages from node to node.
      * @param links links
      */
+    //@Transactional
     public void importNodeLinkages (Links links) {
         if (links == null || links.getLink() == null) {
             return;
@@ -204,6 +232,56 @@ public class NodalGeographyService {
                     link.isIsSiding(), link.isIsCrossOver(), link.isIsRunningLine(), StringUtil.strToInt(link.getTrackSectionId()));
         }
 
+    }
+
+    /**
+     * import NodalHeader.
+     * @param geov10RC geov10RC
+     */
+    //@Transactional
+    public void importNodalHeader(CgGeography.Geov10RC geov10RC) {
+        if (geov10RC != null) {
+            nodalGeographyManager.emptyTrackSections();
+            nodalGeographyManager.createNodalHeader(geov10RC.getDescription(), geov10RC.getOwner(), geov10RC.getDate().toString());
+        }
+    }
+
+    /**
+     * extract NodalGeography.
+     * @return CgGeography
+     */
+    public CgGeography exportNodalGeography() {
+        return nodalGeographyManager.exportNodalGeography();
+    }
+
+    /**
+     * Export Platform list into csv format and return as StreamingOutput.
+     * @return Streamingoutput
+     */
+    public StreamingOutput exportNodalGeographyToXml() {
+        StreamingOutput streamingOutput = null;
+        try {
+            final StringWriter writer = new StringWriter();
+            final JAXBContext context = JAXBContext.newInstance(CgGeography.class);
+            final Marshaller marshaller = context.createMarshaller();
+
+            final CgGeography cgGeography = nodalGeographyManager.exportNodalGeography();
+            marshaller.marshal(cgGeography, writer);
+            final String theXml = writer.toString();
+            logger.info(" exported nodalGegoraphy: ");
+            logger.info(theXml);
+            streamingOutput = new StreamingOutput() {
+                @Override
+                public void write(OutputStream output) throws IOException, WebApplicationException {
+                    output.write(theXml.getBytes());
+                    output.flush();
+                }
+            };
+            return streamingOutput;
+        } catch (Exception e) {
+            logger.error("Exception in writing nodalGeography into xml: ", e);
+            return null;
+        }
     }
 
 }

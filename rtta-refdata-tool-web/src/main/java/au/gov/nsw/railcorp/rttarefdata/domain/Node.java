@@ -75,6 +75,21 @@ public class Node {
     protected double longitude;
 
     /**
+     * master timing junction node name.
+     */
+    protected String masterJunctionName;
+
+    /**
+     * master timing point node name.
+     */
+    protected String masterTimingPointName;
+
+    /**
+     * if the source of the node is railNet?
+     */
+    protected boolean railNetNode;
+
+    /**
      * Master Timing Point.
      */
    @RelatedTo (type = Links.MASTER_TIMING_POINT, direction = Direction.OUTGOING)
@@ -381,5 +396,29 @@ public class Node {
 
     public void setNodeLinkages(Collection<NodeLinkage> nodeLinkages) {
         this.nodeLinkages = nodeLinkages;
+    }
+
+    public String getMasterJunctionName() {
+        return masterJunctionName;
+    }
+
+    public void setMasterJunctionName(String masterJunctionName) {
+        this.masterJunctionName = masterJunctionName;
+    }
+
+    public String getMasterTimingPointName() {
+        return masterTimingPointName;
+    }
+
+    public void setMasterTimingPointName(String masterTimingPointName) {
+        this.masterTimingPointName = masterTimingPointName;
+    }
+
+    public boolean isRailNetNode() {
+        return railNetNode;
+    }
+
+    public void setRailNetNode(boolean railNetNode) {
+        this.railNetNode = railNetNode;
     }
 }

@@ -1,5 +1,7 @@
 package au.gov.nsw.railcorp.rttarefdata.rest;
 
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
+import au.gov.nsw.railcorp.rttarefdata.service.NodalGeographyService;
 import au.gov.nsw.railcorp.rttarefdata.service.NodeService;
 import au.gov.nsw.railcorp.rttarefdata.service.StopService;
 import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
@@ -33,6 +35,9 @@ public class ExportService {
 
     @Autowired
     private NodeService nodeService;
+
+    @Autowired
+    private NodalGeographyService nodalGeographyService;
 
     /**
      * export networks into csv format.
@@ -117,4 +122,28 @@ public class ExportService {
         final StreamingOutput streamingOutput = stopService.exportStopLinksToCsv();
             return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = StopLinks.csv").build();
     }
+
+    /**
+     * export Nodal geography in xml format.
+     * @return xml format
+     */
+    @Path("/nodalGeography")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public CgGeography exportNodalGeography() {
+        return nodalGeographyService.exportNodalGeography();
+    }
+
+    /**
+     * export nodalGeography into xml format and return as file.
+     * @return xml file
+     */
+    @Path("/nodalGeography/xml")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response exportNodalGeographyToXml() {
+        final StreamingOutput streamingOutput = nodalGeographyService.exportNodalGeographyToXml();
+        return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = NodalGeography.xml").build();
+    }
+
 }

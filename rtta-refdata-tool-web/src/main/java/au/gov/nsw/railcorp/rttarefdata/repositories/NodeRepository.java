@@ -21,7 +21,23 @@ public interface NodeRepository extends GraphRepository<Node> {
             "MATCH (n:Node) RETURN id(n) AS nodeId,  n.name AS name, n.longName AS longName, n.platfromName AS  platformName"
                     + ", n.isDummy AS dummy, n.isJunction AS junction, n.isWorkingTimingPoint AS  workingTimingPoint, n.isPublicTimingPoint AS publicTimingPoint"
                     + ", n.isEndOfLine AS endOfLine, n.dWellDuration AS wellDuration, n.upRecoveryDuration AS upRecoveryDuration, n.downRecoveryDuration AS downRecoveryDuration"
-                    + ", n.length AS length, n.latitude AS latitude, n.longitude AS longtitude"
+                    + ", n.length AS length, n.latitude AS latitude, n.longitude AS longtitude, n.masterJunctionName as masterJunctionName, n.masterTimingPointName as masterTimingPointName"
     )
     List<INodeData> getAllNodes();
+
+    /**
+     * Return Master Timing Point for a node.
+     * @param nodeName nodeName
+     * @return Master Timing Point Node
+     */
+    @Query("MATCH (node:Node{name:{0}})-[:MASTER_TIMING_POINT]->(mtp:Node) RETURN mtp")
+    Node getMasterTimingPointNode(String nodeName);
+
+    /**
+     * Return Master Timing Point for a node.
+     * @param nodeName nodeName
+     * @return Master Timing Point Node
+     */
+    @Query("MATCH (node:Node{name:{0}})-[:MASTER_JUNCTION]->(mj:Node) RETURN mj")
+    Node getMasterJunctionNode(String nodeName);
 }

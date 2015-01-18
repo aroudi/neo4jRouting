@@ -1,13 +1,36 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.SpeedBands;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Links;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Links.Link.RunningTimes;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Links.Link.RunningTimes.RunningTime;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Links.Link;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.TrackSections;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeTurnPenaltyBans.NodeTurnPenaltyBan;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeTurnPenaltyBans;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeMasterJunction;
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeMasterTimingPoint;
+
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeLinkRunTimeData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
+import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import javax.xml.datatype.DatatypeFactory;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import javax.xml.datatype.Duration;
 
 /**
  * Created by arash on 11/11/14.
@@ -15,6 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class NodalGeographyManager implements INodalGeographyManager {
+
+    private final Logger logger = LoggerFactory.getLogger(NodalGeographyManager.class);
+
     @Autowired
     private NodeRepository nodeRepository;
 
@@ -40,6 +66,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
     private IDataTypeManager dataTypeManager;
     @Autowired
     private NodeLinkageRepository nodeLinkageRepository;
+    @Autowired
+    private NodalHeaderRepository nodalHeaderRepository;
     /**
      * Create SpeedBand Record.
      * @param id id
@@ -212,11 +240,13 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param upRecoveryDuration upRecoveryDuration
      * @param downRecoveryDuration downRecoveryDuration
      * @param length length
+     * @param masterTimingPoint masterTimingPoint
+     * @param masterJunction masterJunction
      * @return Node node
      */
     public Node createNode(String name, String longName, String platformName, boolean isDummy, boolean isJunction,
                            boolean isWorkingTimingPoint, boolean isPublicTimingPoint, boolean isEndOfLine, String dWellDuration,
-                           String upRecoveryDuration, String downRecoveryDuration, double length)
+                           String upRecoveryDuration, String downRecoveryDuration, double length, String masterTimingPoint, String masterJunction)
     {
         Node node;
         node = nodeRepository.findBySchemaPropertyValue("name", name);
@@ -237,6 +267,9 @@ public class NodalGeographyManager implements INodalGeographyManager {
         //reset relations
         node.setMasterTimingPoint(null);
         node.setMasterJunction(null);
+        node.setMasterTimingPointName(masterTimingPoint);
+        node.setMasterJunctionName(masterJunction);
+        node.setRailNetNode(true);
         //node.setIncomingTurnPenaltyBans(null);
         //node.setOutGoingNodeLinks(null);
         //
@@ -295,10 +328,261 @@ public class NodalGeographyManager implements INodalGeographyManager {
         turnPenaltyBan.setFromNode(fromNode);
         turnPenaltyBan.setToNode(toNode);
         turnPenaltyBan.setPenalty(penaltyBan);
+        turnPenaltyBan.setFromNodeName(fromNodeName);
+        turnPenaltyBan.setToNodeName(toNodeName);
         turnPenaltyBanRepository.save(turnPenaltyBan);
         return turnPenaltyBan;
     }
 
+    /**
+     * export NodalGeography.
+     * @return CgGeography
+     */
+    public CgGeography exportNodalGeography() {
+        logger.info("NodalGeographyManager: export begin.");
+        final CgGeography cgGeography = new CgGeography();
+        final Geov10RC geov10RC = exportNodalHeader();
+        geov10RC.setNodes(exportNodes());
+        logger.info("NodalGeographyManager: nodes exported");
+        geov10RC.setSpeedBands(exportSpeedBands());
+        logger.info("NodalGeographyManager: speed bands exported");
+        geov10RC.setTrackSections(exportTrackSections());
+        logger.info("NodalGeographyManager: track section exported");
+        geov10RC.setLinks(exportLinks());
+        logger.info("NodalGeographyManager: links exported");
+        cgGeography.getGeov10RC().add(geov10RC);
+        logger.info("NodalGeographyManager return");
+        return cgGeography;
+    }
+    /**
+     * Build Node list for export.
+     * @return Nodes
+     */
+    public Nodes exportNodes() {
+        final Nodes exportNodeList = new CgGeography.Geov10RC.Nodes();
+        try {
+            final List<INodeData> nodeDataList = nodeRepository.getAllNodes();
+            List<TurnPenaltyBan> turnPenaltyBanList = null;
+            Nodes.Node node;
+            NodeTurnPenaltyBan nodeTurnPenaltyBan = null;
+            NodeMasterJunction nodeMasterJunction = null;
+            NodeMasterTimingPoint nodeMasterTimingPoint = null;
+            Duration duration;
+            NodeTurnPenaltyBans nodeTurnPenaltyBans = null;
+            for (INodeData nodeData : nodeDataList) {
+                node = new Nodes.Node();
+                node.setName(nodeData.getName());
+                node.setLongName(nodeData.getLongName());
+                node.setPlatformName(nodeData.getPlatformName());
+                node.setIsDummy(nodeData.isDummy());
+                node.setIsJunction(nodeData.isJunction());
+                node.setIsWorkingTimingPoint(nodeData.isWorkingTimingPoint());
+                node.setIsPublicTimingPoint(nodeData.isPublicTimingPoint());
+                node.setIsEndOfLine(nodeData.isEndOfLine());
+                try {
+                    duration = DatatypeFactory.newInstance().newDuration(nodeData.getWellDuration());
+                } catch (Exception e) {
+                    duration = null;
+                }
+                node.setDwellDuration(duration);
+
+                try {
+                    duration = DatatypeFactory.newInstance().newDuration(nodeData.getUpRecoveryDuration());
+                } catch (Exception e) {
+                    duration = null;
+                }
+                node.setUpRecoveryDuration(duration);
+
+                try {
+                    duration = DatatypeFactory.newInstance().newDuration(nodeData.getDownRecoveryDuration());
+                } catch (Exception e) {
+                    duration = null;
+                }
+                node.setDownRecoveryDuration(duration);
+                node.setLength(nodeData.getLength());
+
+                if (!nodeData.getMasterJunctionName().isEmpty()) {
+                    nodeMasterJunction = new NodeMasterJunction();
+                    nodeMasterJunction.setNodeName(nodeData.getMasterJunctionName());
+                }
+
+                if (!nodeData.getMasterTimingPointName().isEmpty()) {
+                    nodeMasterTimingPoint = new NodeMasterTimingPoint();
+                    nodeMasterTimingPoint.setNodeName(nodeData.getMasterTimingPointName());
+                }
+                node.getNodeMasterTimingPoint().add(nodeMasterTimingPoint);
+                node.getNodeMasterJunction().add(nodeMasterJunction);
+                //fetch NodeTurnPenaltyBan
+                turnPenaltyBanList = turnPenaltyBanRepository.getAllTurnPenaltyBansPerNode(node.getName());
+                nodeTurnPenaltyBans = new NodeTurnPenaltyBans();
+                for (TurnPenaltyBan turnPenaltyBan : turnPenaltyBanList) {
+                    nodeTurnPenaltyBan = new NodeTurnPenaltyBan();
+                    nodeTurnPenaltyBan.setFromNodeName(turnPenaltyBan.getFromNodeName());
+                    nodeTurnPenaltyBan.setToNodeName(turnPenaltyBan.getToNodeName());
+                    try {
+                        duration = DatatypeFactory.newInstance().newDuration(turnPenaltyBan.getPenalty());
+                    } catch (Exception e) {
+                        duration = null;
+                    }
+                    nodeTurnPenaltyBan.setPenalty(duration);
+                    nodeTurnPenaltyBans.getNodeTurnPenaltyBan().add(nodeTurnPenaltyBan);
+                }
+                node.setNodeTurnPenaltyBans(nodeTurnPenaltyBans);
+                exportNodeList.getNode().add(node);
+            }
+            return exportNodeList;
+        } catch (Exception e) {
+            logger.error("Error in building NodalGegraphy's nodes section :", e);
+            return exportNodeList;
+        }
+    }
+
+    /**
+     * build speedBands for export.
+     * @return SpeedBands
+     */
+    public SpeedBands exportSpeedBands() {
+        final SpeedBands speedBands = new SpeedBands();
+        try {
+            SpeedBands.SpeedBand speedBand = new SpeedBands.SpeedBand();
+            final List<SpeedBand> speedBandList = speedBandRepository.getAllSpeedBands();
+            for (SpeedBand speedBand1 : speedBandList) {
+                speedBand = new SpeedBands.SpeedBand();
+                speedBand.setId(StringUtil.intToStr(speedBand1.getId()));
+                speedBand.setName(speedBand1.getName());
+                speedBands.getSpeedBand().add(speedBand);
+            }
+            return speedBands;
+        } catch (Exception e) {
+            logger.error("Exception in exporting NodalGeography speed bands: ", e);
+            return speedBands;
+        }
+    }
+
+    /**
+     * return all TrackSections.
+     * @return TrackSections
+     */
+    public TrackSections exportTrackSections() {
+        final TrackSections trackSections = new TrackSections();
+        try {
+            TrackSections.TrackSection trackSection = null;
+            final List<TrackSection> trackSectionList = trackSectionRepository.getAllTrackSections();
+            for (TrackSection trackSection1 : trackSectionList) {
+                trackSection = new TrackSections.TrackSection();
+                trackSection.setName(trackSection1.getName());
+                trackSection.setId(trackSection1.getId());
+                trackSection.setIsPermissive(trackSection1.isPermissive());
+                trackSection.setIsUp(trackSection1.isUpDirection());
+                trackSections.getTrackSection().add(trackSection);
+            }
+            return trackSections;
+        } catch (Exception e) {
+            logger.error("Exception in exporting NodalGegoraphy TrackSections: ", e);
+            return trackSections;
+        }
+    }
+
+
+    /**
+     * export Links.
+     * @return Links
+     */
+    public Links exportLinks() {
+        Duration duration;
+        final Links links = new Links();
+        Link link = null;
+        RunningTimes runningTimes = null;
+        RunningTime runningTime = null;
+        try {
+            final List<INodeLinkRunTimeData> nodeLinkRunTimeDataList = nodeLinkRepository.getAllNodeLinksAndRunningTimes();
+            logger.info("NodalGeographyManager: after returning NodeLinkRunTimeData");
+            if (nodeLinkRunTimeDataList == null) {
+                return links;
+            }
+
+            long headNodeLinkId;
+            INodeLinkRunTimeData nodeLinkRunTimeData = null;
+            final ListIterator iterator = nodeLinkRunTimeDataList.listIterator();
+            boolean goForward = false;
+            while (iterator.hasNext()) {
+                goForward = false;
+                nodeLinkRunTimeData = (INodeLinkRunTimeData) iterator.next();
+                logger.info("NodalGeographyManager: processing nodelink: " + nodeLinkRunTimeData.getFromNodeName() + " --> " + nodeLinkRunTimeData.getToNodeName());
+                headNodeLinkId = nodeLinkRunTimeData.getNodeLinkId();
+
+                link = new Link();
+                link.setFromNodeName(nodeLinkRunTimeData.getFromNodeName());
+                link.setToNodeName(nodeLinkRunTimeData.getToNodeName());
+                link.setLength(nodeLinkRunTimeData.getLength());
+                link.setIsBusEnergy(nodeLinkRunTimeData.getBusEnergy());
+                link.setIsACEnergy(nodeLinkRunTimeData.getAcEnergy());
+                link.setIsDCEnergy(nodeLinkRunTimeData.getDcEnergy());
+                link.setIsDieselEnergy(nodeLinkRunTimeData.getDieselEnergy());
+                link.setIsBusGauge(nodeLinkRunTimeData.getBusGauge());
+                link.setIsNarrowGauge(nodeLinkRunTimeData.getNarrowGauge());
+                link.setIsStandardGauge(nodeLinkRunTimeData.getStandardGauge());
+                link.setIsBroadGauge(nodeLinkRunTimeData.getBroadGauge());
+                link.setIsSiding(nodeLinkRunTimeData.getSliding());
+                link.setIsCrossOver(nodeLinkRunTimeData.getCrossOver());
+                link.setIsRunningLine(nodeLinkRunTimeData.getRunningLine());
+                link.setTrackSectionId(nodeLinkRunTimeData.getTrackSectionId());
+
+                //runingTimeList = nodeLinkRepository.getNodeLinkRunningTimes(nodeLinkData.getNodeLinkId());
+                runningTimes = new RunningTimes();
+                while (nodeLinkRunTimeData.getNodeLinkId().longValue() == headNodeLinkId && iterator.hasNext()) {
+                    runningTime = new RunningTime();
+                    runningTime.setSBId(nodeLinkRunTimeData.getSbId());
+                    try {
+                        duration = DatatypeFactory.newInstance().newDuration(nodeLinkRunTimeData.getPassToPass());
+                    } catch (Exception e) {
+                        duration = null;
+                    }
+                    runningTime.setPP(duration);
+                    try {
+                        duration = DatatypeFactory.newInstance().newDuration(nodeLinkRunTimeData.getStopToStop());
+                    } catch (Exception e) {
+                        duration = null;
+                    }
+                    runningTime.setSS(duration);
+                    runningTimes.getRunningTime().add(runningTime);
+                    nodeLinkRunTimeData = (INodeLinkRunTimeData) iterator.next();
+                    goForward = true;
+                }
+                link.setRunningTimes(runningTimes);
+                links.getLink().add(link);
+                if (goForward) {
+                    iterator.previous();
+                }
+            }
+            return links;
+        } catch (Exception e) {
+            logger.error("Exception in exporting NodalGeography nodeLinks : ", e);
+            return links;
+        }
+    }
+
+    /**
+     * build Geov10RC for export.
+      * @return Geov10RC
+     */
+    public Geov10RC exportNodalHeader() {
+        final Geov10RC geov10RC = new Geov10RC();
+        try {
+            final Iterator iterator = nodalHeaderRepository.findAll().iterator();
+            NodalHeader nodalHeader;
+            if (iterator != null && iterator.hasNext()) {
+                nodalHeader = (NodalHeader) iterator.next();
+                geov10RC.setDescription(nodalHeader.getDescription());
+                geov10RC.setOwner(nodalHeader.getOwner());
+                geov10RC.setDate(StringUtil.stringToXmlGregorianCalendar(nodalHeader.getDate()));
+            }
+            return geov10RC;
+        } catch (Exception e) {
+            logger.error("Exception in exporting NodalHeader :", e);
+            return geov10RC;
+        }
+    }
     /**
      * Remove all runningtime records.
      */
@@ -336,5 +620,28 @@ public class NodalGeographyManager implements INodalGeographyManager {
      */
     public void emptyTrackSections () {
         trackSectionRepository.deleteAll();
+    }
+
+    /**
+     * create NodalHeader.
+     * @param description description
+     * @param owner owner
+     * @param date date
+     * @return NodalHeader
+     */
+    public NodalHeader createNodalHeader(String description, String owner, String date) {
+        final NodalHeader nodalHeader = new NodalHeader();
+        nodalHeader.setDescription(description);
+        nodalHeader.setOwner(owner);
+        nodalHeader.setDate(date);
+        return nodalHeaderRepository.save(nodalHeader);
+
+    }
+
+    /**
+     * remove NodalHeader.
+     */
+    public void emptyNodalHeader () {
+        nodalHeaderRepository.deleteAll();
     }
 }

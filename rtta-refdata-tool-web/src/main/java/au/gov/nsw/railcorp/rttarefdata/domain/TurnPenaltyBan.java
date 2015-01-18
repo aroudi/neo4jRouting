@@ -22,6 +22,9 @@ public class TurnPenaltyBan {
     @Indexed
     private String viaNodeName;
 
+    private String fromNodeName;
+    private String toNodeName;
+
     /**
      * Constructor.
      * @param fromNode fromNode
@@ -78,5 +81,21 @@ public class TurnPenaltyBan {
 
     public void setViaNodeName(String viaNodeName) {
         this.viaNodeName = viaNodeName;
+    }
+
+    public String getFromNodeName() {
+        return fromNodeName;
+    }
+
+    public void setFromNodeName(String fromNodeName) {
+        this.fromNodeName = fromNodeName;
+    }
+
+    public String getToNodeName() {
+        return toNodeName;
+    }
+
+    public void setToNodeName(String toNodeName) {
+        this.toNodeName = toNodeName;
     }
 }

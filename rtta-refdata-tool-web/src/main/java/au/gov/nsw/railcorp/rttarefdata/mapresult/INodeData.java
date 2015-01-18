@@ -98,7 +98,7 @@ public interface INodeData {
      * @return double
      */
     @ResultColumn("length")
-    double getLength();
+    long getLength();
 
     /**
      * latitude.
@@ -113,4 +113,18 @@ public interface INodeData {
      */
     @ResultColumn("longtitude")
     double getLongtitude();
+
+    /**
+     * masterTimingPointName.
+     * @return String
+     */
+    @ResultColumn("masterTimingPointName")
+    String getMasterTimingPointName();
+
+    /**
+     * masterJunctionName.
+     * @return String
+     */
+    @ResultColumn("masterJunctionName")
+    String getMasterJunctionName();
 }

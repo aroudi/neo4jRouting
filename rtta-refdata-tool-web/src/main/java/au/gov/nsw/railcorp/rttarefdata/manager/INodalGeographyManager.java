@@ -1,5 +1,6 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 
 
@@ -72,11 +73,13 @@ public interface INodalGeographyManager {
      * @param upRecoveryDuration upRecoveryDuration
      * @param downRecoveryDuration downRecoveryDuration
      * @param length length
+     * @param masterTimingPoint masterTimingPoint
+     * @param masterJunction masterJunction
      * @return Node node
      */
     Node createNode(String name, String longName, String platformName, boolean isDummy, boolean isJunction,
                            boolean isWorkingTimingPoint, boolean isPublicTimingPoint, boolean isEndOfLine, String dWellDuration,
-                           String upRecoveryDuration, String downRecoveryDuration, double length);
+                           String upRecoveryDuration, String downRecoveryDuration, double length, String masterTimingPoint, String masterJunction);
     /**
      * define master timing point for specific node.
      * @param nodeName nodeName
@@ -152,4 +155,24 @@ public interface INodalGeographyManager {
      * Remove All TrackSection.
      */
     void emptyTrackSections ();
+
+    /**
+     * create NodalHeader.
+     * @param description description
+     * @param owner owner
+     * @param date date
+     * @return NodalHeader
+     */
+    NodalHeader createNodalHeader(String description, String owner, String date);
+
+    /**
+     * remove NodalHeader.
+     */
+    void emptyNodalHeader ();
+
+    /**
+     * export NodalGeography.
+     * @return CgGeography
+     */
+    CgGeography exportNodalGeography();
 }

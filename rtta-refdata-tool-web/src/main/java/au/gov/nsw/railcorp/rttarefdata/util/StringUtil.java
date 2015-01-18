@@ -3,6 +3,12 @@ package au.gov.nsw.railcorp.rttarefdata.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 /**
  * Created by arash on 7/11/14.
  */
@@ -91,5 +97,33 @@ public class StringUtil {
             return null;
         }
     }
+
+    /**
+     * Convert String to XMLGregorianCalendar.
+     * @param s s
+     * @return XMLGregorianCalendar
+     */
+    public static XMLGregorianCalendar stringToXmlGregorianCalendar(String s) {
+        try {
+            XMLGregorianCalendar result = null;
+            Date date;
+            SimpleDateFormat simpleDateFormat;
+            GregorianCalendar gregorianCalendar;
+
+            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            date = simpleDateFormat.parse(s);
+            gregorianCalendar =
+                    (GregorianCalendar) GregorianCalendar.getInstance();
+            gregorianCalendar.setTime(date);
+            result = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+            return result;
+        } catch (Exception e) {
+            COMMON_LOGGER.error("Error on converting String to XMLGregorianCalendar :", e);
+            return null;
+        }
+    }
+
+
+
 
 }

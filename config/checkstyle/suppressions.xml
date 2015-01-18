@@ -85,5 +85,6 @@
     <suppress checks="RedundantThrowsCheck" files="[/\\]TopologyService.java"/>
     <suppress checks="RedundantThrowsCheck" files="[/\\]StopService.java"/>
     <suppress checks="RedundantThrowsCheck" files="[/\\]NodeService.java"/>
+    <suppress checks="RedundantThrowsCheck" files="[/\\]NodalGeographyService.java"/>
     <!-- End of suppressions for specfic files -->
 </suppressions>

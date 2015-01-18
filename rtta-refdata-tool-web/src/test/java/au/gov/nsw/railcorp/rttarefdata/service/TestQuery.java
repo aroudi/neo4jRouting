@@ -1,13 +1,16 @@
 package au.gov.nsw.railcorp.rttarefdata.service;
 
+import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 import au.gov.nsw.railcorp.rttarefdata.manager.ServiceTest;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeLinkData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationPlatformData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -21,6 +24,7 @@ public class TestQuery {
     static NodeLinkageRepository nodeLinkageRepository;
     static NodeRepository nodeRepository;
     static PlatformRepository platformRepository;
+    static NodeLinkRepository nodeLinkRepository;
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("rttaDataRefContext.xml");
         tripletRepository = context.getBean(StationTripletRepository.class);
@@ -30,6 +34,7 @@ public class TestQuery {
         nodeRepository = context.getBean(NodeRepository.class);
         platformRepository = context.getBean(PlatformRepository.class);
         serviceTest = context.getBean(ServiceTest.class);
+        nodeLinkRepository = context.getBean(NodeLinkRepository.class);
         //createStationTriplet();
         //queryStationTriplet();
 
@@ -37,7 +42,7 @@ public class TestQuery {
         //removeNodeLink();
         //removeNodeLinkage();
         //queryNodeLinkage();
-        queryPlatforms();
+        queryNodeLinkReposiory();
 
 
 
@@ -124,5 +129,21 @@ public class TestQuery {
         for (IStationPlatformData platformData:platformDataList) {
             System.out.println("platform ="+ platformData.getPlatformName());
         }
+    }
+    public static void queryNodeLinkReposiory(){
+        System.out.print("befor returning nodeList ");
+        List<INodeLinkData> nodeLinkDatas = nodeLinkRepository.getAllNodeLinks();
+        int i=0;
+        for (INodeLinkData nodeLinkData:nodeLinkDatas) {
+            i = i+1;
+            System.out.println("for nodeLink: " + i);
+            List<RuningTime> runingTimes = nodeLinkRepository.getNodeLinkRunningTimes(nodeLinkData.getNodeLinkId());
+        }
+        System.out.print("after returning nodeList ");
+    }
+
+    public void test () {
+        CgGeography cgGeography = new CgGeography();
+        //cgGeography.Geov10RC.Nodes ;
     }
 }
