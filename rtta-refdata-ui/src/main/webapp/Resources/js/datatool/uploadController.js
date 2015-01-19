@@ -1,8 +1,9 @@
 /**
  * Created by arash on 16/12/2014.
  */
-function UploadController($scope, fileUploadService,singleFileUploadService, SUCCESS, FAILURE, UPLOAD_STOPS_URI, UPLOAD_TOPOLOGY_URI, UPLOAD_NODES_URI, UPLOAD_NODAL_URI) {
+function UploadController($scope, generalService, fileUploadService,singleFileUploadService, SUCCESS, FAILURE, UPLOAD_STOPS_URI, UPLOAD_TOPOLOGY_URI, UPLOAD_NODES_URI, UPLOAD_NODAL_URI) {
 
+    generalService.setChosenMenuItem('uploadRefData');
     $scope.fileName ='Stops'
     $scope.fileSet = [
         'Stops' ,

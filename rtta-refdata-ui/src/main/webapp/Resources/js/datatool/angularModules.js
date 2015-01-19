@@ -78,9 +78,17 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
     var addBottonLabel ='Add' ;
     var editBottonLabel ='Edit' ;
     var rowSelected = false;
+    var chosenMenuItem = 'network';
+
 
     return {
 
+        getChosenMenuItem: function () {
+            return chosenMenuItem;
+        },
+        setChosenMenuItem: function (value) {
+            chosenMenuItem = value;
+        },
         isRowSelected: function () {
             return rowSelected;
         },

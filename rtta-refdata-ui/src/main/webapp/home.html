@@ -2,6 +2,7 @@
 <html lang="en" ng-app="rttaRefDataUi">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="CHACHE-CONTROL" content="NO-CACHE">
 
     <title>Rtta Reference Data Tool</title>
 
@@ -39,7 +40,7 @@
     <script src="Resources/js/fileUpload/angular-file-upload.shim.js" type="text/javascript"></script>
 
 </head>
-<body ng-controller="NetworkController">
+<body ng-controller="MainController">
 <div class="wrapper">
     <div class="headingsContainer">
         <div class="headings">
@@ -53,16 +54,20 @@
             </div>
         </div>
     </div>
+    <div class="selectionsBar">
+        <ul class="clans">
+            <div ng-repeat="menuItem in menuItems" class="noFloat">
+                <a href="#/{{menuItem.path}}">
+                    <li
+                            ng-class="{selected: getChosenMenuItem()==menuItem.path}">
+                        {{menuItem.name}}
+                    </li>
+                </a>
+            </div>
+        </ul>
+    </div>
     <div class="actionBar">
         <div class="actionTools">
-            <!-- Menu tool-->
-            <a  class="actionText" href="#/network"> Network </a>
-            <a  class="actionText" href="#/line"> Line </a>
-            <a  class="actionText" href="#/linePath"> Path </a>
-            <a  class="actionText" href="#/station"> Station </a>
-            <a  class="actionText" href="#/platform"> Platform </a>
-            <a  class="actionText" href="#/node"> Nodes </a>
-            <a  class="actionText" href="#/uploadStops"> Upload Stops </a>
         </div>
     </div>
     <div ng-view class="appWindow"></div>

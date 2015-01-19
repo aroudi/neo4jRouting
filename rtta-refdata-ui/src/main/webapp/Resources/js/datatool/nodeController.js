@@ -1,4 +1,6 @@
 function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_URI, EDIT_NODE_URI, DEL_NODE_URI, NODE_CSV_URI, uiGridConstants) {
+
+    generalService.setChosenMenuItem('node');
     $scope.node = {};
     generalService.initBottons();
     $scope.addBottonLabel = generalService.getAddBottonLabel();
@@ -16,11 +18,11 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
             {field:'platformName'},
             {field:'dummy'},
             {field:'junction'},
-            {field:'workingTimingPoint'},
+            {field:'workingTimingPoint', visible:false},
             {field:'endOfLine'},
-            {field:'wellDuration'},
-            {field:'upRecoveryDuration'},
-            {field:'downRecoveryDuration'},
+            {field:'wellDuration', visible:false},
+            {field:'upRecoveryDuration', visible:false},
+            {field:'downRecoveryDuration', visible:false},
             {field:'length'},
             {field:'latitude'},
             {field:'longtitude'}

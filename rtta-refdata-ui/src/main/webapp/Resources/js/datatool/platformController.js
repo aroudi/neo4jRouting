@@ -1,5 +1,6 @@
 function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFORM_URI, ADD_PLATFORM_URI, EDIT_PLATFORM_URI, DEL_PLATFORM_URI, GET_STATION_REF_URI, PLATFORM_CSV_URI) {
 
+    generalService.setChosenMenuItem('platform');
     $scope.platform = {};
     generalService.initBottons();
     /**

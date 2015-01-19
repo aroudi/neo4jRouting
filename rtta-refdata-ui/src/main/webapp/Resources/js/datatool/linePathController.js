@@ -1,5 +1,6 @@
 function LinePathController($scope, generalService, SUCCESS, FAILURE, ALL_PATH_URI, GET_LINE_REF_URI, PATH_CSV_URI) {
 
+    generalService.setChosenMenuItem('linePath');
     $scope.path = {};
     generalService.initBottons();
     /**

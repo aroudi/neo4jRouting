@@ -1,5 +1,6 @@
 function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK_URI, ADD_NETWORK_URI, EDIT_NETWORK_URI, DEL_NETWORK_URI, NETWORK_CSV_URI, uiGridConstants) {
 
+    generalService.setChosenMenuItem('network');
     $scope.platform = {};
     generalService.initBottons();
     $scope.addBottonLabel = generalService.getAddBottonLabel();

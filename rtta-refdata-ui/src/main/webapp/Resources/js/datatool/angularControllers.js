@@ -1,9 +1,26 @@
-function NetworkController($scope) {
+function MainController($scope, generalService) {
+    $scope.menuItems = [
+        { name: 'Networks', path:'network'},
+        { name: 'Lines', path :'line'},
+        { name: 'Line Paths', path:'linePath'},
+        { name: 'Stations', path :'station'},
+        { name: 'Platforms' , path :'platform'},
+        { name: 'Nodes', path :'node'},
+        { name: 'Import Ref Data', path:'uploadRefData'},
+        { name: 'Export Ref Data', path:'downloadRefData'}
+    ];
+
+    $scope.generalService = generalService;
+    $scope.getChosenMenuItem = function()
+    {
+        return generalService.getChosenMenuItem();
+    };
 
 }
 
 function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION_URI, ADD_STATION_URI, EDIT_STATION_URI, DEL_STATION_URI, STATION_CSV_URI, TRIPLET_CSV_URI) {
 
+    generalService.setChosenMenuItem('station');
     generalService.initBottons();
     /**
      * UI-Grid declaration
