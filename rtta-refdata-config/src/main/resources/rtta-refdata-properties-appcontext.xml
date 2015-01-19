@@ -19,10 +19,10 @@
         <property name="locations">
             <list>
                 <value>
-                    classpath:configDev/database.properties
+                    classpath:${RTTA_CONFIG_DIR}/database.properties
                 </value>
                 <value>
-                    classpath:configDev/import.properties
+                    classpath:${RTTA_CONFIG_DIR}/import.properties
                 </value>
             </list>
         </property>

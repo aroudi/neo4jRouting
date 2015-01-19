@@ -51,7 +51,7 @@
     <logger name="commonLogger" level="INFO" additivity="false">
         <appernder-ref ref="COMMON-LOG"/>
     </logger>
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="COMMON-LOG" />
     </root>
 </configuration>
