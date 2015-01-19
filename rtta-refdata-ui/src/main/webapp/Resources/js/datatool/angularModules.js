@@ -41,7 +41,8 @@ var service_uri = {
     'STATION_CSV_URI' : 'export/stationsToCsv',
     'PLATFORM_CSV_URI' : 'export/platformsToCsv',
     'NODE_CSV_URI' : 'export/nodesToCsv',
-    'TRIPLET_CSV_URI' : 'export/tripletsToCsv'
+    'TRIPLET_CSV_URI' : 'export/tripletsToCsv',
+    'NODAL_XML_URI' : 'export/nodalGeography/xml'
 }
 
 var response_status = {

@@ -361,7 +361,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
     public Nodes exportNodes() {
         final Nodes exportNodeList = new CgGeography.Geov10RC.Nodes();
         try {
-            final List<INodeData> nodeDataList = nodeRepository.getAllNodes();
+            final List<INodeData> nodeDataList = nodeRepository.getAllRailNetNodes();
             List<TurnPenaltyBan> turnPenaltyBanList = null;
             Nodes.Node node;
             NodeTurnPenaltyBan nodeTurnPenaltyBan = null;

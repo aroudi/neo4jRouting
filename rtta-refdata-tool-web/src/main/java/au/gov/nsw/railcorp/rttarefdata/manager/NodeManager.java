@@ -75,6 +75,7 @@ public class NodeManager implements INodeManager {
         node.setLongName(longName);
         node.setLatitude(latt);
         node.setLongitude(longt);
+        node.setRailNetNode(false);
         nodeRepository.save(node);
         return node;
     }

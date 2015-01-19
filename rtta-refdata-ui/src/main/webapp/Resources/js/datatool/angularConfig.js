@@ -28,4 +28,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/FileUpload.html',
             controller: UploadController
         });
+        $routeProvider.when('/downloadRefData', {
+            templateUrl: 'RailNetwork/ExportRefData.html',
+            controller: ExportController
+        });
     } ]);

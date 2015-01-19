@@ -13,10 +13,10 @@ function LinePathController($scope, generalService, SUCCESS, FAILURE, ALL_PATH_U
         columnDefs: [
             //default
             {field:'pathId', visible:false, enableCellEdit:false},
-            {field:'lineName', enableCellEdit:false},
-            {field:'name', enableCellEdit:false},
-            {field:'longName', enableCellEdit:false},
-            {name:'linePathStationList', displayName:'Stations', type:'object', cellFilter:'linePathStationList',enableCellEdit:false}
+            {field:'lineName', enableCellEdit:false, width:'10%'},
+            {field:'name', enableCellEdit:false, width:'5%'},
+            {field:'longName', enableCellEdit:false, width:'20%'},
+            {name:'linePathStationList', displayName:'Stations', type:'object', cellFilter:'linePathStationList',enableCellEdit:false, width:'65%'}
         ]
     }
     $scope.gridOptions.enableRowSelection = true;
