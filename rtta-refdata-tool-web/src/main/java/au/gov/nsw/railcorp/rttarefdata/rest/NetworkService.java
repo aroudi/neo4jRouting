@@ -4,8 +4,8 @@ import au.gov.nsw.railcorp.rttarefdata.domain.Network;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.NetworkModel;
 import au.gov.nsw.railcorp.rttarefdata.response.NetworkResponse;
+import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,8 @@ public class NetworkService {
 
     @Autowired
     private NetworkRepository networkRepository;
+    @Autowired
+    private TopologyService topologyService;
 
     /**
      * Return All Networks.
@@ -43,9 +45,9 @@ public class NetworkService {
     @Produces(MediaType.APPLICATION_JSON)
     public List getAllNetworks() {
         try {
-                return Lists.newArrayList(networkRepository.findAll().iterator());
+                return topologyService.getAllNetworks();
         } catch (Exception e) {
-            logger.error("Exception in returning platform list ", e);
+            logger.error("Exception in returning network list ", e);
             return null;
         }
     }

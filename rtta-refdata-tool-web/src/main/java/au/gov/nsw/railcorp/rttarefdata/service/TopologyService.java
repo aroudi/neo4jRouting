@@ -274,6 +274,20 @@ public class TopologyService {
         }
         return extractedData;
     }
+
+    /**
+     * return all networks.
+     * @return List of Networks.
+     */
+    public List getAllNetworks() {
+        try {
+            return topologyManager.getAllNetworks();
+        } catch (Exception e) {
+            logger.error("Exception in returning network list ", e);
+            return null;
+        }
+    }
+
 }
 
 
