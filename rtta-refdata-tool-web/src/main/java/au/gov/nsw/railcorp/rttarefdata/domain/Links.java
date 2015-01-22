@@ -107,4 +107,9 @@ public interface Links {
      * Link between (Node) -[NODE_LINK]-> (Node).
      */
     String NODE_LINKAGE = "NODE_LINKAGE";
+
+    /**
+     * Link between (Node) -[NODE_LOCATION]-> (Location).
+     */
+    String NODE_LOCATION = "NODE_LOCATION";
 }

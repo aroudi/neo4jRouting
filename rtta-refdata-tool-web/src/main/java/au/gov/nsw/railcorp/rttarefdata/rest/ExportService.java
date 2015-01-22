@@ -1,10 +1,7 @@
 package au.gov.nsw.railcorp.rttarefdata.rest;
 
 import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
-import au.gov.nsw.railcorp.rttarefdata.service.NodalGeographyService;
-import au.gov.nsw.railcorp.rttarefdata.service.NodeService;
-import au.gov.nsw.railcorp.rttarefdata.service.StopService;
-import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
+import au.gov.nsw.railcorp.rttarefdata.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,8 @@ public class ExportService {
     @Autowired
     private NodalGeographyService nodalGeographyService;
 
+    @Autowired
+    private LocationService locationService;
     /**
      * export networks into csv format.
      * @return csv file
@@ -146,4 +145,15 @@ public class ExportService {
         return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = NodalGeography.xml").build();
     }
 
+    /**
+     * export locations into csv format.
+     * @return csv file
+     */
+    @Path("/locationsToCsv")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response exportLocationsToCsv() {
+        final StreamingOutput streamingOutput = locationService.exportLocationsToCsv();
+        return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = Location.csv").build();
+    }
 }

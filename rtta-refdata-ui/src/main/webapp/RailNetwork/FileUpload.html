@@ -9,7 +9,7 @@ ng-multiple="false" accept="*.xml" resetOnClick="true">
             ng-options="f for f in fileSet">
     </select> &nbsp &nbsp
 
-<input type=file name=file data-ng-model="myFile" required ng-file-change="generateThumb(myFile[0], $files)" ng-multiple="false" accept="*.xml" ng-file-select>
+<input type=file name=file data-ng-model="myFile" required ng-file-change="generateThumb(myFile[0], $files)" ng-multiple="false" accept="*.xml;*.csv" ng-file-select>
 <I ng-show="myForm.file.$error.required">*Required</I> &nbsp &nbsp
 <button ng-click="onFileSelect(myFile)" ng-disabled ="!myForm.$valid">Upload</button>
 </FORM>

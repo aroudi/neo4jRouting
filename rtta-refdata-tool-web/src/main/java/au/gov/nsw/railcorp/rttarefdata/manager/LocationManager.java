@@ -1,0 +1,110 @@
+package au.gov.nsw.railcorp.rttarefdata.manager;
+
+import au.gov.nsw.railcorp.rttarefdata.domain.Location;
+import au.gov.nsw.railcorp.rttarefdata.domain.Node;
+import au.gov.nsw.railcorp.rttarefdata.repositories.LocationRepository;
+import au.gov.nsw.railcorp.rttarefdata.repositories.NodeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * Created by arash on 20/01/2015.
+ */
+
+@Component
+@Transactional
+public class LocationManager implements ILocationManager {
+
+    private final Logger logger = LoggerFactory.getLogger(TopologyManager.class);
+    @Autowired
+    private LocationRepository locationRepository;
+    @Autowired
+    private NodeRepository nodeRepository;
+
+    /**
+     * create a location.
+     * @param name name
+     * @param systemName systemName
+     * @param longtitude longtitude
+     * @param latitude latitude
+     * @param nodeName nodeName
+     * @param excludeFringe excludeFringe
+     * @return Location
+     */
+    public Location createLocation(String name, String systemName, double longtitude, double latitude, String nodeName, int excludeFringe) {
+        try {
+            if (name == null || name.isEmpty()) {
+                logger.error("location name is empty");
+                return null;
+            }
+            Location location = locationRepository.findBySchemaPropertyValue("name", name);
+            if (location == null) {
+                location = new Location();
+            }
+            location.setName(name);
+            location.setSystemName(systemName);
+            location.setLongtitude(longtitude);
+            location.setLatitude(latitude);
+            location.setNodeName(nodeName);
+            if (nodeName != null || !nodeName.isEmpty()) {
+                final Node node = nodeRepository.findBySchemaPropertyValue("name", nodeName);
+                if (node == null) {
+                    logger.error("not able to locate node " + nodeName);
+                }
+                location.setNode(node);
+            }
+            location.setExcludeFringe(excludeFringe);
+            return locationRepository.save(location);
+        } catch (Exception e) {
+            logger.error("Unable to create location : ", e);
+            return null;
+        }
+    }
+
+    /**
+     * return list of locations.
+     * @return list of locations
+     */
+    public List<Location> getAllLocations() {
+        try {
+            return locationRepository.getAllLocations();
+        } catch (Exception e) {
+            logger.error("error in retrieving location list: ", e);
+            return  null;
+        }
+    }
+
+    /**
+     * find location by name.
+     * @param name name
+     * @return location
+     */
+    public Location getLocationByName(String name) {
+        try {
+            return locationRepository.findBySchemaPropertyValue("name", name);
+        } catch (Exception e) {
+            logger.error("Error in finding location by name: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * delete location by id.
+     * @param locationId locationId
+     * @return status
+     */
+    public int deleteLocation (Long locationId) {
+        try {
+            locationRepository.delete(locationId);
+            return 0;
+        } catch (Exception e) {
+            logger.error("Not able to delete location");
+            return -1;
+        }
+    }
+}

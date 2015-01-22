@@ -53,14 +53,19 @@ public class NodalGeographyService {
                 importSpeedBands(geov10RC.getSpeedBands());
                 logger.info("importRailNetGeography: importSpeedBands finished");
                 importTrackSections(geov10RC.getTrackSections());
+                System.gc();
                 logger.info("importRailNetGeography: importTrackSections finished");
                 importNodes(geov10RC.getNodes());
+                System.gc();
                 logger.info("importRailNetGeography: importNodes finished");
                 importLinks(geov10RC.getLinks());
+                System.gc();
                 logger.info("importRailNetGeography: importLinks finished");
                 importNodeLinkages(geov10RC.getLinks());
+                System.gc();
                 logger.info("importRailNetGeography: importNodeLinkages finished");
                 importNodeSelfRelations(geov10RC.getNodes());
+                System.gc();
                 logger.info("importRailNetGeography: importNodeSelfRelations finished");
 
             }

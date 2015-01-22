@@ -39,4 +39,12 @@ public interface INodeManager {
          * @return list of nodes
          */
     List getAllNodes();
+
+    /**
+     * find node by name.
+     * @param name name
+     * @return Node
+     */
+    Node getNodeByName (String name);
+
 }

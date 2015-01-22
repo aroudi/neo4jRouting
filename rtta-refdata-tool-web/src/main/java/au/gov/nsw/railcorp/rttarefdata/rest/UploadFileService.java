@@ -8,10 +8,7 @@ import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RttaGtfsTopology;
 import au.gov.nsw.railcorp.rtta.refint.generated.nodes.RttaNodes;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RttaStops;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
-import au.gov.nsw.railcorp.rttarefdata.service.NodalGeographyService;
-import au.gov.nsw.railcorp.rttarefdata.service.NodeService;
-import au.gov.nsw.railcorp.rttarefdata.service.StopService;
-import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
+import au.gov.nsw.railcorp.rttarefdata.service.*;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import com.sun.jersey.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -54,6 +51,9 @@ public class UploadFileService {
 
     @Autowired
     private TopologyService topologyService;
+
+    @Autowired
+    private LocationService locationService;
 
     /**
      * upload stops.
@@ -148,6 +148,26 @@ public class UploadFileService {
             nodalGeographyService.importRailNetGeography(cgGeography);
             response.setStatus(IConstants.RESPONSE_SUCCESS);
         } catch (Exception e) {
+            response.setStatus(IConstants.RESPONSE_FAILURE);
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
+    /**
+     * upload nodal Geography.
+     * @param uploadedInputStream uploadedInputStream
+     * @return Response
+     */
+    @POST
+    @Path("/locations")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadLocations(@FormDataParam("file")InputStream uploadedInputStream) {
+        final Response response = new Response();
+        try {
+            locationService.importLocationsFromInputStream(uploadedInputStream);
+            response.setStatus(IConstants.RESPONSE_SUCCESS);
+        } catch (Exception e) {
+            logger.error("Error in uploading locations :", e);
             response.setStatus(IConstants.RESPONSE_FAILURE);
             response.setMessage(e.getMessage());
         }

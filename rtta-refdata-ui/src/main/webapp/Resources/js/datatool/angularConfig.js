@@ -32,4 +32,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/ExportRefData.html',
             controller: ExportController
         });
+        $routeProvider.when('/location', {
+            templateUrl: 'RailNetwork/Location.html',
+            controller: LocationController
+        });
     } ]);

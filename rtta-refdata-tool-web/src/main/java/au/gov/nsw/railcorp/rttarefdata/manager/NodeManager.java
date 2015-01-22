@@ -124,4 +124,18 @@ public class NodeManager implements INodeManager {
         }
     }
 
+    /**
+     * find node by name.
+     * @param name name
+     * @return Node
+     */
+    public Node getNodeByName (String name) {
+        try {
+            return nodeRepository.findBySchemaPropertyValue("name", name);
+        } catch (Exception e) {
+            logger.error ("Exception in getting node by name:", e);
+            return null;
+        }
+    }
+
 }

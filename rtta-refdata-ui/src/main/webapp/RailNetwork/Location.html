@@ -1,0 +1,59 @@
+<h1 style="text-align: center">Location List</h1>
+<!--div ng-controller="StationController" style="height:80%; width: 80%"-->
+<div id="locations" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:70%; width: 95%"></div>
+
+<form name="locationForm">
+    <table>
+        <tr>
+            <td>
+                <b>Name :</b>
+                <input type="text" size="30" name="locationName" data-ng-model="location.name" ng-disabled="formFieldDisabled()" required>
+                <span class="warnText" ng-show="locationForm.locationName.$error.required&&!formFieldDisabled()">
+                    Required!
+                </span>
+            </td>
+            <td>
+                <b>System Name:</b>
+                <input type="text" size="50" name="systemName" data-ng-model="location.systemName" ng-disabled="formFieldDisabled()" required>
+            <span class="warnText" ng-show="locationForm.systemName.$error.required&&!formFieldDisabled()">
+                Required!
+            </span>
+            </td>
+            <td>
+                <b>Node Name:</b>
+                <input type="text" maxlength="20" size="25" data-ng-model="location.nodeName" name="nodeName1" ng-disabled="formFieldDisabled()" >
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b>Longitude:</b>
+                <input type="text" maxlength="30" size="30" data-ng-model="location.longtitude" name="longtitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
+                <span class="warnText" ng-show="locationForm.longtitude.$error.pattern&&!formFieldDisabled()">
+                    Not valid number!
+                </span>
+            </td>
+            <td>
+                <b>Latitude:</b>
+                <input type="text" maxlength="30" size="30" data-ng-model="location.latitude" name="latitude" ng-disabled="formFieldDisabled()" ng-pattern="/^(-)?\d{0,9}(\.\d{1,10})?$/">
+                <span class="warnText" ng-show="locationForm.latitude.$error.pattern&&!formFieldDisabled()">
+                    Not valid number!
+                </span>
+            </td>
+            <td>
+                <b>Exclude Fringe</b>
+                <input type="text" maxlength="50" size="30" name="excludeFringe" data-ng-model="location.excludeFringe" ng-disabled="formFieldDisabled()" >
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <button ng-click="addLocationRow(location)" ng-disabled="isAddBottonDisable() || (!formFieldDisabled() && !locationForm.$valid)">{{addBottonLabel}}</button>
+                <button ng-click="editLocationRow(location)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !locationForm.$valid)">{{editBottonLabel}}</button>
+                <button ng-click="deleteLocationRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
+                <button ng-click="cancelLocationRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+                <button ng-click="exportToCsv()">Export To CSV</button>
+            </td>
+        </tr>
+    </table>
+</form>

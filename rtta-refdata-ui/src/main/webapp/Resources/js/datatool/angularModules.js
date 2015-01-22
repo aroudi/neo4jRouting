@@ -29,6 +29,7 @@ var service_uri = {
     'UPLOAD_TOPOLOGY_URI' : 'upload/topology',
     'UPLOAD_NODES_URI' : 'upload/nodes',
     'UPLOAD_NODAL_URI' : 'upload/nodalGeography',
+    'UPLOAD_LOCATIONS_URI' : 'upload/locations',
     'ALL_NODE_URI' : 'nodes/all',
     'ADD_NODE_URI' : 'nodes/add',
     'EDIT_NODE_URI' : 'nodes/edit',
@@ -41,8 +42,13 @@ var service_uri = {
     'STATION_CSV_URI' : 'export/stationsToCsv',
     'PLATFORM_CSV_URI' : 'export/platformsToCsv',
     'NODE_CSV_URI' : 'export/nodesToCsv',
+    'LOCATION_CSV_URI' : 'export/locationsToCsv',
     'TRIPLET_CSV_URI' : 'export/tripletsToCsv',
-    'NODAL_XML_URI' : 'export/nodalGeography/xml'
+    'NODAL_XML_URI' : 'export/nodalGeography/xml',
+    'ALL_LOCATION_URI' : 'locations/all',
+    'ADD_LOCATION_URI' : 'locations/add',
+    'EDIT_LOCATION_URI' : 'locations/edit',
+    'DEL_LOCATION_URI' : 'locations/delete'
 }
 
 var response_status = {

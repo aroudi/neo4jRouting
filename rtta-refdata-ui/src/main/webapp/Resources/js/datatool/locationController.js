@@ -1,44 +1,23 @@
-function MainController($scope, generalService) {
-    $scope.menuItems = [
-        { name: 'Networks', path:'network'},
-        { name: 'Lines', path :'line'},
-        { name: 'Line Paths', path:'linePath'},
-        { name: 'Stations', path :'station'},
-        { name: 'Platforms' , path :'platform'},
-        { name: 'Nodes', path :'node'},
-        { name: 'Locations', path :'location'},
-        { name: 'Import Ref Data', path:'uploadRefData'},
-        { name: 'Export Ref Data', path:'downloadRefData'}
-    ];
+function LocationController($scope, generalService, SUCCESS, FAILURE, ALL_LOCATION_URI, ADD_LOCATION_URI, EDIT_LOCATION_URI, DEL_LOCATION_URI, LOCATION_CSV_URI, uiGridConstants) {
 
-    $scope.generalService = generalService;
-    $scope.getChosenMenuItem = function()
-    {
-        return generalService.getChosenMenuItem();
-    };
-
-}
-
-function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION_URI, ADD_STATION_URI, EDIT_STATION_URI, DEL_STATION_URI, STATION_CSV_URI, TRIPLET_CSV_URI) {
-
-    generalService.setChosenMenuItem('station');
+    generalService.setChosenMenuItem('location');
     generalService.initBottons();
+    $scope.addBottonLabel = generalService.getAddBottonLabel();
+    $scope.editBottonLabel = generalService.getEditBottonLabel();
     /**
      * UI-Grid declaration
      */
-    $scope.addBottonLabel = generalService.getAddBottonLabel();
-    $scope.editBottonLabel = generalService.getEditBottonLabel();
     $scope.gridOptions = {
+        showFooter: true,
         enableFiltering: true,
         columnDefs: [
-            //default
-            {field:'stationId', enableCellEdit:false},
-            {field:'shortName', enableCellEdit:false},
-            {field:'longName', enableCellEdit:false},
-            {field:'gtfsStopId', enableCellEdit:false},
-            {field:'latitude', enableCellEdit:false},
-            {field:'longtitude',enableCellEdit:false},
-            {field:'interchangePoint', enableCellEdit:false}
+            {field:'id', visible:false, enableCellEdit:false},
+            {field:'name', aggregationType: uiGridConstants.aggregationTypes.count},
+            {field:'nodeName'},
+            {field:'systemName'},
+            {field:'longtitude', displayName:'Longitude'},
+            {field:'latitude'},
+            {field:'excludeFringe'}
         ]
     }
     $scope.gridOptions.enableRowSelection = true;
@@ -55,7 +34,7 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope, function(row) {
             populateFormField(row);
-            $scope.station = angular.copy(generalService.getRow());
+            $scope.location = angular.copy(generalService.getRow());
         });
         gridApi.cellNav.on.navigate($scope, function(newRowCol, oldRowCol){
         });
@@ -65,35 +44,30 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
      * Scroll to the specific row.
      */
     $scope.scrollTo = function (rowIndex, colIndex) {
-      $scope.gridApi.cellNav.scrollTo($scope.gridApi.grid, $scope, $scope.gridOptions.data[rowIndex], $scope.gridOptions.data[colIndex]);
+        $scope.gridApi.cellNav.scrollTo($scope.gridApi.grid, $scope, $scope.gridOptions.data[rowIndex], $scope.gridOptions.data[colIndex]);
     };
 
     /**
-     * retreive station list from server
+     * retreive location list from server
      */
-    getAllStations();
-    function getAllStations() {
-        generalService.getAllRows(ALL_STATION_URI).then(function(response){
+    getAllLocations();
+    function getAllLocations() {
+        generalService.getAllRows(ALL_LOCATION_URI).then(function(response){
             $scope.gridOptions.data = angular.copy(response.data);
         });
 
     }
 
     /**
-     * Reset station form.
+     * Reset location form.
      */
-    function resetStationForm() {
-        $scope.station.shortName='';
-        $scope.station.longName='';
-        $scope.station.gtfsStopId='';
-        $scope.station.latitude='';
-        $scope.station.longtitude='';
-        $scope.station.interchangePoint=false;
+    function resetLocationForm() {
+        $scope.location = generalService.getRow();
 
     };
 
     /**
-     * Populate station fields from selected row.
+     * Populate location fields from selected row.
      */
 
     function populateFormField(row) {
@@ -101,14 +75,14 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         generalService.setRow(row.entity);
         generalService.setSelectedRow(row.entity);
         generalService.setRowSelected(true);
-    }
+    };
 
     /**
-     * Adding new station
-     * @param stationObject
+     * Adding new Location
+     * @param locationObject
      */
 
-    $scope.addStationRow = function(stationObject)
+    $scope.addLocationRow = function(locationObject)
     {
         if (generalService.getAddBottonLabel() == 'Add') {
             generalService.setAddBottonLabel('Save')
@@ -117,15 +91,15 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         }
         if (generalService.getAddBottonLabel() =='Save') {
 
-            stationObject.stationId = -1;
-            generalService.addRow(stationObject, ADD_STATION_URI).then(function(response) {
+            locationObject.id = -1;
+                generalService.addRow(locationObject, ADD_LOCATION_URI).then(function(response) {
                 addResponse = response.data;
                 if (addResponse.status == SUCCESS ) {
-                    stationObject.stationId = addResponse.stationId;
-                    $scope.gridOptions.data.push(angular.copy(stationObject));
+                    locationObject.id = addResponse.id;
+                    $scope.gridOptions.data.push(angular.copy(locationObject));
                     $scope.scrollTo($scope.gridOptions.data.length-2,0);
                 } else {
-                    alert('Not able to add new station. ' + addResponse.message);
+                    alert('Not able to add new location. ' + addResponse.message);
                 }
             });
 
@@ -136,31 +110,31 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         }
     };
 
+
     /**
      * Editing specific row
      */
-    $scope.editStationRow = function(stationObject)
+    $scope.editLocationRow = function(locationObject)
     {
         if (generalService.getEditBottonLabel() == 'Edit') {
-
-            //$scope.station = angular.copy(generalService.getRow());
+            //$scope.location = angular.copy(generalService.getRow());
             generalService.setEditBottonLabel('Save')
             $scope.editBottonLabel = generalService.getEditBottonLabel();
             return;
         }
         if (generalService.getEditBottonLabel() == 'Save') {
-
-            generalService.editRow(stationObject,EDIT_STATION_URI).then(function(response) {
+            generalService.editRow(locationObject,EDIT_LOCATION_URI).then(function(response) {
                 serviceResponse = response.data;
                 if (serviceResponse.status == SUCCESS ) {
                     selectedRow = generalService.getSelectedRow();
-                    selectedRow.shortName = stationObject.shortName;
-                    selectedRow.longName = stationObject.longName;
-                    selectedRow.gtfsStopId = stationObject.gtfsStopId;
-                    selectedRow.latitude = stationObject.latitude;
-                    selectedRow.longtitude = stationObject.longtitude;
-                    selecteRow.interchangePoint =stationObject.interchangePoint;
-                    generalService.setRow(stationObject);
+                    selectedRow.id = locationObject.id;
+                    selectedRow.name = locationObject.name;
+                    selectedRow.systemName = locationObject.systemName;
+                    selectedRow.nodeName = locationObject.nodeName;
+                    selectedRow.longtitude = locationObject.longtitude;
+                    selectedRow.latitude = locationObject.latitude;
+                    selectedRow.excludeFringe = locationObject.excludeFringe;
+                    generalService.setRow(locationObject);
                 } else {
                     alert('edit failed:'+serviceResponse.message);
                 }
@@ -171,16 +145,16 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
         }
     };
 
-    $scope.deleteStationRow = function()
+    $scope.deleteLocationRow = function()
     {
-        stationObject = generalService.getSelectedRow();
-        if (!confirm('Are you sure you want to delete station: '+stationObject.longName +'?')) {
+        locationObject = generalService.getSelectedRow();
+        if (!confirm('Are you sure you want to delete location: '+locationObject.name +'?')) {
             return;
         }
-        generalService.deleteRow(stationObject.stationId,DEL_STATION_URI).then(function(response){
+        generalService.deleteRow(locationObject.id,DEL_LOCATION_URI).then(function(response){
             serviceResponse = response.data;
             if (serviceResponse.status == SUCCESS ) {
-                rowIndex = $scope.gridOptions.data.indexOf(stationObject);
+                rowIndex = $scope.gridOptions.data.indexOf(locationObject);
                 if (rowIndex>-1) {
                     $scope.gridOptions.data.splice(rowIndex,1);
                     generalService.setRowSelected(false);
@@ -190,11 +164,12 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
             }
         });
     }
+
     /**
      * cancel Adding or Editing
      */
 
-    $scope.cancelStationRow = function()
+    $scope.cancelLocationRow = function()
     {
         if (generalService.getAddBottonLabel() =='Save') {
             generalService.setAddBottonLabel('Add')
@@ -205,7 +180,7 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
             $scope.editBottonLabel = generalService.getEditBottonLabel();
 
         }
-        //resetStationForm();
+        resetLocationForm();
     };
 
     /**
@@ -239,24 +214,19 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
     {
         return generalService.isEditBottonDisable();
     };
-    $scope.exportStationToCsv = function()
+
+    $scope.isInEditMode = function()
     {
-        var hiddenElement = document.createElement('a');
-        generalService.getAllRows(STATION_CSV_URI).then(function(response){
-            hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
-            hiddenElement.target ='_blank';
-            hiddenElement.download = 'STATION_DATA.csv';
-            hiddenElement.click();
-        });
+        return generalService.getEditBottonLabel()=='Save' ? true : false;
     };
 
-    $scope.exportTripletToCsv = function()
+    $scope.exportToCsv = function()
     {
         var hiddenElement = document.createElement('a');
-        generalService.getAllRows(TRIPLET_CSV_URI).then(function(response){
+        generalService.getAllRows(LOCATION_CSV_URI).then(function(response){
             hiddenElement.href = 'data:attachment/csv,' + encodeURI(response.data);
             hiddenElement.target ='_blank';
-            hiddenElement.download = 'StopLinks.csv';
+            hiddenElement.download = 'Location.csv';
             hiddenElement.click();
         });
     };

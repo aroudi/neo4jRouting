@@ -131,6 +131,11 @@ public class Node {
     @RelatedToVia(type = Links.NODE_LINKAGE, direction = Direction.OUTGOING)
     protected Collection<NodeLinkage> nodeLinkages;
 
+    /**
+     * Locations related to this node.
+     */
+    @RelatedTo(type = Links.NODE_LOCATION, direction = Direction.BOTH)
+    protected Collection<Location> locations;
 
     /**
      * graph Id.
@@ -420,5 +425,13 @@ public class Node {
 
     public void setRailNetNode(boolean railNetNode) {
         this.railNetNode = railNetNode;
+    }
+
+    public Collection<Location> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Collection<Location> locations) {
+        this.locations = locations;
     }
 }

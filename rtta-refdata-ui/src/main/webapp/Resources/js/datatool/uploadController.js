@@ -1,7 +1,7 @@
 /**
  * Created by arash on 16/12/2014.
  */
-function UploadController($scope, generalService, fileUploadService,singleFileUploadService, SUCCESS, FAILURE, UPLOAD_STOPS_URI, UPLOAD_TOPOLOGY_URI, UPLOAD_NODES_URI, UPLOAD_NODAL_URI) {
+function UploadController($scope, generalService, fileUploadService,singleFileUploadService, SUCCESS, FAILURE, UPLOAD_STOPS_URI, UPLOAD_TOPOLOGY_URI, UPLOAD_NODES_URI, UPLOAD_NODAL_URI, UPLOAD_LOCATIONS_URI) {
 
     generalService.setChosenMenuItem('uploadRefData');
     $scope.fileName ='Stops'
@@ -9,7 +9,8 @@ function UploadController($scope, generalService, fileUploadService,singleFileUp
         'Stops' ,
         'Nodes' ,
         'Topology',
-        'Nodal Geography'
+        'Nodal Geography',
+        'Locations'
     ];
 
 
@@ -28,6 +29,9 @@ function UploadController($scope, generalService, fileUploadService,singleFileUp
                 break;
             case 'Nodal Geography':
                 uploadUrl = UPLOAD_NODAL_URI;
+                break;
+            case 'Locations':
+                uploadUrl = UPLOAD_LOCATIONS_URI;
                 break;
             default :
                 uploadUrl = UPLOAD_STOPS_URI;
