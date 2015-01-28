@@ -35,6 +35,12 @@ public class NodeLinkage {
     @EndNode
     private Node toNode;
 
+    /**
+     * Default Constructor.
+     */
+    public NodeLinkage() {
+    }
+
     public Long getNodeLinkageId() {
         return nodeLinkageId;
     }

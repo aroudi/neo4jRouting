@@ -16,6 +16,12 @@ public class EntitySequence {
     @Indexed
     private String entityName = IConstants.ENTITY_SEQUENCE_NAME;
 
+    /**
+     * defulat constructor.
+     */
+    public EntitySequence() {
+    }
+
     public long getStationSeq() {
         return stationSeq;
     }

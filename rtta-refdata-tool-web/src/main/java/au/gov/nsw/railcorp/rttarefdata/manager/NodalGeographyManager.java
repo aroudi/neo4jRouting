@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.datatype.DatatypeFactory;
 import java.util.Iterator;
@@ -36,7 +37,7 @@ import javax.xml.datatype.Duration;
  * Created by arash on 11/11/14.
  */
 @Component
-@Transactional
+//@Transactional
 public class NodalGeographyManager implements INodalGeographyManager {
 
     private final Logger logger = LoggerFactory.getLogger(NodalGeographyManager.class);
@@ -358,6 +359,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * Build Node list for export.
      * @return Nodes
      */
+    @Transactional
     public Nodes exportNodes() {
         final Nodes exportNodeList = new CgGeography.Geov10RC.Nodes();
         try {
@@ -441,6 +443,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * build speedBands for export.
      * @return SpeedBands
      */
+    @Transactional
     public SpeedBands exportSpeedBands() {
         final SpeedBands speedBands = new SpeedBands();
         try {
@@ -463,6 +466,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * return all TrackSections.
      * @return TrackSections
      */
+    @Transactional
     public TrackSections exportTrackSections() {
         final TrackSections trackSections = new TrackSections();
         try {
@@ -488,6 +492,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * export Links.
      * @return Links
      */
+    @Transactional
     public Links exportLinks() {
         Duration duration;
         final Links links = new Links();
@@ -566,6 +571,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * build Geov10RC for export.
       * @return Geov10RC
      */
+    @Transactional
     public Geov10RC exportNodalHeader() {
         final Geov10RC geov10RC = new Geov10RC();
         try {

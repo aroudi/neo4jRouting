@@ -29,6 +29,12 @@ public class Location {
     private Node node;
     private String nodeName;
 
+    /**
+     * Default constructor.
+     */
+    public Location() {
+    }
+
     public String getName() {
         return name;
     }

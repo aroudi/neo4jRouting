@@ -20,6 +20,12 @@ public class NodalHeader {
     private String owner;
     private String date;
 
+    /**
+     * Default Constructor.
+     */
+    public NodalHeader() {
+    }
+
     public String getDescription() {
         return description;
     }

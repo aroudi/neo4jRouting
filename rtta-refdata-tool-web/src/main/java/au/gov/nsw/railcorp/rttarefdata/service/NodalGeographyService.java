@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -53,19 +54,19 @@ public class NodalGeographyService {
                 importSpeedBands(geov10RC.getSpeedBands());
                 logger.info("importRailNetGeography: importSpeedBands finished");
                 importTrackSections(geov10RC.getTrackSections());
-                System.gc();
+                //System.gc();
                 logger.info("importRailNetGeography: importTrackSections finished");
                 importNodes(geov10RC.getNodes());
-                System.gc();
+                //System.gc();
                 logger.info("importRailNetGeography: importNodes finished");
                 importLinks(geov10RC.getLinks());
-                System.gc();
+                //System.gc();
                 logger.info("importRailNetGeography: importLinks finished");
                 importNodeLinkages(geov10RC.getLinks());
-                System.gc();
+                //System.gc();
                 logger.info("importRailNetGeography: importNodeLinkages finished");
                 importNodeSelfRelations(geov10RC.getNodes());
-                System.gc();
+                //System.gc();
                 logger.info("importRailNetGeography: importNodeSelfRelations finished");
 
             }
@@ -79,7 +80,7 @@ public class NodalGeographyService {
      * import nodes.
      * @param nodes list of nodes
      */
-    //@Transactional
+    @Transactional
     public void importNodes(Nodes nodes) {
 
         if (nodes == null || nodes.getNode() == null) {
@@ -112,7 +113,7 @@ public class NodalGeographyService {
      * create MasterTimingPoint, MaterJunction and TurnPenaltyBan relations between nodes.
      * @param nodes nodes
      */
-    //@Transactional
+    @Transactional
     public void importNodeSelfRelations(Nodes nodes) {
         if (nodes == null || nodes.getNode() == null) {
             return;
@@ -152,7 +153,7 @@ public class NodalGeographyService {
      * import speed bands.
      * @param speedBands speedBands
      */
-    //@Transactional
+    @Transactional
     public void importSpeedBands(SpeedBands speedBands) {
         nodalGeographyManager.emptySpeedBands();
         if (speedBands == null) {
@@ -170,7 +171,7 @@ public class NodalGeographyService {
      * import trackSections.
      * @param trackSections trackSections
      */
-    //@Transactional
+    @Transactional
     public void  importTrackSections(TrackSections trackSections) {
         nodalGeographyManager.emptyTrackSections();
         if (trackSections == null) {
@@ -188,7 +189,7 @@ public class NodalGeographyService {
      * import links.
      * @param links links
      */
-    //@Transactional
+    @Transactional
     public void importLinks(Links links) {
         NodeLink nodeLink;
         if (links == null || links.getLink() == null) {
@@ -215,6 +216,7 @@ public class NodalGeographyService {
                     nodalGeographyManager.createRuningTime(nodeLink, runningTime.getSBId(), runningTime.getSS().toString(), runningTime.getPP().toString());
                 }
             }
+            //System.gc();
         }
     }
 
@@ -222,7 +224,7 @@ public class NodalGeographyService {
      * for writing algorithms on graph we create a simple linkages from node to node.
      * @param links links
      */
-    //@Transactional
+    @Transactional
     public void importNodeLinkages (Links links) {
         if (links == null || links.getLink() == null) {
             return;
@@ -243,7 +245,7 @@ public class NodalGeographyService {
      * import NodalHeader.
      * @param geov10RC geov10RC
      */
-    //@Transactional
+    @Transactional
     public void importNodalHeader(CgGeography.Geov10RC geov10RC) {
         if (geov10RC != null) {
             nodalGeographyManager.emptyTrackSections();
@@ -273,8 +275,8 @@ public class NodalGeographyService {
             final CgGeography cgGeography = nodalGeographyManager.exportNodalGeography();
             marshaller.marshal(cgGeography, writer);
             final String theXml = writer.toString();
-            logger.info(" exported nodalGegoraphy: ");
-            logger.info(theXml);
+            //logger.info(" exported nodalGegoraphy: ");
+            //logger.info(theXml);
             streamingOutput = new StreamingOutput() {
                 @Override
                 public void write(OutputStream output) throws IOException, WebApplicationException {

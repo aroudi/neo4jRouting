@@ -20,16 +20,43 @@
     <import resource="classpath:rtta-refdata-properties-appcontext.xml"/>
     <import resource="classpath:rtta-refdata-core-appcontext.xml"/>
     <!-- uncomment this if you want to connect to the neo4j file base db -->
+    <!--
     <neo4j:config storeDirectory="${storeDirectory}"
                   base-package="au.gov.nsw.railcorp.rttarefdata.domain"/>
+    -->
+
+    <bean id="graphDatabaseService" class="org.springframework.data.neo4j.support.GraphDatabaseServiceFactoryBean" destroy-method="shutdown" scope="singleton">
+        <constructor-arg value="${storeDirectory}" />
+        <constructor-arg>
+            <map>
+                <entry key="enable_remote_shell" value="true" />
+            </map>
+        </constructor-arg>
+    </bean>
+
     <neo4j:repositories base-package="au.gov.nsw.railcorp.rttarefdata.repositories"/>
     <!-- uncomment this if you want to connect to the neo4j server -->
-    <!--
     <neo4j:config graphDatabaseService="graphDatabaseService" base-package="au.gov.nsw.railcorp.rttarefdata.domain"/>
+    <!--
     <bean id="graphDatabaseService" class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
         <constructor-arg index="0" value="http://${host}:${port}${db}" />
     </bean>
     -->
-    <tx:annotation-driven />
+    <!--
+    <bean id="neo4jTransactionManager" class="org.springframework.data.neo4j.config.JtaTransactionManagerFactoryBean">
+        <constructor-arg ref="graphDatabaseService"/>
+    </bean>
+    -->
+    <bean id="neo4jTransactionManagerService" class="org.neo4j.kernel.impl.transaction.SpringTransactionManager">
+        <constructor-arg ref="graphDatabaseService" />
+    </bean>
+    <bean id="neo4jUserTransactionService" class="org.neo4j.kernel.impl.transaction.UserTransactionImpl" >
+        <constructor-arg ref="graphDatabaseService" />
+    </bean>
+    <bean id="neo4jTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="transactionManager" ref="neo4jTransactionManagerService" />
+        <property name="userTransaction" ref="neo4jUserTransactionService" />
+    </bean>
+    <tx:annotation-driven transaction-manager="neo4jTransactionManager" />
 </beans>
 
