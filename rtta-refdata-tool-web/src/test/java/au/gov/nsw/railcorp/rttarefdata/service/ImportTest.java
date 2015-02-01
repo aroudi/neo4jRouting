@@ -47,13 +47,13 @@ public class ImportTest {
         stopService.importRttaStops(rttaStops);
         */
         importStops();
-        System.out.println("stops imported");
+        //System.out.println("stops imported");
         importGtfsTopology();
         System.out.println("topology imported");
-        importGtfsNodes();
-        System.out.println("nodes imported");
-        importNodalGeography();
-        System.out.println("nodal geography imported");
+        //importGtfsNodes();
+        //System.out.println("nodes imported");
+        //importNodalGeography();
+        //System.out.println("nodal geography imported");
 
     }
     public static void importStops() {

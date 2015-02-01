@@ -120,6 +120,9 @@ public class TopologyManager implements ITopologyManager {
                 if (station != null) {
                     boolean pathIsMatch = false;
                     for (String matchInclude : pathMatchInclude) {
+                        if (matchInclude == null) {
+                            continue;
+                        }
                         if (matchInclude.equals(stationName)) {
                             pathIsMatch = true;
                             break;

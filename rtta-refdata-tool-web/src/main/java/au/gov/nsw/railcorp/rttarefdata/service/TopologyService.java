@@ -90,6 +90,7 @@ public class TopologyService {
         String[] pathMatchInclude;
         String[] interchagePoints;
         if (linePaths == null) {
+            logger.error("importLinePath: linePath is null");
             return;
         }
         for (RefGtfsLinePath linePath:linePaths) {

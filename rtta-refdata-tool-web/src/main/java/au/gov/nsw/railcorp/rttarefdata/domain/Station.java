@@ -188,4 +188,36 @@ public class Station {
     public void setTriplets(Collection<StationTriplet> triplets) {
         this.triplets = triplets;
     }
+
+    public Collection<StationTriplet> getOutGoingTriplets() {
+        return outGoingTriplets;
+    }
+
+    public void setOutGoingTriplets(Collection<StationTriplet> outGoingTriplets) {
+        this.outGoingTriplets = outGoingTriplets;
+    }
+
+    public Collection<StationTriplet> getIncomingTriplets() {
+        return incomingTriplets;
+    }
+
+    public void setIncomingTriplets(Collection<StationTriplet> incomingTriplets) {
+        this.incomingTriplets = incomingTriplets;
+    }
+
+    public Set<LinePath> getLinePaths() {
+        return linePaths;
+    }
+
+    public void setLinePaths(Set<LinePath> linePaths) {
+        this.linePaths = linePaths;
+    }
+
+    public Collection<PathStation> getPathStations() {
+        return pathStations;
+    }
+
+    public void setPathStations(Collection<PathStation> pathStations) {
+        this.pathStations = pathStations;
+    }
 }
