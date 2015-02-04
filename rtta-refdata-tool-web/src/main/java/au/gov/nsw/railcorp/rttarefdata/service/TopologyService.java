@@ -5,10 +5,14 @@ import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RefGtfsNetwork;
 import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RefGtfsNetworkLine;
 import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.RttaGtfsTopology;
 import au.gov.nsw.railcorp.rttarefdata.domain.Network;
+import au.gov.nsw.railcorp.rttarefdata.manager.IStopManager;
 import au.gov.nsw.railcorp.rttarefdata.manager.ITopologyManager;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.LinePathData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.LinePathStationData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.NetworkLineData;
+import au.gov.nsw.railcorp.rttarefdata.request.EdgeModel;
+import au.gov.nsw.railcorp.rttarefdata.request.LineInfo;
+import au.gov.nsw.railcorp.rttarefdata.request.NetworkVisModel;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
@@ -32,6 +36,8 @@ public class TopologyService {
     private final Logger logger = LoggerFactory.getLogger(TopologyService.class);
     @Autowired
     private ITopologyManager topologyManager;
+    @Autowired
+    private IStopManager stopManager;
 
     /**
      * import Rtta Gtfs Topology object.
@@ -286,6 +292,77 @@ public class TopologyService {
         } catch (Exception e) {
             logger.error("Exception in returning network list ", e);
             return null;
+        }
+    }
+
+    /**
+     * get network in vis.js format for visualizing it on screen.
+     * @return NetworkVisModel
+     */
+    public NetworkVisModel getNetworkVisModel() {
+        try {
+            final NetworkVisModel networkVisModel = new NetworkVisModel();
+            networkVisModel.setNodes(stopManager.getAllStations());
+            final List<LinePathData> linePathDataList = topologyManager.getAllPathStation();
+            for (LinePathData linePathData: linePathDataList) {
+                extractEdges(networkVisModel, linePathData);
+            }
+            return networkVisModel;
+        } catch (Exception e) {
+            logger.error("Exception in returning networkVisModel :", e);
+            return null;
+        }
+    }
+
+    /**
+     * extract Edges from linePathData.
+     * @param networkVisModel networkVisModel
+     * @param linePathData linePathData
+     */
+    public void extractEdges(NetworkVisModel networkVisModel, LinePathData linePathData) {
+        try {
+            final List<LinePathStationData> linePathStationList = linePathData.getLinePathStationList();
+            if (linePathData == null || linePathData.getLinePathStationList() == null) {
+                return;
+            }
+            LinePathStationData fromNode;
+            LinePathStationData toNode;
+            String mainKey;
+            String reverseKey;
+            EdgeModel edgeModel;
+            LineInfo lineInfo;
+            for (int i = 0; i < linePathStationList.size() - 2; i++) {
+                fromNode = linePathStationList.get(i);
+                toNode = linePathStationList.get(i + 1);
+                mainKey = fromNode.getName() + toNode.getName();
+                reverseKey = toNode.getName() + fromNode.getName();
+                edgeModel = new EdgeModel();
+                edgeModel.setFromNode(fromNode.getStationId());
+                edgeModel.setToNode(toNode.getStationId());
+                lineInfo = new LineInfo();
+                lineInfo.setName(linePathData.getLineName());
+                lineInfo.setLongName(linePathData.getLineLongName());
+                lineInfo.setBackgroundColourHex(linePathData.getBackgroundColourHex());
+                lineInfo.setTextColourHex(linePathData.getTextColourHex());
+                networkVisModel.addEdge(mainKey, reverseKey, edgeModel, lineInfo);
+            }
+            final int edgesNo = linePathStationList.size();
+            fromNode = linePathStationList.get(edgesNo - 2);
+            toNode = linePathStationList.get(edgesNo - 1);
+            mainKey = fromNode.getName() + toNode.getName();
+            reverseKey = toNode.getName() + fromNode.getName();
+            edgeModel = new EdgeModel();
+            edgeModel.setFromNode(fromNode.getStationId());
+            edgeModel.setToNode(toNode.getStationId());
+            lineInfo = new LineInfo();
+            lineInfo.setName(linePathData.getLineName());
+            lineInfo.setLongName(linePathData.getLineLongName());
+            lineInfo.setBackgroundColourHex(linePathData.getBackgroundColourHex());
+            lineInfo.setTextColourHex(linePathData.getTextColourHex());
+            networkVisModel.addEdge(mainKey, reverseKey, edgeModel, lineInfo);
+        } catch (Exception e) {
+            logger.error("Exception in extracting edges from linePath: ", e);
+            return;
         }
     }
 

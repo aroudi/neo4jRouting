@@ -3,6 +3,7 @@ package au.gov.nsw.railcorp.rttarefdata.rest;
 import au.gov.nsw.railcorp.rttarefdata.domain.Network;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.NetworkModel;
+import au.gov.nsw.railcorp.rttarefdata.request.NetworkVisModel;
 import au.gov.nsw.railcorp.rttarefdata.response.NetworkResponse;
 import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
@@ -148,6 +149,17 @@ public class NetworkService {
             response.setMessage(e.getMessage());
         }
         return response;
+    }
+
+    /**
+     * return network in visjs format.
+     * @return NetworkVisModel
+     */
+    @GET
+    @Path("/visualize")
+    @Produces(MediaType.APPLICATION_JSON)
+    public NetworkVisModel visualizeNetwork () {
+        return topologyService.getNetworkVisModel();
     }
 
 }

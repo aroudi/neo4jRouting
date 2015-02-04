@@ -48,7 +48,8 @@ var service_uri = {
     'ALL_LOCATION_URI' : 'locations/all',
     'ADD_LOCATION_URI' : 'locations/add',
     'EDIT_LOCATION_URI' : 'locations/edit',
-    'DEL_LOCATION_URI' : 'locations/delete'
+    'DEL_LOCATION_URI' : 'locations/delete',
+    'VIS_NETWORK_URI' : 'networks/visualize'
 }
 
 var response_status = {
@@ -337,6 +338,56 @@ myApp.service('drawNetworkService', function ( ) {
         getNetworkOptions: function () {
             return networkOptions;
         },
+
+        drawAllNetwork: function (visNetworkData) {
+            if (visNetworkData == undefined) {
+                return;
+            }
+            myNodes = new vis.DataSet();
+            myEdges = new vis.DataSet();
+            networkData = {
+                nodes: myNodes,
+                edges: myEdges
+            };
+            networkOptions = {
+                hierarchicalLoyout: {
+                    direction :"UD"
+                },
+                edges : {
+                    color: '#00205b',
+                    width :2,
+                    style:'arrow'
+                },
+                nodes : {
+                    color : {
+                        background : 'white',
+                        border : '#00205b',
+                        width :2,
+                        highlight : {
+                            background: '#a6192e',
+                            border : '#00205b',
+                            fontFill :'white'
+                        }
+                    },
+                    fontSize : 20,
+                    fontColor:'#00205b',
+                    radius: 14
+                }
+            };
+            nodes = visNetworkData.nodes;
+            for (var i = 0; i < nodes.length; i++) {
+                myTitle = nodes[i].longName + "(Latt: " + nodes[i].latitude + ", Long: " + nodes[i].longtitude + ")";
+                myNodes.add([{id:nodes[i].stationId, label:nodes[i].shortName , title: myTitle} ])
+            }
+            edges = visNetworkData.arcs;
+            for (var i = 0; i < edges.length; i++) {
+                myEdges.add([
+                    {id:i, from:edges[i].fromNode, to:edges[i].toNode}
+                ]);
+            }
+
+        },
+
         setNetworkData : function (nodeData, backgroundColour, textColour) {
             if (nodeData == undefined )
                 return;
@@ -374,7 +425,7 @@ myApp.service('drawNetworkService', function ( ) {
             }
             nodeSetLength = nodeData.length;
             for (var i = 0; i < nodeSetLength; i++) {
-                myTitle = nodeData[i].longName + "(Latt: " + nodeData[i].longtitude + ", Long: " + nodeData[i].latitude + ")"
+                myTitle = nodeData[i].longName + "(Latt: " + nodeData[i].latitude + ", Long: " + nodeData[i].longtitude + ")"
                 myNodes.add([{id:nodeData[i].sequence, label:nodeData[i].name , title: myTitle} ])
             }
             for (var i = 0; i < nodeSetLength-2; i++) {

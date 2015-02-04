@@ -36,4 +36,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Location.html',
             controller: LocationController
         });
+        $routeProvider.when('/visNetwork', {
+            templateUrl: 'RailNetwork/VisualizeNetwork.html',
+            controller: VisNetworkController
+        });
     } ]);
