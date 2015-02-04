@@ -1,4 +1,4 @@
-var myApp = angular.module('rttaRefDataUi', ["stationFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload"]);
+var myApp = angular.module('rttaRefDataUi', ["stationFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload","ngVis"]);
 var config_data = {
     'SERVER' : 'localhost',
     'PORT'   : '8082',
@@ -324,6 +324,72 @@ myApp.service('fileUploadService', function ($location, $upload, $http, $q, conf
         }
     }
 });
+
+myApp.service('drawNetworkService', function ( ) {
+    var networkData;
+    var networkOptions;
+    var myNodes ;
+    var myEdges ;
+    return {
+        getNetworkData: function () {
+            return networkData;
+        },
+        getNetworkOptions: function () {
+            return networkOptions;
+        },
+        setNetworkData : function (nodeData, backgroundColour, textColour) {
+            if (nodeData == undefined )
+                return;
+
+            myNodes = new vis.DataSet();
+            myEdges = new vis.DataSet();
+            networkData = {
+                nodes: myNodes,
+                edges: myEdges
+            };
+            networkOptions = {
+                hierarchicalLoyout: {
+                    direction :"UD"
+                },
+                edges : {
+                    color: '#00205b',
+                    width :2,
+                    style:'arrow'
+                },
+                nodes : {
+                    color : {
+                        background : 'white',
+                        border : '#00205b',
+                        width :2,
+                        highlight : {
+                            background: '#a6192e',
+                            border : '#00205b',
+                            fontFill :'white'
+                        }
+                    },
+                    fontSize : 20,
+                    fontColor:'#00205b',
+                    radius: 14
+                }
+            }
+            nodeSetLength = nodeData.length;
+            for (var i = 0; i < nodeSetLength; i++) {
+                myTitle = nodeData[i].longName + "(Latt: " + nodeData[i].longtitude + ", Long: " + nodeData[i].latitude + ")"
+                myNodes.add([{id:nodeData[i].sequence, label:nodeData[i].name , title: myTitle} ])
+            }
+            for (var i = 0; i < nodeSetLength-2; i++) {
+                myEdges.add([
+                    {id:i+1, from:nodeData[i].sequence, to:nodeData[i+1].sequence}
+                ]);
+            }
+            myEdges.add([
+                {id:nodeSetLength, from:nodeData[nodeSetLength-2].sequence, to:nodeData[nodeSetLength-1].sequence}
+            ]);
+        }
+    }
+});
+
+
 
 myApp.directive('fileModel', ['$parse', function ($parse) {
     return {

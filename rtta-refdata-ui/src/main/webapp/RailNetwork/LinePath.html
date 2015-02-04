@@ -1,7 +1,11 @@
 
 <h1 style="text-align: center">Path List</h1>
 <!--div ng-controller="StationController" style="height:80%; width: 80%"-->
-    <div id="linePaths" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav ui-grid-resize-columns style="height:80%; width: 99%" ></div>
+    <div id="linePaths" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav ui-grid-resize-columns style="height:90%; width: 50%" ></div>
+    <div style="height:90%; width: 40%">
+        <b style="text-align: center">{{pathName}} : </b>
+        <vis-network ng-model ="network_data" data="network_data" options="network_options" id ="previewNetwork" ></vis-network>
+    </div>
     <button ng-click="exportToCsv()">Export To CSV</button>
 
 <!--/div-->
