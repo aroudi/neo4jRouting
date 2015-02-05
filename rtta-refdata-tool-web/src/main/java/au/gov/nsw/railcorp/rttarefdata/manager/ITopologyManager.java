@@ -63,4 +63,10 @@ public interface ITopologyManager {
      */
     List getAllPathStation();
 
+    /**
+     * Returns all path stations per Netwrok.
+     * @param networkName networkName
+     * @return List of path station
+     */
+    List getAllPathStationPerNetwork(String networkName);
     }

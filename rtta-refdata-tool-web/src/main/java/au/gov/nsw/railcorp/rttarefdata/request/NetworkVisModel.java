@@ -1,6 +1,7 @@
 package au.gov.nsw.railcorp.rttarefdata.request;
 
 
+import au.gov.nsw.railcorp.rttarefdata.mapresult.LinePathStationData;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Collection;
@@ -13,7 +14,9 @@ import java.util.List;
  */
 public class NetworkVisModel {
     private String networkName;
-    private List nodes;
+    @JsonIgnore
+    private HashMap<String, LinePathStationData> stations;
+    private Collection nodes;
     @JsonIgnore
     private HashMap<String, EdgeModel> edges;
     private Collection arcs;
@@ -49,6 +52,26 @@ public class NetworkVisModel {
 
     }
 
+    /**
+     * add station to the nodes.
+     * @param  linePathStationData linePathStationData
+     */
+    public void addStation (LinePathStationData linePathStationData) {
+
+        if (linePathStationData == null) {
+            return;
+        }
+        final String key = linePathStationData.getName();
+        if (stations == null) {
+            stations = new HashMap<String, LinePathStationData>();
+        }
+        //search for key
+        if (stations.containsKey(key)) {
+            return;
+        }
+        stations.put(key, linePathStationData);
+    }
+
     public String getNetworkName() {
         return networkName;
     }
@@ -57,7 +80,14 @@ public class NetworkVisModel {
         this.networkName = networkName;
     }
 
-    public List getNodes() {
+    /**
+     * return nodes.
+     * @return Collection
+     */
+    public Collection getNodes() {
+        if (stations != null) {
+            return stations.values();
+        }
         return nodes;
     }
 

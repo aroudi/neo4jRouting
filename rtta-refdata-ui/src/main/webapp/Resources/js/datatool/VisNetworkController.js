@@ -1,5 +1,5 @@
 function VisNetworkController($scope, generalService,drawNetworkService, SUCCESS, FAILURE, VIS_NETWORK_URI) {
-
+    //$scope.networkList = [];
     generalService.setChosenMenuItem('visNetwork');
     /**
      * UI-Grid declaration
@@ -10,13 +10,20 @@ function VisNetworkController($scope, generalService,drawNetworkService, SUCCESS
      * retreive network list from server
      */
     getAllVisNetworks();
+
     function getAllVisNetworks() {
         generalService.getAllRows(VIS_NETWORK_URI).then(function(response){
-            displayNetwork(response.data);
+            $scope.networkList = response.data;
+            displayNetwork(response.data[2]);
+            $scope.networkName = response.data[2].networkName;
         });
 
     }
+    $scope.displayNetwork = function(networkData) {
+        displayNetwork(networkData);
+    }
     function displayNetwork(networkData) {
+        $scope.networkName = networkData.networkName;
         if ( networkData == undefined )
             return;
         drawNetworkService.drawAllNetwork(networkData);

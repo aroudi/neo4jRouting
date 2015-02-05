@@ -158,7 +158,7 @@ public class NetworkService {
     @GET
     @Path("/visualize")
     @Produces(MediaType.APPLICATION_JSON)
-    public NetworkVisModel visualizeNetwork () {
+    public List<NetworkVisModel> visualizeNetwork () {
         return topologyService.getNetworkVisModel();
     }
 

@@ -326,7 +326,7 @@ myApp.service('fileUploadService', function ($location, $upload, $http, $q, conf
     }
 });
 
-myApp.service('drawNetworkService', function ( ) {
+myApp.service('drawNetworkService', function ($q, loadDisplay  ) {
     var networkData;
     var networkOptions;
     var myNodes ;
@@ -340,6 +340,7 @@ myApp.service('drawNetworkService', function ( ) {
         },
 
         drawAllNetwork: function (visNetworkData) {
+
             if (visNetworkData == undefined) {
                 return;
             }
@@ -377,7 +378,7 @@ myApp.service('drawNetworkService', function ( ) {
             nodes = visNetworkData.nodes;
             for (var i = 0; i < nodes.length; i++) {
                 myTitle = nodes[i].longName + "(Latt: " + nodes[i].latitude + ", Long: " + nodes[i].longtitude + ")";
-                myNodes.add([{id:nodes[i].stationId, label:nodes[i].shortName , title: myTitle} ])
+                myNodes.add([{id:nodes[i].stationId, label:nodes[i].longName , title: myTitle} ])
             }
             edges = visNetworkData.arcs;
             for (var i = 0; i < edges.length; i++) {
@@ -385,7 +386,6 @@ myApp.service('drawNetworkService', function ( ) {
                     {id:i, from:edges[i].fromNode, to:edges[i].toNode}
                 ]);
             }
-
         },
 
         setNetworkData : function (nodeData, backgroundColour, textColour) {
@@ -426,7 +426,7 @@ myApp.service('drawNetworkService', function ( ) {
             nodeSetLength = nodeData.length;
             for (var i = 0; i < nodeSetLength; i++) {
                 myTitle = nodeData[i].longName + "(Latt: " + nodeData[i].latitude + ", Long: " + nodeData[i].longtitude + ")"
-                myNodes.add([{id:nodeData[i].sequence, label:nodeData[i].name , title: myTitle} ])
+                myNodes.add([{id:nodeData[i].sequence, label:nodeData[i].longName , title: myTitle} ])
             }
             for (var i = 0; i < nodeSetLength-2; i++) {
                 myEdges.add([

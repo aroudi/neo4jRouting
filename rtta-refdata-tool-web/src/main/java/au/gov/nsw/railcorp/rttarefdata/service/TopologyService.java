@@ -299,15 +299,24 @@ public class TopologyService {
      * get network in vis.js format for visualizing it on screen.
      * @return NetworkVisModel
      */
-    public NetworkVisModel getNetworkVisModel() {
+    public List<NetworkVisModel> getNetworkVisModel() {
         try {
-            final NetworkVisModel networkVisModel = new NetworkVisModel();
-            networkVisModel.setNodes(stopManager.getAllStations());
-            final List<LinePathData> linePathDataList = topologyManager.getAllPathStation();
-            for (LinePathData linePathData: linePathDataList) {
-                extractEdges(networkVisModel, linePathData);
+            final List<NetworkVisModel> networkVisModelList = new ArrayList<NetworkVisModel>();
+            NetworkVisModel networkVisModel;
+            final List<Network> networkList = topologyManager.getAllNetworks();
+            for (Network network : networkList) {
+                if (network == null) {
+                    continue;
+                }
+                networkVisModel = new NetworkVisModel();
+                networkVisModel.setNetworkName(network.getName());
+                final List<LinePathData> linePathDataList = topologyManager.getAllPathStationPerNetwork(network.getName());
+                for (LinePathData linePathData: linePathDataList) {
+                    extractEdges(networkVisModel, linePathData);
+                }
+                networkVisModelList.add(networkVisModel);
             }
-            return networkVisModel;
+            return networkVisModelList;
         } catch (Exception e) {
             logger.error("Exception in returning networkVisModel :", e);
             return null;
@@ -345,6 +354,7 @@ public class TopologyService {
                 lineInfo.setBackgroundColourHex(linePathData.getBackgroundColourHex());
                 lineInfo.setTextColourHex(linePathData.getTextColourHex());
                 networkVisModel.addEdge(mainKey, reverseKey, edgeModel, lineInfo);
+                networkVisModel.addStation(fromNode);
             }
             final int edgesNo = linePathStationList.size();
             fromNode = linePathStationList.get(edgesNo - 2);
@@ -360,6 +370,8 @@ public class TopologyService {
             lineInfo.setBackgroundColourHex(linePathData.getBackgroundColourHex());
             lineInfo.setTextColourHex(linePathData.getTextColourHex());
             networkVisModel.addEdge(mainKey, reverseKey, edgeModel, lineInfo);
+            networkVisModel.addStation(fromNode);
+            networkVisModel.addStation(toNode);
         } catch (Exception e) {
             logger.error("Exception in extracting edges from linePath: ", e);
             return;

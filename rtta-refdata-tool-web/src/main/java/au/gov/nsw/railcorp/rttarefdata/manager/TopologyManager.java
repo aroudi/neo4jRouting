@@ -218,4 +218,49 @@ public class TopologyManager implements ITopologyManager {
             return null;
         }
     }
+
+    /**
+     * Returns all path stations per Netwrok.
+     * @param networkName networkName
+     * @return List of path station
+     */
+    public List getAllPathStationPerNetwork(String networkName) {
+        final List<LinePathData> result = new ArrayList<LinePathData>();
+        final List<ILinePath> linePathList;
+        List<ILinePathStation> linePathStationList;
+        LinePathData linePathData;
+        LinePathStationData linePathStationData;
+        try {
+            linePathList = linePathRepository.getAllLinePathsPerNetwork(networkName);
+            for (ILinePath linePath: linePathList) {
+                linePathData = new LinePathData();
+                linePathData.setPathId(linePath.getPathId());
+                linePathData.setName(linePath.getName());
+                linePathData.setLongName(linePath.getLongName());
+                linePathData.setLineName(linePath.getLineName());
+                linePathData.setLineLongName(linePath.getLineLongName());
+                linePathData.setBackgroundColourHex(linePath.getBackgroundColourHex());
+                linePathData.setTextColourHex(linePath.getTextColourHex());
+                linePathStationList = pathStationRepository.getAllLinePathStations(linePath.getName());
+                for (ILinePathStation pathStation: linePathStationList) {
+                    linePathStationData = new LinePathStationData();
+                    linePathStationData.setStationId(pathStation.getStationId());
+                    linePathStationData.setName(pathStation.getName());
+                    linePathStationData.setLongName(pathStation.getLongName());
+                    linePathStationData.setLatitude(pathStation.getLatitude());
+                    linePathStationData.setLongtitude(pathStation.getLongtitude());
+                    linePathStationData.setPathMatchInclude(pathStation.getPathMatchInclude());
+                    linePathStationData.setSequence(pathStation.getSequence());
+                    linePathStationData.setInterchangePoint(pathStation.getInterchangePoint());
+                    linePathData.addStationToPath(linePathStationData);
+                }
+                result.add(linePathData);
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Exception in returning station list ", e);
+            return null;
+        }
+    }
+
 }

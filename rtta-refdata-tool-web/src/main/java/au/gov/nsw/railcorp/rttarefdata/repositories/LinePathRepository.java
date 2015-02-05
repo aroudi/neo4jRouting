@@ -21,4 +21,15 @@ public interface LinePathRepository extends GraphRepository<LinePath> {
             + "line.backgroundColourHex AS backgroundColourHex, line.textColourHex AS textColourHex"
     )
     List<ILinePath> getAllLinePaths();
+
+    /**
+     * get all line path for specific network.
+     * @param networkName networkName
+     * @return ILinePath
+     */
+    @Query("MATCH (network:Network{name:{0}})-[:NETWORK_LINE]->(line:NetworkLine)-[:LINE_PATH]->(linePath:LinePath) RETURN id(linePath) AS pathId, linePath.name AS name,"
+            + "linePath.longName AS longName, line.name AS lineName, line.longName AS lineLongName, "
+            + "line.backgroundColourHex AS backgroundColourHex, line.textColourHex AS textColourHex"
+    )
+    List<ILinePath> getAllLinePathsPerNetwork(String networkName);
 }

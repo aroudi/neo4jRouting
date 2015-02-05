@@ -1,1 +1,6 @@
+<div ng-repeat="network in networkList">
+    <input type="radio" name="networkRadio" id="networkRadio" ng-click="displayNetwork(network)" ng-checked="network.networkName == 'SydneyTrains'"> {{network.networkName}}
+</div>
+<br>
+<!--<b> Network: {{networkName}}</b> -->
 <vis-network ng-model ="network_data" data="network_data" options="network_options" id ="previewNetwork" ></vis-network>
