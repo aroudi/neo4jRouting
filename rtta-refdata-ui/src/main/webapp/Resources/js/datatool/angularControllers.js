@@ -9,7 +9,8 @@ function MainController($scope, generalService) {
         { name: 'Nodes', path :'node'},
         { name: 'Locations', path :'location'},
         { name: 'Import Ref Data', path:'uploadRefData'},
-        { name: 'Export Ref Data', path:'downloadRefData'}
+        { name: 'Export Ref Data', path:'downloadRefData'},
+        { name: 'Find Paths', path:'traversal'}
     ];
 
     $scope.generalService = generalService;

@@ -40,4 +40,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/VisualizeNetwork.html',
             controller: VisNetworkController
         });
+        $routeProvider.when('/traversal', {
+            templateUrl: 'RailNetwork/Traverse.html',
+            controller: TraversalController
+        });
     } ]);

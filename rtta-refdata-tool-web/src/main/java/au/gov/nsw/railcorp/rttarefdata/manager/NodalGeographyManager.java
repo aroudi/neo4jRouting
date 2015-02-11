@@ -15,11 +15,20 @@ import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.
 import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeMasterTimingPoint;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
+import au.gov.nsw.railcorp.rttarefdata.domain.Node;
+import au.gov.nsw.railcorp.rttarefdata.expander.TurnPenaltyBanExpander;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeLinkRunTimeData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
+import au.gov.nsw.railcorp.rttarefdata.request.NodeModel;
+import au.gov.nsw.railcorp.rttarefdata.request.TraverseModel;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
+import org.neo4j.graphalgo.GraphAlgoFactory;
+import org.neo4j.graphalgo.PathFinder;
+import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.traversal.*;
+import org.neo4j.graphdb.traversal.Traverser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.datatype.DatatypeFactory;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import javax.xml.datatype.Duration;
 
 /**
@@ -69,6 +76,11 @@ public class NodalGeographyManager implements INodalGeographyManager {
     private NodeLinkageRepository nodeLinkageRepository;
     @Autowired
     private NodalHeaderRepository nodalHeaderRepository;
+    @Autowired
+    private GraphDatabaseService graphDatabaseService;
+    private boolean metEndNode;
+    private boolean timedOut;
+
     /**
      * Create SpeedBand Record.
      * @param id id
@@ -649,5 +661,264 @@ public class NodalGeographyManager implements INodalGeographyManager {
      */
     public void emptyNodalHeader () {
         nodalHeaderRepository.deleteAll();
+    }
+
+    /**
+     * find All paths between 2 nodes.
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of paths.
+     */
+
+    @Transactional
+    public List findAllPaths(String fromNodeName, final String toNodeName) {
+        //boolean endNodeMet = false;
+        setMetEndNode(false);
+        setTimedOut(false);
+        List result = null;
+        org.neo4j.graphdb.Node fromNode;
+        final org.neo4j.graphdb.Node toNode;
+        final long startTime = System.currentTimeMillis();
+        fromNode = graphDatabaseService.getNodeById(nodeRepository.findBySchemaPropertyValue("name", fromNodeName).getNodeId());
+        toNode = graphDatabaseService.getNodeById(
+                    nodeRepository.findBySchemaPropertyValue("name", toNodeName).getNodeId());
+        Evaluator penaltyBanEvaluator = new Evaluator() {
+            @Override
+            public Evaluation evaluate(Path path) {
+                logPath(path);
+                if (path.length() < 2) {
+                    return Evaluation.INCLUDE_AND_CONTINUE;
+                }
+                org.neo4j.graphdb.Node node;
+                final Iterator iterator = path.reverseNodes().iterator();
+                node = (org.neo4j.graphdb.Node) iterator.next();
+                final String toNodeName = (String) node.getProperty("name");
+                node = (org.neo4j.graphdb.Node) iterator.next();
+                final String viaNodeName = (String) node.getProperty("name");
+                node = (org.neo4j.graphdb.Node) iterator.next();
+                final String fromNodeName = (String) node.getProperty("name");
+                logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
+
+                final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(fromNodeName, viaNodeName, toNodeName);
+
+                if (turnPenaltyBan != null && "PT99999S".equals(turnPenaltyBan.getPenalty())) {
+                    logger.info("       PATH excluded");
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+                return Evaluation.INCLUDE_AND_CONTINUE;
+            }
+        };
+        final Evaluator linkDirectionUpEvaluator = new Evaluator() {
+            @Override
+            public Evaluation evaluate(Path path) {
+                try {
+                    if (path.length() < 1) {
+                        return Evaluation.INCLUDE_AND_CONTINUE;
+                    }
+                    final String direction = (String) path.lastRelationship().getProperty("direction");
+                    if (direction.equals(IConstants.TRACK_DOWN_DIRECTION)) {
+                        return Evaluation.EXCLUDE_AND_PRUNE;
+                    }
+                    return Evaluation.INCLUDE_AND_CONTINUE;
+                } catch (Exception e) {
+                    logger.error("Exception in evaluator ", e);
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            }
+        };
+        final Evaluator linkDirectionDownEvaluator = new Evaluator() {
+            @Override
+            public Evaluation evaluate(Path path) {
+                try {
+                    if (path.length() < 1) {
+                        return Evaluation.INCLUDE_AND_CONTINUE;
+                    }
+                    final String direction = (String) path.lastRelationship().getProperty("direction");
+                    if (direction.equals(IConstants.TRACK_UP_DIRECTION)) {
+                        return Evaluation.EXCLUDE_AND_PRUNE;
+                    }
+                    return Evaluation.INCLUDE_AND_CONTINUE;
+                } catch (Exception e) {
+                    logger.error("Exception in evaluator ", e);
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            }
+        };
+        final Evaluator isReachEndNode = new Evaluator() {
+            @Override
+            public Evaluation evaluate(Path path) {
+                if (isMetEndNode()) {
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+                final boolean isEndNode = path.endNode().getProperty("name").equals(toNodeName);
+                if (isEndNode) {
+                    setMetEndNode(true);
+                    return Evaluation.INCLUDE_AND_PRUNE;
+                }
+
+                return Evaluation.INCLUDE_AND_CONTINUE;
+            }
+        };
+        final Evaluator isTimedOut = new Evaluator() {
+            @Override
+            public Evaluation evaluate(Path path) {
+                if (isTimedOut()) {
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+                final long stopTime = System.currentTimeMillis();
+                final long elapsedTime = stopTime - startTime;
+                if (elapsedTime > 300000) {
+                    setTimedOut(true);
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+                return Evaluation.INCLUDE_AND_CONTINUE;
+            }
+        };
+        final RelationshipType relationshipType = DynamicRelationshipType.withName("NODE_LINKAGE");
+        /*
+        final TraversalDescription traversalDescription = graphDatabaseService.traversalDescription().relationships(relationshipType, Direction.OUTGOING).evaluator(linkDirectionDownEvaluator).
+                evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
+        */
+        final TraversalDescription traversalDescription = graphDatabaseService.traversalDescription().uniqueness(Uniqueness.NODE_PATH).breadthFirst()
+                .relationships(relationshipType, Direction.OUTGOING).evaluator(isReachEndNode).evaluator(isTimedOut)
+                .evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
+        //.evaluator(linkDirectionUpEvaluator).
+        final Traverser traverser = traversalDescription.traverse(fromNode);
+
+        final Iterator pathIterator = traverser.iterator();
+        if (pathIterator == null) {
+            return null;
+        }
+        Path path;
+        org.neo4j.graphdb.Node foundNode;
+        Iterator nodeIterator;
+        result = new ArrayList();
+        TraverseModel traverseModel;
+        NodeModel nodeModel;
+        int i = 1;
+        while (pathIterator.hasNext()) {
+            path = (Path) pathIterator.next();
+            nodeIterator = path.nodes().iterator();
+            traverseModel = new TraverseModel();
+            traverseModel.setPathName("PATH" + String.valueOf(i));
+            i++;
+            while (nodeIterator.hasNext()) {
+                nodeModel = new NodeModel();
+                foundNode = (org.neo4j.graphdb.Node) nodeIterator.next();
+                nodeModel.setName((String) foundNode.getProperty("name"));
+                nodeModel.setNodeId(foundNode.getId());
+                try {
+                    nodeModel.setLatitude((Double) foundNode.getProperty("latitude"));
+                    nodeModel.setLongtitude((Double) foundNode.getProperty("longtitude"));
+                } catch (NotFoundException nfe) {
+                    nodeModel.setLatitude(0.00);
+                    nodeModel.setLongtitude(0.00);
+                }
+                nodeModel.setLongName((String) foundNode.getProperty("longName"));
+                traverseModel.addNode(nodeModel);
+            }
+            result.add(traverseModel);
+        }
+        return result;
+    }
+
+    /**
+     * log path.
+     * @param path path
+     */
+    public void logPath (Path path) {
+
+        if (path == null) {
+            return;
+        }
+        final Iterator nodeIterator = path.nodes().iterator();
+        final StringBuffer pathStr = new StringBuffer("");
+
+        while (nodeIterator.hasNext()) {
+            final org.neo4j.graphdb.Node foundNode = (org.neo4j.graphdb.Node) nodeIterator.next();
+            pathStr.append((String) foundNode.getProperty("name"));
+            pathStr.append(" ");
+        }
+        logger.info("-------------------------------------------------------------------------------------------------------------");
+        logger.info("Path :" + pathStr.toString());
+    }
+
+    /**
+     * find all path between 2 nodes by algorithemns.
+     * @param startNodeName startNodeName
+     * @param endNodeName endNodeName
+     * @return List
+     */
+    public List findAllPath2(String startNodeName, String endNodeName) {
+
+        List result = null;
+        org.neo4j.graphdb.Node fromNode;
+        final org.neo4j.graphdb.Node toNode;
+
+        fromNode = graphDatabaseService.getNodeById(nodeRepository.findBySchemaPropertyValue("name", startNodeName).getNodeId());
+        toNode = graphDatabaseService.getNodeById(
+                nodeRepository.findBySchemaPropertyValue("name", endNodeName).getNodeId());
+
+        final RelationshipType relationshipType = DynamicRelationshipType.withName("NODE_LINKAGE");
+
+        /*
+        final TraversalDescription traversalDescription = graphDatabaseService.traversalDescription().uniqueness(Uniqueness.NODE_PATH).relationships(relationshipType, Direction.OUTGOING)
+                .evaluator(Evaluators.returnWhereEndNodeIs(toNode));
+        */
+
+        final TurnPenaltyBanExpander expander = new TurnPenaltyBanExpander(relationshipType, Direction.OUTGOING, turnPenaltyBanRepository);
+        final PathFinder<Path> finder = GraphAlgoFactory.shortestPath(expander, 100);
+        final Iterable<Path> pathIterator = finder.findAllPaths(fromNode, toNode);
+        Path path;
+        org.neo4j.graphdb.Node foundNode;
+        Iterator nodeIterator;
+        result = new ArrayList();
+        TraverseModel traverseModel;
+        NodeModel nodeModel;
+        int i = 1;
+        if (pathIterator == null) {
+            logger.info("PathIterator is null");
+            return  null;
+        }
+        while (pathIterator.iterator().hasNext()) {
+            path = (Path) pathIterator.iterator().next();
+            nodeIterator = path.nodes().iterator();
+            traverseModel = new TraverseModel();
+            traverseModel.setPathName("PATH" + String.valueOf(i));
+            i++;
+            while (nodeIterator.hasNext()) {
+                nodeModel = new NodeModel();
+                foundNode = (org.neo4j.graphdb.Node) nodeIterator.next();
+                nodeModel.setName((String) foundNode.getProperty("name"));
+                nodeModel.setNodeId(foundNode.getId());
+                try {
+                    nodeModel.setLatitude((Double) foundNode.getProperty("latitude"));
+                    nodeModel.setLongtitude((Double) foundNode.getProperty("longtitude"));
+                } catch (NotFoundException nfe) {
+                    nodeModel.setLatitude(0.00);
+                    nodeModel.setLongtitude(0.00);
+                }
+                nodeModel.setLongName((String) foundNode.getProperty("longName"));
+                traverseModel.addNode(nodeModel);
+            }
+            result.add(traverseModel);
+        }
+        return result;
+    }
+
+    public boolean isMetEndNode() {
+        return metEndNode;
+    }
+
+    public void setMetEndNode(boolean metEndNode) {
+        this.metEndNode = metEndNode;
+    }
+
+    public boolean isTimedOut() {
+        return timedOut;
+    }
+
+    public void setTimedOut(boolean timedOut) {
+        this.timedOut = timedOut;
     }
 }

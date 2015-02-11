@@ -2,6 +2,8 @@ package au.gov.nsw.railcorp.rttarefdata.service;
 
 import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
+import au.gov.nsw.railcorp.rttarefdata.manager.INodalGeographyManager;
+import au.gov.nsw.railcorp.rttarefdata.manager.NodalGeographyManager;
 import au.gov.nsw.railcorp.rttarefdata.manager.ServiceTest;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeLinkData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationPlatformData;
@@ -25,6 +27,7 @@ public class TestQuery {
     static NodeRepository nodeRepository;
     static PlatformRepository platformRepository;
     static NodeLinkRepository nodeLinkRepository;
+    static INodalGeographyManager nodalGeographyManager;
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("rttaDataRefContext.xml");
         tripletRepository = context.getBean(StationTripletRepository.class);
@@ -35,6 +38,7 @@ public class TestQuery {
         platformRepository = context.getBean(PlatformRepository.class);
         serviceTest = context.getBean(ServiceTest.class);
         nodeLinkRepository = context.getBean(NodeLinkRepository.class);
+        nodalGeographyManager = context.getBean(INodalGeographyManager.class);
         //createStationTriplet();
         //queryStationTriplet();
 
@@ -42,7 +46,8 @@ public class TestQuery {
         //removeNodeLink();
         //removeNodeLinkage();
         //queryNodeLinkage();
-        queryNodeLinkReposiory();
+        //queryNodeLinkReposiory();
+        traverse();
 
 
 
@@ -145,5 +150,10 @@ public class TestQuery {
     public void test () {
         CgGeography cgGeography = new CgGeography();
         //cgGeography.Geov10RC.Nodes ;
+    }
+
+    public static void traverse() {
+        nodalGeographyManager.findAllPaths("WAI1","CE18");
+        //nodalGeographyManager.findAllPaths("BNX1","ARM1");
     }
 }

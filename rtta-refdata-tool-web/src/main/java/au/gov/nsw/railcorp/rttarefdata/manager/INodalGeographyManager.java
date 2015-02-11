@@ -3,6 +3,8 @@ package au.gov.nsw.railcorp.rttarefdata.manager;
 import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography;
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 
+import java.util.List;
+
 
 /**
  * Created by arash on 11/11/14.
@@ -175,4 +177,20 @@ public interface INodalGeographyManager {
      * @return CgGeography
      */
     CgGeography exportNodalGeography();
+
+    /**
+     * find All paths between 2 nodes.
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of paths
+     */
+    List findAllPaths(String fromNodeName, String toNodeName);
+
+    /**
+     * find all path between 2 nodes by algorithemns.
+     * @param startNodeName startNodeName
+     * @param endNodeName endNodeName
+     * @return List
+     */
+    List findAllPath2(String startNodeName, String endNodeName);
 }

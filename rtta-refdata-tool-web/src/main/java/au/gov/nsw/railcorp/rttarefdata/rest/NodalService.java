@@ -4,6 +4,7 @@ import au.gov.nsw.railcorp.rttarefdata.domain.Node;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NodeRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.NodeModel;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
+import au.gov.nsw.railcorp.rttarefdata.service.NodalGeographyService;
 import au.gov.nsw.railcorp.rttarefdata.service.NodeService;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class NodalService {
     private NodeRepository nodeRepository;
     @Autowired
     private NodeService nodeService;
+
+    @Autowired
+    private NodalGeographyService nodalGeographyService;
     /**
      * Return node list in Json format.
      * @return Node List
@@ -185,4 +189,23 @@ public class NodalService {
         }
         return response;
     }
+
+    /**
+     * find all path between 2 nodes.
+     * @param  fromNode fromNode
+     * @param toNode toNode
+     * @return List of paths
+     */
+    @GET
+    @Path("/traverse/{fromNode}/{toNode}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<NodeModel> traverse (@PathParam("fromNode") String fromNode, @PathParam("toNode") String toNode) {
+        try {
+            return nodalGeographyService.findAllPaths(fromNode, toNode);
+        } catch (Exception e) {
+            logger.error("Error in traversing the graph: ", e);
+            return null;
+        }
+    }
+
 }

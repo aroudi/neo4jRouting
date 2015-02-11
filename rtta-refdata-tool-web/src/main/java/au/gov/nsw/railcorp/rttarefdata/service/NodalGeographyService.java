@@ -26,6 +26,7 @@ import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.List;
 
 
 /**
@@ -291,4 +292,15 @@ public class NodalGeographyService {
         }
     }
 
+    /**
+     * find All paths between 2 nodes.
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of paths.
+     */
+
+    @Transactional
+    public List findAllPaths(String fromNodeName, String toNodeName) {
+        return nodalGeographyManager.findAllPaths(fromNodeName, toNodeName);
+    }
 }

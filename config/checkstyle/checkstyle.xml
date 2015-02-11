@@ -342,7 +342,7 @@
                       value="TYPE, EXTENDS_CLAUSE, IMPLEMENTS_CLAUSE"
                     />
             <property name="limitedTokens" value="DOT"/>
-            <property name="maximumNumber" value="1"/>
+            <property name="maximumNumber" value="3"/>
             <property name="maximumMessage" value="Do not use fully qualified types."/>
         </module>
 

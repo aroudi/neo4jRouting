@@ -1,0 +1,35 @@
+
+
+<form name="traverseForm">
+<table style="width: 50%" >
+    <tr>
+        <td style="width: 30%">
+            <b>From Node:</b>
+            <input type="text" maxlength="10" size="10" name="fromNode" data-ng-model="traverse.fromNode" required>
+            <span class="warnText" ng-show="traverseForm.fromNode.$error.required">
+                Required!
+            </span>
+        </td>
+        <td style="width: 30%">
+            <b>To Node:</b>
+            <input type="text" maxlength="10" size="10" name="toNode" data-ng-model="traverse.toNode" required>
+            <span class="warnText" ng-show="traverseForm.toNode.$error.required">
+                Required!
+            </span>
+        </td>
+    </tr>
+</table>
+</br>
+<table>
+    <tr>
+        <td>
+            <button ng-click="traverse(traverse)">Find All Paths</button>
+        </td>
+    </tr>
+</table>
+</form>
+<div id="traverseResult" ui-grid ="gridOptions" class="grid"  ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:10%; width: 30%"></div>
+
+<vis-network ng-model ="network_data" data="network_data" options="network_options" id ="previewNetwork" style="height:70%; width: 80%"></vis-network>
+
+

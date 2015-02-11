@@ -49,7 +49,8 @@ var service_uri = {
     'ADD_LOCATION_URI' : 'locations/add',
     'EDIT_LOCATION_URI' : 'locations/edit',
     'DEL_LOCATION_URI' : 'locations/delete',
-    'VIS_NETWORK_URI' : 'networks/visualize'
+    'VIS_NETWORK_URI' : 'networks/visualize',
+    'TRAVERSAL_URI' : 'nodes/traverse'
 }
 
 var response_status = {
@@ -426,15 +427,78 @@ myApp.service('drawNetworkService', function ($q, loadDisplay  ) {
             nodeSetLength = nodeData.length;
             for (var i = 0; i < nodeSetLength; i++) {
                 myTitle = nodeData[i].longName + "(Latt: " + nodeData[i].latitude + ", Long: " + nodeData[i].longtitude + ")"
-                myNodes.add([{id:nodeData[i].sequence, label:nodeData[i].longName , title: myTitle} ])
+                var sequence;
+                if (nodeData[i].sequence != undefined) {
+                    sequence = nodeData[i].sequence
+                } else if (nodeData[i].nodeId != undefined) {
+                    sequence = nodeData[i].nodeId
+                }
+                myNodes.add([{id:sequence, label:nodeData[i].longName , title: myTitle} ])
             }
             for (var i = 0; i < nodeSetLength-2; i++) {
+                var sequence1, sequence2;
+                if (nodeData[i].sequence != undefined) {
+                    sequence1 = nodeData[i].sequence
+                    sequence2 = nodeData[i+1].sequence
+                } else if (nodeData[i].nodeId != undefined) {
+                    sequence1 = nodeData[i].nodeId
+                    sequence2 = nodeData[i+1].nodeId
+                }
                 myEdges.add([
-                    {id:i+1, from:nodeData[i].sequence, to:nodeData[i+1].sequence}
+                    {id:i+1, from:sequence1, to:sequence2}
                 ]);
             }
             myEdges.add([
                 {id:nodeSetLength, from:nodeData[nodeSetLength-2].sequence, to:nodeData[nodeSetLength-1].sequence}
+            ]);
+        },
+        drawPath : function (nodeData) {
+            if (nodeData == undefined )
+                return;
+
+            myNodes = new vis.DataSet();
+            myEdges = new vis.DataSet();
+            networkData = {
+                nodes: myNodes,
+                edges: myEdges
+            };
+            networkOptions = {
+                hierarchicalLoyout: {
+                    direction :"UD"
+                },
+                edges : {
+                    color: '#00205b',
+                    width :2,
+                    style:'arrow'
+                },
+                nodes : {
+                    color : {
+                        background : 'white',
+                        border : '#00205b',
+                        width :2,
+                        highlight : {
+                            background: '#a6192e',
+                            border : '#00205b',
+                            fontFill :'white'
+                        }
+                    },
+                    fontSize : 20,
+                    fontColor:'#00205b',
+                    radius: 14
+                }
+            }
+            nodeSetLength = nodeData.length;
+            for (var i = 0; i < nodeSetLength; i++) {
+                myTitle = nodeData[i].longName + "(Latt: " + nodeData[i].latitude + ", Long: " + nodeData[i].longtitude + ")"
+                myNodes.add([{id:nodeData[i].nodeId, label:nodeData[i].name , title: myTitle} ])
+            }
+            for (var i = 0; i < nodeSetLength-2; i++) {
+                myEdges.add([
+                    {id:i+1, from:nodeData[i].nodeId, to:nodeData[i+1].nodeId}
+                ]);
+            }
+            myEdges.add([
+                {id:nodeSetLength, from:nodeData[nodeSetLength-2].nodeId, to:nodeData[nodeSetLength-1].nodeId}
             ]);
         }
     }
