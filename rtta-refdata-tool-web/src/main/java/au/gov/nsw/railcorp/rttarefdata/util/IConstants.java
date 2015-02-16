@@ -66,4 +66,13 @@ public interface IConstants {
      * FAILURE RESPONSE STATUS.
      */
     int RESPONSE_FAILURE = 0;
+
+    /**
+     * Turn Penalty Ban.
+     */
+    String TURN_PENALTY_BAN = "PT99999S";
+    /**
+     * Maximum Node Count between 2 platforms.
+     */
+    int MAX_NODE_COUNT = 74;
 }

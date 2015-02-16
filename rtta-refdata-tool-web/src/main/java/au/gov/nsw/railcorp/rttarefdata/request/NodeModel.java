@@ -19,6 +19,7 @@ public class NodeModel {
     private double length;
     private Double latitude;
     private Double longtitude;
+    private boolean platform;
 
     public Long getNodeId() {
         return nodeId;
@@ -138,5 +139,13 @@ public class NodeModel {
 
     public void setLongtitude(Double longtitude) {
         this.longtitude = longtitude;
+    }
+
+    public boolean isPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(boolean platform) {
+        this.platform = platform;
     }
 }

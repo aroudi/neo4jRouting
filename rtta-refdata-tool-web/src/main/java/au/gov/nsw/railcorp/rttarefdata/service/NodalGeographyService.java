@@ -225,11 +225,12 @@ public class NodalGeographyService {
      * for writing algorithms on graph we create a simple linkages from node to node.
      * @param links links
      */
-    @Transactional
+    //@Transactional
     public void importNodeLinkages (Links links) {
         if (links == null || links.getLink() == null) {
             return;
         }
+        nodalGeographyManager.emptyNodeNodeLinkages();
         for (Link link : links.getLink()) {
             if (link == null) {
                 continue;
@@ -301,6 +302,6 @@ public class NodalGeographyService {
 
     @Transactional
     public List findAllPaths(String fromNodeName, String toNodeName) {
-        return nodalGeographyManager.findAllPaths(fromNodeName, toNodeName);
+        return nodalGeographyManager.findAllShortestPaths(fromNodeName, toNodeName);
     }
 }

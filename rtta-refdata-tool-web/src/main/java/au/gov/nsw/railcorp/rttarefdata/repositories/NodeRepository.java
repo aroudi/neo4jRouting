@@ -38,6 +38,16 @@ public interface NodeRepository extends GraphRepository<Node> {
     List<INodeData> getAllNodes();
 
     /**
+     * Return all Nodes.
+     * @param fromNode fromNode
+     * @param toNode toNode
+     * @return List of nodes
+     */
+    @Query(
+            "MATCH p=allShortestPaths((fromNode:Node{name:{0}})-[r:NODE_LINKAGE*..500]->(toNode:Node{name:{1}})) RETURN extract(n IN nodes(p)| n) AS paths"
+    )
+    List<List<org.neo4j.graphdb.Node>> findAllShortestPaths(String fromNode, String toNode);
+    /**
      * Return Master Timing Point for a node.
      * @param nodeName nodeName
      * @return Master Timing Point Node

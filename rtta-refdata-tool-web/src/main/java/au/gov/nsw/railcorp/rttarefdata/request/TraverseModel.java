@@ -28,6 +28,38 @@ public class TraverseModel {
         }
         nodes.add(nodeModel);
     }
+
+    /**
+     * return last node.
+     * @return NodeModel
+     */
+    public NodeModel getLastNode() {
+        if (nodes == null || nodes.size() < 1) {
+            return null;
+        }
+        return nodes.get(nodes.size() - 1);
+    }
+    /**
+     * return first node.
+     * @return NodeModel
+     */
+    public NodeModel getFirstNode() {
+        if (nodes == null || nodes.size() < 1) {
+            return null;
+        }
+        return nodes.get(0);
+    }
+
+    /**
+     * remove last node.
+     */
+    public void removeLastNode() {
+        if (nodes == null || nodes.size() < 1) {
+            return;
+        }
+        nodes.remove(nodes.size() - 1);
+    }
+
     public List<NodeModel> getNodes() {
         return nodes;
     }

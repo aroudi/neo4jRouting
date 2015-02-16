@@ -77,6 +77,9 @@ public class NodalGeographyManager implements INodalGeographyManager {
     @Autowired
     private NodalHeaderRepository nodalHeaderRepository;
     @Autowired
+    private PlatformRepository platformRepository;
+
+    @Autowired
     private GraphDatabaseService graphDatabaseService;
     private boolean metEndNode;
     private boolean timedOut;
@@ -195,6 +198,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param trackSectionId trackSectionId
      * @return NodeLinkage
      */
+    @Transactional
     public NodeLinkage createNodeLinkage(String fromNodeName, String toNodeName, long length, boolean isBusEnergy,
                                          boolean isACEnergy, boolean isDCEnergy, boolean isDieselEnergyk, boolean isBusGauge,
                                          boolean isNarrowGauge, boolean isStandardGauge,
@@ -206,6 +210,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
             return null;
         }
         NodeLinkage nodeLinkage;
+        /*
         if (trackSectionId < 0) {
             nodeLinkage = nodeLinkageRepository.getNodeLinkageNonTrackSection(fromNodeName, toNodeName);
             if (nodeLinkage != null) {
@@ -213,6 +218,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 return nodeLinkage;
             }
         }
+        */
         TrackSection trackSection = null;
         trackSection = trackSectionRepository.findBySchemaPropertyValue("id", trackSectionId);
         nodeLinkage = new NodeLinkage();
@@ -616,6 +622,13 @@ public class NodalGeographyManager implements INodalGeographyManager {
     }
 
     /**
+     * Remove All NodeLinks.
+     */
+    public void emptyNodeLinkages () {
+        nodeLinkageRepository.deleteAll();
+    }
+
+    /**
      * Remove All TurnPenaltyBan.
      */
     public void emptyNodeTurnPenaltyBan () {
@@ -667,11 +680,12 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * find All paths between 2 nodes.
      * @param fromNodeName fromNodeName
      * @param toNodeName toNodeName
+     * @param toDepth toDepth
      * @return List of paths.
      */
 
     @Transactional
-    public List findAllPaths(String fromNodeName, final String toNodeName) {
+    public List findAllPaths(String fromNodeName, final String toNodeName, int toDepth) {
         //boolean endNodeMet = false;
         setMetEndNode(false);
         setTimedOut(false);
@@ -780,7 +794,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         */
         final TraversalDescription traversalDescription = graphDatabaseService.traversalDescription().uniqueness(Uniqueness.NODE_PATH).breadthFirst()
-                .relationships(relationshipType, Direction.OUTGOING).evaluator(isReachEndNode).evaluator(isTimedOut)
+                .relationships(relationshipType, Direction.OUTGOING).evaluator(Evaluators.toDepth(toDepth)).evaluator(isReachEndNode).evaluator(isTimedOut)
                 .evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         //.evaluator(linkDirectionUpEvaluator).
         final Traverser traverser = traversalDescription.traverse(fromNode);
@@ -809,7 +823,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 nodeModel.setNodeId(foundNode.getId());
                 try {
                     nodeModel.setLatitude((Double) foundNode.getProperty("latitude"));
-                    nodeModel.setLongtitude((Double) foundNode.getProperty("longtitude"));
+                    nodeModel.setLongtitude((Double) foundNode.getProperty("longitude"));
                 } catch (NotFoundException nfe) {
                     nodeModel.setLatitude(0.00);
                     nodeModel.setLongtitude(0.00);
@@ -828,7 +842,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
      */
     public void logPath (Path path) {
 
-        if (path == null) {
+        if (path == null || path.length() < 1) {
             return;
         }
         final Iterator nodeIterator = path.nodes().iterator();
@@ -843,6 +857,46 @@ public class NodalGeographyManager implements INodalGeographyManager {
         logger.info("Path :" + pathStr.toString());
     }
 
+    /**
+     * log path.
+     * @param path path
+     */
+    public void logPath (List path) {
+
+        if (path == null || path.size() < 1) {
+            return;
+        }
+        final Iterator nodeIterator = path.iterator();
+        final StringBuffer pathStr = new StringBuffer("");
+
+        while (nodeIterator.hasNext()) {
+            final org.neo4j.graphdb.Node foundNode = (org.neo4j.graphdb.Node) nodeIterator.next();
+            pathStr.append((String) foundNode.getProperty("name"));
+            pathStr.append(" ");
+        }
+        logger.info("-------------------------------------------------------------------------------------------------------------");
+        logger.info("Path :" + pathStr.toString());
+    }
+    /**
+     * log path.
+     * @param path path
+     */
+    public void logPath2 (List<NodeModel> path) {
+
+        if (path == null || path.size() < 1) {
+            return;
+        }
+        final Iterator nodeIterator = path.iterator();
+        final StringBuffer pathStr = new StringBuffer("");
+
+        while (nodeIterator.hasNext()) {
+            final NodeModel foundNode = (NodeModel) nodeIterator.next();
+            pathStr.append((String) foundNode.getName());
+            pathStr.append(" ");
+        }
+        logger.info("-------------------------------------------------------------------------------------------------------------");
+        logger.info("Path :" + pathStr.toString());
+    }
     /**
      * find all path between 2 nodes by algorithemns.
      * @param startNodeName startNodeName
@@ -893,7 +947,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 nodeModel.setNodeId(foundNode.getId());
                 try {
                     nodeModel.setLatitude((Double) foundNode.getProperty("latitude"));
-                    nodeModel.setLongtitude((Double) foundNode.getProperty("longtitude"));
+                    nodeModel.setLongtitude((Double) foundNode.getProperty("longitude"));
                 } catch (NotFoundException nfe) {
                     nodeModel.setLatitude(0.00);
                     nodeModel.setLongtitude(0.00);
@@ -904,6 +958,196 @@ public class NodalGeographyManager implements INodalGeographyManager {
             result.add(traverseModel);
         }
         return result;
+    }
+
+    /**
+     * find all shortest path between 2 nodes.
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of valid path
+     */
+
+    @Transactional
+    public List findAllShortestPaths(String fromNodeName, final String toNodeName) {
+        //check if both nodes are platform.
+        Node node1;
+        node1 = platformRepository.findBySchemaPropertyValue("name", fromNodeName);
+        if (node1 == null) {
+            return  null;
+        }
+        node1 = platformRepository.findBySchemaPropertyValue("name", toNodeName);
+        if (node1 == null) {
+            return null;
+        }
+        final List<List<org.neo4j.graphdb.Node>> shortestPaths = nodeRepository.findAllShortestPaths(fromNodeName, toNodeName);
+        List<TraverseModel> result;
+        List<org.neo4j.graphdb.Node> subsequentPlatformPath;
+        TraverseModel traverseModel = null;
+        TraverseModel tempTraverseModel = null;
+        if (shortestPaths == null || shortestPaths.isEmpty()) {
+            return null;
+        }
+        result = new ArrayList<TraverseModel>();
+        for (List<org.neo4j.graphdb.Node> path : shortestPaths) {
+            if (path == null || path.isEmpty()) {
+                continue;
+            }
+            logPath(path);
+            traverseModel = new TraverseModel();
+            if (path.size() < 3) {
+                for (org.neo4j.graphdb.Node node: path) {
+                    buildTraversModel(traverseModel, node);
+                }
+                result.add(traverseModel);
+                continue;
+            }
+            subsequentPlatformPath = new ArrayList<org.neo4j.graphdb.Node>();
+            org.neo4j.graphdb.Node previouseNode = null;
+            int index = 0;
+            org.neo4j.graphdb.Node currentNode = null;
+            while (index < path.size()) {
+                currentNode = path.get(index);
+            //for (org.neo4j.graphdb.Node currentNode: path) {
+                index = index + 1;
+                if (isNodePlatform(currentNode)) {
+                    buildTraversModel(traverseModel, currentNode);
+                    //subsequentPlatformPath.add(currentNode);
+                    previouseNode = currentNode;
+                    continue;
+                } else {
+                    subsequentPlatformPath.add(previouseNode);
+                    while (!isNodePlatform(currentNode) && index < path.size()) {
+                        subsequentPlatformPath.add(currentNode);
+                        currentNode = path.get(index);
+                        index = index + 1;
+                    }
+                    subsequentPlatformPath.add(currentNode);
+                    logger.info("subsequent platforms path :");
+                    logPath(subsequentPlatformPath);
+                    tempTraverseModel = new TraverseModel();
+                    if (!isPathValid(tempTraverseModel, subsequentPlatformPath)) {
+                        traverseModel = null;
+                        break;
+                    }
+                    if (traverseModel.getLastNode().getName().equals(tempTraverseModel.getFirstNode().getName())) {
+                        traverseModel.removeLastNode();
+                    }
+                    logger.info("tempTraversalModel :");
+                    logPath2(tempTraverseModel.getNodes());
+                    traverseModel.getNodes().addAll(tempTraverseModel.getNodes());
+                    previouseNode = currentNode;
+                    subsequentPlatformPath = new ArrayList<org.neo4j.graphdb.Node>();
+                }
+            }
+            if (traverseModel != null) {
+                logger.info("traversalModel: ");
+                logPath2(traverseModel.getNodes());
+                result.add(traverseModel);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * check if special node is a platform or not.
+     * @param currentNode currentNode
+     * @return boolean
+     */
+    public boolean isNodePlatform(org.neo4j.graphdb.Node currentNode) {
+        boolean isPlatform = false;
+        try {
+            final Integer gtfsStopId = (Integer) currentNode.getProperty("gtfsStopId");
+            if (gtfsStopId != null) {
+                isPlatform = true;
+            }
+        } catch (NotFoundException nfe) {
+            isPlatform = false;
+        }
+        return isPlatform;
+    }
+
+    /**
+     * convert node to nodeModel and to traverseModel.
+     * @param traverseModel traverseModel
+     * @param node node
+     */
+    public void buildTraversModel (TraverseModel traverseModel, org.neo4j.graphdb.Node node) {
+        NodeModel nodeModel;
+        if (node == null) {
+            return;
+        }
+        nodeModel = new NodeModel();
+        nodeModel.setName((String) node.getProperty("name"));
+        nodeModel.setLongName((String) node.getProperty("longName"));
+        nodeModel.setNodeId(node.getId());
+        nodeModel.setLatitude((Double) node.getProperty("latitude"));
+        nodeModel.setLongtitude((Double) node.getProperty("longitude"));
+        nodeModel.setEndOfLine((Boolean) node.getProperty("isEndOfLine"));
+        try {
+            boolean isPlatform = false;
+            final Integer gtfsStopId = (Integer) node.getProperty("gtfsStopId");
+            if (gtfsStopId != null) {
+                isPlatform = true;
+            }
+            nodeModel.setPlatform(isPlatform);
+        } catch (NotFoundException nfe) {
+            nodeModel.setPlatform(false);
+        }
+        traverseModel.addNode(nodeModel);
+    }
+
+    /**
+     * process penalty ban for all 3 subsequent nodes in the provided path. if penaltyBan exists, then try to find alternative path.
+     * provided path is a path between 2 subsequent platforms.
+     * if alternative path exists add new path to the final path
+     * @param traverseModel traverseModel
+     * @param nodeList nodeList
+     * @return TraverseModel: return the valid path
+     */
+    public boolean isPathValid(TraverseModel traverseModel, List<org.neo4j.graphdb.Node> nodeList) {
+        for (org.neo4j.graphdb.Node node: nodeList) {
+            if (node == null) {
+                return false;
+            }
+            buildTraversModel(traverseModel, node);
+            if (traverseModel.getNodes().size() < 3) {
+                //pathIsValid = pathIsValid && true;
+                continue;
+            }
+            final List<NodeModel> window = new ArrayList<NodeModel>();
+            window.add(traverseModel.getNodes().get(traverseModel.getNodes().size() - 3));
+            window.add(traverseModel.getNodes().get(traverseModel.getNodes().size() - 2));
+            window.add(traverseModel.getNodes().get(traverseModel.getNodes().size() - 1));
+            //traverseModel.getNodes().subList(traverseModel.getNodes().size() - 3, traverseModel.getNodes().size() - 1);
+            final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(window.get(0).getName(), window.get(1).getName(), window.get(2).getName());
+            //there is an invalid link so try to find another valid path between the two subsequent platforms which invalid link is belong to
+            logger.info("checking penalty ban for fromNode = " + window.get(0).getName() + " viaNode = " + window.get(1).getName() + " toNode = " + window.get(2).getName());
+            if (turnPenaltyBan != null) {
+                logger.info("turning penalty ban = " + turnPenaltyBan.getPenalty());
+            } else {
+                logger.info("turning penalty ban is null");
+            }
+
+            if (turnPenaltyBan == null || (turnPenaltyBan != null && !turnPenaltyBan.getPenalty().equals(IConstants.TURN_PENALTY_BAN))) {
+                continue;
+            }
+            //there is no real path between these three nodes. so try it
+            NodeModel fromNode = (NodeModel) traverseModel.getNodes().get(traverseModel.getNodes().size() - 1);
+            while (!fromNode.isPlatform()) {
+                traverseModel.getNodes().remove(fromNode);
+                fromNode = (NodeModel) traverseModel.getNodes().get(traverseModel.getNodes().size() - 1);
+            }
+            traverseModel.getNodes().remove(fromNode);
+            final org.neo4j.graphdb.Node toNode = nodeList.get(nodeList.size() - 1);
+            final List<TraverseModel> newPaths = findAllPaths(fromNode.getName(), (String) toNode.getProperty("name"), IConstants.MAX_NODE_COUNT);
+            if (newPaths == null || newPaths.size() < 1 || newPaths.get(0) == null || newPaths.get(0).getNodes() == null) {
+                return false;
+            }
+            final TraverseModel newTraversalModel = newPaths.get(0);
+            traverseModel.getNodes().addAll(newTraversalModel.getNodes());
+            return true;
+        }
+        return true;
     }
 
     public boolean isMetEndNode() {

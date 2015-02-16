@@ -153,7 +153,7 @@ public class TestQuery {
     }
 
     public static void traverse() {
-        nodalGeographyManager.findAllPaths("WAI1","CE18");
+        nodalGeographyManager.findAllPaths("WAI1","CE18", 20);
         //nodalGeographyManager.findAllPaths("BNX1","ARM1");
     }
 }

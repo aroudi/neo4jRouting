@@ -182,9 +182,10 @@ public interface INodalGeographyManager {
      * find All paths between 2 nodes.
      * @param fromNodeName fromNodeName
      * @param toNodeName toNodeName
+     * @param toDepth toDepth
      * @return List of paths
      */
-    List findAllPaths(String fromNodeName, String toNodeName);
+    List findAllPaths(String fromNodeName, String toNodeName, int toDepth);
 
     /**
      * find all path between 2 nodes by algorithemns.
@@ -193,4 +194,17 @@ public interface INodalGeographyManager {
      * @return List
      */
     List findAllPath2(String startNodeName, String endNodeName);
+    /**
+     * find all shortest path between 2 nodes.
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of valid path
+     */
+    List findAllShortestPaths(String fromNodeName, final String toNodeName);
+
+    /**
+     * Remove All NodeLinks.
+     */
+    void emptyNodeLinkages ();
+
 }
