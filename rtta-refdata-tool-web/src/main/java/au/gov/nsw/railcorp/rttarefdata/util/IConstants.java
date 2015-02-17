@@ -74,5 +74,5 @@ public interface IConstants {
     /**
      * Maximum Node Count between 2 platforms.
      */
-    int MAX_NODE_COUNT = 74;
+    int MAX_NODE_COUNT = 20;
 }

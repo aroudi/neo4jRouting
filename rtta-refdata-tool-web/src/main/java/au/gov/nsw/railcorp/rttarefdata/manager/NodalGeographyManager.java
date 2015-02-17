@@ -1010,11 +1010,13 @@ public class NodalGeographyManager implements INodalGeographyManager {
             //for (org.neo4j.graphdb.Node currentNode: path) {
                 index = index + 1;
                 if (isNodePlatform(currentNode)) {
+                    logger.info("node " + (String) currentNode.getProperty("name") + " is platform");
                     buildTraversModel(traverseModel, currentNode);
                     //subsequentPlatformPath.add(currentNode);
                     previouseNode = currentNode;
                     continue;
                 } else {
+                    logger.info("node " + (String) currentNode.getProperty("name") + " is not platform");
                     subsequentPlatformPath.add(previouseNode);
                     while (!isNodePlatform(currentNode) && index < path.size()) {
                         subsequentPlatformPath.add(currentNode);
@@ -1057,11 +1059,12 @@ public class NodalGeographyManager implements INodalGeographyManager {
         boolean isPlatform = false;
         try {
             final Integer gtfsStopId = (Integer) currentNode.getProperty("gtfsStopId");
-            if (gtfsStopId != null) {
+            if (gtfsStopId != null && gtfsStopId > 0) {
                 isPlatform = true;
             }
         } catch (NotFoundException nfe) {
             isPlatform = false;
+            return isPlatform;
         }
         return isPlatform;
     }
@@ -1083,16 +1086,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         nodeModel.setLatitude((Double) node.getProperty("latitude"));
         nodeModel.setLongtitude((Double) node.getProperty("longitude"));
         nodeModel.setEndOfLine((Boolean) node.getProperty("isEndOfLine"));
-        try {
-            boolean isPlatform = false;
-            final Integer gtfsStopId = (Integer) node.getProperty("gtfsStopId");
-            if (gtfsStopId != null) {
-                isPlatform = true;
-            }
-            nodeModel.setPlatform(isPlatform);
-        } catch (NotFoundException nfe) {
-            nodeModel.setPlatform(false);
-        }
+        nodeModel.setPlatform(isNodePlatform(node));
         traverseModel.addNode(nodeModel);
     }
 
@@ -1129,6 +1123,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
             }
 
             if (turnPenaltyBan == null || (turnPenaltyBan != null && !turnPenaltyBan.getPenalty().equals(IConstants.TURN_PENALTY_BAN))) {
+                logger.info("no turning penalty ban");
                 continue;
             }
             //there is no real path between these three nodes. so try it
@@ -1137,8 +1132,11 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 traverseModel.getNodes().remove(fromNode);
                 fromNode = (NodeModel) traverseModel.getNodes().get(traverseModel.getNodes().size() - 1);
             }
+            logger.info("fronNode =" + fromNode.getName());
             traverseModel.getNodes().remove(fromNode);
             final org.neo4j.graphdb.Node toNode = nodeList.get(nodeList.size() - 1);
+            logger.info("toNode =" + (String) toNode.getProperty("name"));
+
             final List<TraverseModel> newPaths = findAllPaths(fromNode.getName(), (String) toNode.getProperty("name"), IConstants.MAX_NODE_COUNT);
             if (newPaths == null || newPaths.size() < 1 || newPaths.get(0) == null || newPaths.get(0).getNodes() == null) {
                 return false;
