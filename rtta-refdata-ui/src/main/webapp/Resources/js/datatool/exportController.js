@@ -48,8 +48,10 @@ function ExportController($scope, generalService, SUCCESS, FAILURE, NETWORK_CSV_
         }
         var hiddenElement = document.createElement('a');
         generalService.getAllRows(downloadUrl).then(function(response){
-            hiddenElement.href = 'data:attachment/'+fileFormat+',' + encodeURI(response.data);
-            hiddenElement.target ='_blank';
+            var blob = new Blob([response.data], {'type': 'application/octet-stream'});
+            saveAs (blob , outPutFile);
+            hiddenElement.href = window.URL.createObjectURL(blob)//'data:attachment/'+fileFormat+',' + encodeURI(response.data);
+            //hiddenElement.target ='_blank';
             hiddenElement.download = outPutFile;
             hiddenElement.click();
         });
