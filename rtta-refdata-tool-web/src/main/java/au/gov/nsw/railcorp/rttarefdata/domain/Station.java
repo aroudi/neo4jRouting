@@ -57,6 +57,11 @@ public class Station {
     @RelatedToVia(type = Links.LINE_PATH_STATION, direction = Direction.INCOMING)
     private Collection<PathStation> pathStations;
 
+    @JsonIgnore
+    @RelatedTo(type = Links.STATION_PLATFORM, direction = OUTGOING)
+    @Fetch
+    private Collection<Platform> platforms;
+
     /**
      * Constructor.
      * @param shortName name
@@ -219,5 +224,13 @@ public class Station {
 
     public void setPathStations(Collection<PathStation> pathStations) {
         this.pathStations = pathStations;
+    }
+
+    public Collection<Platform> getPlatforms() {
+        return platforms;
+    }
+
+    public void setPlatforms(Collection<Platform> platforms) {
+        this.platforms = platforms;
     }
 }

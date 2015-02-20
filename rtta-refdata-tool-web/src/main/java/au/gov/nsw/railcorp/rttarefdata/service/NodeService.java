@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -84,4 +87,32 @@ public class NodeService {
             return null;
         }
     }
+    /**
+     * Export Node list into xml format and return as StreamingOutput.
+     * @return Streamingoutput
+     */
+    public StreamingOutput exportNodesToXml() {
+        StreamingOutput streamingOutput = null;
+        try {
+            final StringWriter writer = new StringWriter();
+            final JAXBContext context = JAXBContext.newInstance(RttaNodes.class);
+            final Marshaller marshaller = context.createMarshaller();
+
+            final RttaNodes rttaNodes = nodeManager.buildRttaNodes();
+            marshaller.marshal(rttaNodes, writer);
+            final String theXml = writer.toString();
+            streamingOutput = new StreamingOutput() {
+                @Override
+                public void write(OutputStream output) throws IOException, WebApplicationException {
+                    output.write(theXml.getBytes());
+                    output.flush();
+                }
+            };
+            return streamingOutput;
+        } catch (Exception e) {
+            logger.error("Exception in writing RttaNodes into xml: ", e);
+            return null;
+        }
+    }
+
 }

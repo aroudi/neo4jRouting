@@ -1,7 +1,7 @@
 var myApp = angular.module('rttaRefDataUi', ["stationFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload","ngVis"]);
 var config_data = {
-    'SERVER' : 'SVr-web-01',
-    'PORT'   : '9090',
+    'SERVER' : 'localhost',
+    'PORT'   : '8082',
     'WEBAPP' :'rtta-refdata-tool'
 }
 
@@ -45,6 +45,8 @@ var service_uri = {
     'LOCATION_CSV_URI' : 'export/locationsToCsv',
     'TRIPLET_CSV_URI' : 'export/tripletsToCsv',
     'NODAL_XML_URI' : 'export/nodalGeography/xml',
+    'STOPS_XML_URI' : 'export/stops/xml',
+    'NODES_XML_URI' : 'export/nodes/xml',
     'ALL_LOCATION_URI' : 'locations/all',
     'ADD_LOCATION_URI' : 'locations/add',
     'EDIT_LOCATION_URI' : 'locations/edit',

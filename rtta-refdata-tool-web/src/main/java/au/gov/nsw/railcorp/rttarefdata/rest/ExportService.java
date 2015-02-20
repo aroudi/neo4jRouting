@@ -156,4 +156,27 @@ public class ExportService {
         final StreamingOutput streamingOutput = locationService.exportLocationsToCsv();
         return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = Location.csv").build();
     }
+    /**
+     * export nodalGeography into xml format and return as file.
+     * @return xml file
+     */
+    @Path("/stops/xml")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response exportStopsToXml() {
+        final StreamingOutput streamingOutput = stopService.exportStopsToXml();
+        return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = RttaStops.xml").build();
+    }
+
+    /**
+     * export Nodes into xml format and return as file.
+     * @return xml file
+     */
+    @Path("/nodes/xml")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response exportNodesToXml() {
+        final StreamingOutput streamingOutput = nodeService.exportNodesToXml();
+        return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = RttaNodes.xml").build();
+    }
 }

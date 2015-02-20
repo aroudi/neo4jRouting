@@ -127,4 +127,11 @@ public interface INodeData {
      */
     @ResultColumn("masterJunctionName")
     String getMasterJunctionName();
+
+    /**
+     * gtfsStopId.
+     * @return String
+     */
+    @ResultColumn("gtfsStopId")
+    int getGtfsStopId();
 }

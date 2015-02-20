@@ -19,6 +19,7 @@ public class NodeData {
     private double length;
     private double latitude;
     private double longtitude;
+    private int gtfsStopId;
 
     public Long getNodeId() {
         return nodeId;
@@ -138,5 +139,13 @@ public class NodeData {
 
     public void setLongtitude(double longtitude) {
         this.longtitude = longtitude;
+    }
+
+    public int getGtfsStopId() {
+        return gtfsStopId;
+    }
+
+    public void setGtfsStopId(int gtfsStopId) {
+        this.gtfsStopId = gtfsStopId;
     }
 }

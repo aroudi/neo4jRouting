@@ -2,10 +2,9 @@ package au.gov.nsw.railcorp.rttarefdata.service;
 
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RefStop;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RefStopLink;
+import au.gov.nsw.railcorp.rtta.refint.generated.stops.RefStopLinks;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RttaStops;
-import au.gov.nsw.railcorp.rttarefdata.domain.PowerType;
 import au.gov.nsw.railcorp.rttarefdata.manager.IStopManager;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.ITriplet;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.StationData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
@@ -17,8 +16,11 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,32 +204,14 @@ public class StopService {
             streamingOutput = new StreamingOutput() {
                 @Override
                 public void write(OutputStream output) throws IOException, WebApplicationException {
-                    final List<ITriplet> tripletList = stopManager.getAllTriplets();
-                    if (tripletList == null) {
-                        return;
-                    }
                     String line = "InStopId, StopId, OutStopId, InStopName, StopName, OutStopName, Reversible, Electric, Diesel ";
                     output.write(line.getBytes());
                     output.write(System.getProperty("line.separator").getBytes());
-                    boolean isDiesel = false;
-                    boolean isElectric = false;
-                    for (ITriplet triplet : tripletList) {
-                        isDiesel = false;
-                        isElectric = false;
-                        line = triplet.getInStopId() + ", " + triplet.getStopId() + ", " + triplet.getOutStopId() + ", "
-                                + triplet.getInStopName() + ", " + triplet.getStopName() + ", " + triplet.getOutStopName() + ", " + triplet.getReversible();
-                        final List<PowerType> powerTypes = stopManager.getTripletPowerTypes(triplet.getInStopId(), triplet.getStopId(), triplet.getOutStopId());
-                        if (powerTypes != null) {
-                            for (PowerType powerType: powerTypes) {
-                                if (powerType.getName().equals(IConstants.POWER_TYPE_ELECTRIC)) {
-                                    isElectric = true;
-                                }
-                                if (powerType.getName().equals(IConstants.POWER_TYPE_DIESEL)) {
-                                    isDiesel = true;
-                                }
-                            }
-                        }
-                        line = line + ", " + isElectric + ", " + isDiesel;
+                    final RefStopLinks refStopLinks = stopManager.buildStopLinks();
+                    for (RefStopLink refStopLink: refStopLinks.getLink()) {
+                        line = refStopLink.getInStopId() + ", " + refStopLink.getStopId() + ", " + refStopLink.getOutStopId() + ", "
+                                + refStopLink.getInStopName() + ", " + refStopLink.getStopName() + ", " + refStopLink.getOutStopName() + ", " + refStopLink.isReversible()
+                                + refStopLink.isElectric() + refStopLink.isDiesel();
                         output.write(line.getBytes());
                         output.write(System.getProperty("line.separator").getBytes());
                     }
@@ -236,8 +220,39 @@ public class StopService {
             };
             return streamingOutput;
         } catch (Exception e) {
-            logger.error("Exception in writing statioin triplets into csv: ", e);
+            logger.error("Exception in writing stoplinks into csv: ", e);
             return null;
         }
     }
+
+    /**
+     * Export Stop list into xml format and return as StreamingOutput.
+     * @return Streamingoutput
+     */
+    public StreamingOutput exportStopsToXml() {
+        StreamingOutput streamingOutput = null;
+        try {
+            final StringWriter writer = new StringWriter();
+            final JAXBContext context = JAXBContext.newInstance(RttaStops.class);
+            final Marshaller marshaller = context.createMarshaller();
+
+            final RttaStops rttaStops = stopManager.buildStopList();
+            marshaller.marshal(rttaStops, writer);
+            final String theXml = writer.toString();
+            //logger.info(" exported nodalGegoraphy: ");
+            //logger.info(theXml);
+            streamingOutput = new StreamingOutput() {
+                @Override
+                public void write(OutputStream output) throws IOException, WebApplicationException {
+                    output.write(theXml.getBytes());
+                    output.flush();
+                }
+            };
+            return streamingOutput;
+        } catch (Exception e) {
+            logger.error("Exception in writing RttaStops into xml: ", e);
+            return null;
+        }
+    }
+
 }

@@ -1,25 +1,25 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
+import au.gov.nsw.railcorp.rtta.refint.generated.reference.ReferenceHeader;
+import au.gov.nsw.railcorp.rtta.refint.generated.stops.*;
 import au.gov.nsw.railcorp.rttarefdata.domain.Platform;
 import au.gov.nsw.railcorp.rttarefdata.domain.PowerType;
 import au.gov.nsw.railcorp.rttarefdata.domain.Station;
 import au.gov.nsw.railcorp.rttarefdata.domain.StationTriplet;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.IStationPlatformData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.StationData;
-import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.*;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PlatformRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationTripletRepository;
+import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
+import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by arash on 6/11/14.
@@ -248,5 +248,137 @@ public class StopManager implements IStopManager {
             logger.error("Exception in returning triplet list ", e);
             return null;
         }
+    }
+
+    /**
+     * return list of all Stations and their platforms.
+     * @return List of stations
+     */
+    @Transactional
+    public List<Station> getAllStops() {
+        List<Station> result = null;
+        try {
+            result = Lists.newArrayList(stationRepository.findAll().iterator());
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in fetching platform list ", e);
+            return null;
+        }
+    }
+
+
+    /**
+     * Build Stop List and return.
+     * @return StopsV01
+     */
+    public StopsV01 buildStops() {
+        try {
+            final StopsV01 stopsV01 = new StopsV01();
+            RefStop refStop;
+            final RefStops refStops = new RefStops();
+            List<Station> stopList;
+            //fetch all stops from database;
+            stopList = getAllStops();
+            if (stopList == null) {
+                return null;
+            }
+            for (Station station: stopList) {
+                refStop = new RefStop();
+                refStop.setStopId(StringUtil.intToStr(station.getGtfsStopId()));
+                refStop.setName(station.getShortName());
+                refStop.setLongName(station.getLongName());
+                refStop.setParentStopId("");
+                refStop.setSource("refDataTool");
+                refStop.setStationStop(true);
+                refStop.setLatitude(station.getLatitude());
+                refStop.setLongitude(station.getLongtitude());
+                refStops.getStop().add(refStop);
+
+                if (station.getPlatforms() == null) {
+                    continue;
+                }
+                for (Platform platform: station.getPlatforms()) {
+                    refStop = new RefStop();
+                    refStop.setStopId(StringUtil.intToStr(platform.getGtfsStopId()));
+                    refStop.setName(platform.getName());
+                    refStop.setLongName(platform.getLongName());
+                    refStop.setParentStopId(StringUtil.intToStr(station.getGtfsStopId()));
+                    refStop.setSource("refDataTool");
+                    refStop.setStationStop(false);
+                    refStop.setLatitude(platform.getLatitude());
+                    refStop.setLongitude(platform.getLongitude());
+                    refStops.getStop().add(refStop);
+                }
+
+            }
+            stopsV01.setStops(refStops);
+            stopsV01.setStopLinks(buildStopLinks());
+            return stopsV01;
+        } catch (Exception e) {
+            logger.error("Error in retrieving stop list :", e);
+            return null;
+        }
+    }
+
+    /**
+     * buildUp and return stops link.
+     * @return RefStopLinks
+     */
+    public RefStopLinks buildStopLinks() {
+        final RefStopLinks refStopLinks = new RefStopLinks();
+        RefStopLink refStopLink;
+        final List<ITriplet> tripletList = getAllTriplets();
+        if (tripletList == null) {
+            return null;
+        }
+        boolean isDiesel = false;
+        boolean isElectric = false;
+        for (ITriplet triplet : tripletList) {
+            refStopLink = new RefStopLink();
+            refStopLink.setInStopId(StringUtil.intToStr(triplet.getInStopId()));
+            refStopLink.setStopId(StringUtil.intToStr(triplet.getStopId()));
+            refStopLink.setOutStopId(StringUtil.intToStr(triplet.getOutStopId()));
+            refStopLink.setInStopName(triplet.getInStopName());
+            refStopLink.setStopName(triplet.getStopName());
+            refStopLink.setOutStopName(triplet.getOutStopName());
+            refStopLink.setReversible(triplet.getReversible());
+            isDiesel = false;
+            isElectric = false;
+            final List<PowerType> powerTypes = getTripletPowerTypes(triplet.getInStopId(), triplet.getStopId(), triplet.getOutStopId());
+            if (powerTypes != null) {
+                for (PowerType powerType: powerTypes) {
+                    if (powerType.getName().equals(IConstants.POWER_TYPE_ELECTRIC)) {
+                        isElectric = true;
+                    }
+                    if (powerType.getName().equals(IConstants.POWER_TYPE_DIESEL)) {
+                        isDiesel = true;
+                    }
+                }
+            }
+            refStopLink.setElectric(isElectric);
+            refStopLink.setDiesel(isDiesel);
+            refStopLinks.getLink().add(refStopLink);
+        }
+        return refStopLinks;
+    }
+
+    /**
+     * build stop list.
+     * @return RttaStops
+     */
+    public RttaStops buildStopList() {
+        final RttaStops rttaStops = new RttaStops();
+        final ReferenceHeader referenceHeader = new ReferenceHeader();
+        referenceHeader.setContent("RttaStops");
+        referenceHeader.setContentVersion("0.1");
+        referenceHeader.setContentManager("StopMessage");
+        referenceHeader.setDescription("TfNSW RTTA Stops Data Bundle");
+        referenceHeader.setComment("Generated by Rtta RefDataTool");
+        referenceHeader.setSequence("0");
+        final Date date = new Date();
+        referenceHeader.setDate(date.toString());
+        rttaStops.setReferenceHeader(referenceHeader);
+        rttaStops.setStopsV01(buildStops());
+        return rttaStops;
     }
 }

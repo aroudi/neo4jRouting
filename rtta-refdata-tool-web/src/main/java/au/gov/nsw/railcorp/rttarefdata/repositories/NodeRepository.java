@@ -33,7 +33,8 @@ public interface NodeRepository extends GraphRepository<Node> {
             "MATCH (n:Node) RETURN id(n) AS nodeId,  n.name AS name, n.longName AS longName, n.platfromName AS  platformName"
                     + ", n.isDummy AS dummy, n.isJunction AS junction, n.isWorkingTimingPoint AS  workingTimingPoint, n.isPublicTimingPoint AS publicTimingPoint"
                     + ", n.isEndOfLine AS endOfLine, n.dWellDuration AS wellDuration, n.upRecoveryDuration AS upRecoveryDuration, n.downRecoveryDuration AS downRecoveryDuration"
-                    + ", n.length AS length, n.latitude AS latitude, n.longitude AS longtitude, n.masterJunctionName as masterJunctionName, n.masterTimingPointName as masterTimingPointName"
+                    + ", n.length AS length, n.latitude AS latitude, n.longitude AS longtitude, n.masterJunctionName as masterJunctionName, n.masterTimingPointName as masterTimingPointName "
+                    + ", n.gtfsStopId as gtfsStopId"
     )
     List<INodeData> getAllNodes();
 

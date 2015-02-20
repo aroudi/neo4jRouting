@@ -1,5 +1,6 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
+import au.gov.nsw.railcorp.rtta.refint.generated.nodes.RttaNodes;
 import au.gov.nsw.railcorp.rttarefdata.domain.Node;
 import au.gov.nsw.railcorp.rttarefdata.domain.Platform;
 
@@ -46,5 +47,11 @@ public interface INodeManager {
      * @return Node
      */
     Node getNodeByName (String name);
+
+    /**
+     * Build RttaNode List.
+     * @return RttaNodes
+     */
+   RttaNodes buildRttaNodes();
 
 }
