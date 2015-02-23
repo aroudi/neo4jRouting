@@ -47,6 +47,7 @@ var service_uri = {
     'NODAL_XML_URI' : 'export/nodalGeography/xml',
     'STOPS_XML_URI' : 'export/stops/xml',
     'NODES_XML_URI' : 'export/nodes/xml',
+    'TOPOLOGY_XML_URI' : 'export/gtfsTopology/xml',
     'ALL_LOCATION_URI' : 'locations/all',
     'ADD_LOCATION_URI' : 'locations/add',
     'EDIT_LOCATION_URI' : 'locations/edit',

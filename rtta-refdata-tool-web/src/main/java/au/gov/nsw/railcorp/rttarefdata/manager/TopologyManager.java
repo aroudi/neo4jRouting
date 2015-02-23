@@ -245,6 +245,7 @@ public class TopologyManager implements ITopologyManager {
                 for (ILinePathStation pathStation: linePathStationList) {
                     linePathStationData = new LinePathStationData();
                     linePathStationData.setStationId(pathStation.getStationId());
+                    linePathStationData.setGtfsStopId(pathStation.getGtfsStopId());
                     linePathStationData.setName(pathStation.getName());
                     linePathStationData.setLongName(pathStation.getLongName());
                     linePathStationData.setLatitude(pathStation.getLatitude());
@@ -263,4 +264,21 @@ public class TopologyManager implements ITopologyManager {
         }
     }
 
+    /**
+     * get service type for specific line.
+     * @param lineName lineName
+     * @return ServiceType
+     */
+    public ServiceType getLineServiceType(String lineName) {
+        return networkLineRepository.getLineServiceType(lineName);
+    }
+
+    /**
+     * return line path powertypes.
+     * @param linePathName linePathName
+     * @return List of power type
+     */
+    public List<PowerType> getLinePathPowerTypes(String linePathName) {
+        return linePathRepository.getLinePathPowerType(linePathName);
+    }
 }

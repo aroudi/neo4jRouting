@@ -5,6 +5,7 @@ package au.gov.nsw.railcorp.rttarefdata.mapresult;
  */
 public class LinePathStationData {
     private Long stationId;
+    private int gtfsStopId;
     private String name;
     private String longName;
     private Double latitude;
@@ -75,5 +76,13 @@ public class LinePathStationData {
 
     public void setInterchangePoint(boolean interchangePoint) {
         this.interchangePoint = interchangePoint;
+    }
+
+    public int getGtfsStopId() {
+        return gtfsStopId;
+    }
+
+    public void setGtfsStopId(int gtfsStopId) {
+        this.gtfsStopId = gtfsStopId;
     }
 }

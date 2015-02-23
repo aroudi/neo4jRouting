@@ -2,6 +2,7 @@
 package au.gov.nsw.railcorp.rttarefdata.repositories;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.NetworkLine;
+import au.gov.nsw.railcorp.rttarefdata.domain.ServiceType;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.ILineData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.INetworkLineData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.IRefData;
@@ -41,4 +42,12 @@ public interface NetworkLineRepository extends GraphRepository<NetworkLine> {
             + "line.backgroundColourHex AS backgroundColourHex, line.textColourHex AS textColourHex"
     )
     List<ILineData> getAllLinesAsRefData();
+
+    /**
+     * get line service type.
+     * @param lineName lineName
+     * @return Service Type
+     */
+    @Query("MATCH (line:NetworkLine{name:{0}})<-[:LINE_SERVICE_TYPE]-(st:ServiceType) RETURN st")
+    ServiceType getLineServiceType(String lineName);
 }

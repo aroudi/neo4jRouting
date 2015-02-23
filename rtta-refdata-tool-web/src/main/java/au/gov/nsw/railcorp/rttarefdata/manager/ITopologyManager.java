@@ -1,8 +1,6 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
-import au.gov.nsw.railcorp.rttarefdata.domain.LinePath;
-import au.gov.nsw.railcorp.rttarefdata.domain.Network;
-import au.gov.nsw.railcorp.rttarefdata.domain.NetworkLine;
+import au.gov.nsw.railcorp.rttarefdata.domain.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -69,4 +67,19 @@ public interface ITopologyManager {
      * @return List of path station
      */
     List getAllPathStationPerNetwork(String networkName);
-    }
+
+
+    /**
+     * get service type for specific line.
+     * @param lineName lineName
+     * @return ServiceType
+     */
+    ServiceType getLineServiceType(String lineName);
+
+    /**
+     * return line path powertypes.
+     * @param linePathName linePathName
+     * @return List of power type
+     */
+    List<PowerType> getLinePathPowerTypes(String linePathName);
+}

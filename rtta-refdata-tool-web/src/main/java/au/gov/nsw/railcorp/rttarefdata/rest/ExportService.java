@@ -179,4 +179,17 @@ public class ExportService {
         final StreamingOutput streamingOutput = nodeService.exportNodesToXml();
         return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = RttaNodes.xml").build();
     }
+    /**
+     * export Gtfs Topology into xml format and return as file.
+     * @return xml file
+     */
+    @Path("/gtfsTopology/xml")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response exportGtfsTopologyToXml() {
+        final StreamingOutput streamingOutput = topologyService.exportGtfsTopologyToXml();
+        return Response.ok(streamingOutput).header("content-disposition", "attachment; filename = RttaGtfsTopology.xml").build();
+    }
+
 }
+

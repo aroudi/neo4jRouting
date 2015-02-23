@@ -123,6 +123,19 @@ public class StringUtil {
         }
     }
 
+    /**
+     * convert Long to str.
+     * @param input input
+     * @return String
+     */
+    public static String longToStr(long input) {
+        try {
+            return String.valueOf(input);
+        } catch (Exception e) {
+            COMMON_LOGGER.error("Can't convert int to str :", e);
+            return "";
+        }
+    }
 
 
 

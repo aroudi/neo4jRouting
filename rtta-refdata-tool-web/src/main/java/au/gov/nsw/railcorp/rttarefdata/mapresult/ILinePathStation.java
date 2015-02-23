@@ -18,6 +18,13 @@ public interface ILinePathStation {
     Long getStationId();
 
     /**
+     * gtfsStopId.
+     * @return gtfsStopId
+     */
+
+    @ResultColumn("gtfsStopId")
+    int getGtfsStopId();
+    /**
      * stationName.
      * @return stationName
      */

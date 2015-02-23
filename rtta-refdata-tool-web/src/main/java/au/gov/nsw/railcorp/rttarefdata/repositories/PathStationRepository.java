@@ -18,7 +18,8 @@ public interface PathStationRepository extends GraphRepository<PathStation> {
      * @return ILinePath
      */
     @Query("MATCH (linePath:LinePath)-[lps:LINE_PATH_STATION]->(station:Station) where linePath.name={0} RETURN station.stationId as stationId,"
-            + " station.shortName as name, station.longName as longName, station.latitude AS latitude, station.longtitude AS longtitude, station.interchangePoint as interchangePoint, "
+            + " station.gtfsStopId as gtfsStopId, station.shortName as name, station.longName as longName, station.latitude AS latitude,"
+            + " station.longtitude AS longtitude, station.interchangePoint as interchangePoint, "
             + "lps.pathMatchInclude AS pathMatchInclude,  lps.sequence AS sequence order by sequence"
     )
     List<ILinePathStation> getAllLinePathStations(String linePathName);

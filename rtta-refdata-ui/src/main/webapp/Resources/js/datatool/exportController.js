@@ -1,7 +1,7 @@
 /**
  * Created by arash on 19/01/2015.
  */
-    function ExportController($scope, generalService, SUCCESS, FAILURE, NETWORK_CSV_URI, LINE_CSV_URI, PATH_CSV_URI, STATION_CSV_URI, PLATFORM_CSV_URI, NODE_CSV_URI, NODAL_XML_URI, TRIPLET_CSV_URI, STOPS_XML_URI, NODES_XML_URI) {
+    function ExportController($scope, generalService, SUCCESS, FAILURE, NETWORK_CSV_URI, LINE_CSV_URI, PATH_CSV_URI, STATION_CSV_URI, PLATFORM_CSV_URI, NODE_CSV_URI, NODAL_XML_URI, TRIPLET_CSV_URI, STOPS_XML_URI, NODES_XML_URI, TOPOLOGY_XML_URI) {
     generalService.setChosenMenuItem('downloadRefData');
     $scope.exportToCsv = function(fileName)
     {
@@ -49,6 +49,11 @@
             case 'nodesXml':
                 downloadUrl = NODES_XML_URI
                 outPutFile ='RttaNodes.xml'
+                fileFormat='xml'
+                break;
+            case 'gtfsTopology':
+                downloadUrl = TOPOLOGY_XML_URI
+                outPutFile ='RttaGtfsTopology.xml'
                 fileFormat='xml'
                 break;
             default :
