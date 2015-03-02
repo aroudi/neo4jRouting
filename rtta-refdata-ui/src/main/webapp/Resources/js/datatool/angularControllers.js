@@ -1,5 +1,6 @@
 function MainController($scope, generalService) {
     $scope.menuItems = [
+        { name: 'Manage Versions', path:'version'},
         { name: 'Display Network', path:'visNetwork'},
         { name: 'Networks', path:'network'},
         { name: 'Lines', path :'line'},

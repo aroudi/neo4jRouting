@@ -112,4 +112,56 @@ public interface Links {
      * Link between (Node) -[NODE_LOCATION]-> (Location).
      */
     String NODE_LOCATION = "NODE_LOCATION";
+    /**
+     * Link between (DataVersion) -[VERSION_NETWORK]-> (Network).
+     */
+    String VERSION_NETWORK = "VERSION_NETWORK";
+    /**
+     * Link between (DataVersion) -[VERSION_LINE]-> (NetworkLine).
+     */
+    String VERSION_LINE = "VERSION_LINE";
+    /**
+     * Link between (DataVersion) -[VERSION_PATH]-> (LinePath).
+     */
+    String VERSION_PATH = "VERSION_PATH";
+    /**
+     * Link between (DataVersion) -[VERSION_STATION]-> (STATION).
+     */
+    String VERSION_STATION = "VERSION_STATION";
+    /**
+     * Link between (DataVersion) -[VERSION_PLATFORM]-> (PLATFORM).
+     */
+    String VERSION_PLATFORM = "VERSION_PLATFORM";
+    /**
+     * Link between (DataVersion) -[VERSION_NODE]-> (NODE).
+     */
+    String VERSION_NODE = "VERSION_NODE";
+    /**
+     * Link between (DataVersion) -[VERSION_LOCATION]-> (LOCATION).
+     */
+    String VERSION_LOCATION = "VERSION_LOCATION";
+    /**
+     * Link between (DataVersion) -[VERSION_RUN_TIME]-> (RunningTime).
+     */
+    String VERSION_RUN_TIME = "VERSION_RUN_TIME";
+    /**
+     * Link between (DataVersion) -[VERSION_NODAL_HEADER]-> (NodalHeader).
+     */
+    String VERSION_NODAL_HEADER = "VERSION_NODAL_HEADER";
+    /**
+     * Link between (DataVersion) -[VERSION_NODE_LINK]-> (NodeLink).
+     */
+    String VERSION_NODE_LINK = "VERSION_NODE_LINK";
+    /**
+     * Link between (DataVersion) -[VERSION_SEQUENCE]-> (EntitySequence).
+     */
+    String VERSION_SEQUENCE = "VERSION_SEQUENCE";
+    /**
+     * Link between (DataVersion) -[VERSION_TRACK_SECTION]-> (TrackSection).
+     */
+    String VERSION_TRACK_SECTION = "VERSION_TRACK_SECTION";
+    /**
+     * Link between (DataVersion) -[BASE_VERSION]-> (DataVersion).
+     */
+    String BASE_VERSION = "BASE_VERSION";
 }

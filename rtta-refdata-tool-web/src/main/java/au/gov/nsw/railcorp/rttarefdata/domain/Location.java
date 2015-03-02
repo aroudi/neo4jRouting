@@ -1,10 +1,7 @@
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
 import org.neo4j.graphdb.Direction;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.RelatedTo;
+import org.springframework.data.neo4j.annotation.*;
 
 /**
  * Created by arash on 20/01/2015.
@@ -28,6 +25,9 @@ public class Location {
     @RelatedTo(type = Links.NODE_LOCATION, direction = Direction.BOTH)
     private Node node;
     private String nodeName;
+    @RelatedTo(type = Links.VERSION_LOCATION, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Default constructor.
@@ -97,5 +97,13 @@ public class Location {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

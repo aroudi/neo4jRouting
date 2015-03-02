@@ -62,6 +62,10 @@ public class Station {
     @Fetch
     private Collection<Platform> platforms;
 
+    @RelatedTo(type = Links.VERSION_STATION, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
+
     /**
      * Constructor.
      * @param shortName name
@@ -232,5 +236,13 @@ public class Station {
 
     public void setPlatforms(Collection<Platform> platforms) {
         this.platforms = platforms;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

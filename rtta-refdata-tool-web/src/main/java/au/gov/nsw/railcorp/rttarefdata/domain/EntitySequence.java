@@ -1,9 +1,8 @@
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
+import org.neo4j.graphdb.Direction;
+import org.springframework.data.neo4j.annotation.*;
 
 /**
  * Created by arash on 6/11/14.
@@ -15,6 +14,9 @@ public class EntitySequence {
     private long stationSeq;
     @Indexed
     private String entityName = IConstants.ENTITY_SEQUENCE_NAME;
+    @RelatedTo(type = Links.VERSION_SEQUENCE, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * defulat constructor.
@@ -44,5 +46,13 @@ public class EntitySequence {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

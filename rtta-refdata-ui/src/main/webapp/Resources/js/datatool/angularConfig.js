@@ -44,4 +44,8 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/Traverse.html',
             controller: TraversalController
         });
+        $routeProvider.when('/version', {
+            templateUrl: 'RailNetwork/DataVersion.html',
+            controller: VersionController
+        });
     } ]);

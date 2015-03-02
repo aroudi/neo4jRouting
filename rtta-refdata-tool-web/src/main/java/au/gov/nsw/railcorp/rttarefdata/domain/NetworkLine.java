@@ -2,10 +2,7 @@
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
 import org.neo4j.graphdb.Direction;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.RelatedTo;
+import org.springframework.data.neo4j.annotation.*;
 
 import java.util.Set;
 
@@ -34,6 +31,10 @@ public class NetworkLine {
 
     @RelatedTo (type = Links.LINE_PATH, direction = Direction.OUTGOING)
     private Set<LinePath> linePath;
+
+    @RelatedTo(type = Links.VERSION_LINE, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Constructor.

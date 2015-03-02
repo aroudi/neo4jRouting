@@ -137,6 +137,11 @@ public class Node {
     @RelatedTo(type = Links.NODE_LOCATION, direction = Direction.BOTH)
     protected Collection<Location> locations;
 
+
+    @RelatedTo(type = Links.VERSION_NODE, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
+
     /**
      * graph Id.
      */
@@ -433,5 +438,13 @@ public class Node {
 
     public void setLocations(Collection<Location> locations) {
         this.locations = locations;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

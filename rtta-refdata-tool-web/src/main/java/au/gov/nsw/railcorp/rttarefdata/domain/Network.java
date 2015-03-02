@@ -3,10 +3,7 @@ package au.gov.nsw.railcorp.rttarefdata.domain;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.neo4j.graphdb.Direction;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.RelatedTo;
+import org.springframework.data.neo4j.annotation.*;
 
 import java.util.Set;
 
@@ -36,6 +33,11 @@ public class Network {
     @RelatedTo (type = Links.NETWORK_LINE, direction = Direction.OUTGOING)
     //@Fetch
     private Set<NetworkLine> networkLines;
+
+    @JsonIgnore
+    @RelatedTo(type = Links.VERSION_NETWORK, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Constructor.
@@ -133,5 +135,13 @@ public class Network {
 
     public void setNetworkLines(Set<NetworkLine> networkLines) {
         this.networkLines = networkLines;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

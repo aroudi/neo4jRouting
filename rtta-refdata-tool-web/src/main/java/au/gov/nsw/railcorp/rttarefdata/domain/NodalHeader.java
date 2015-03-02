@@ -1,8 +1,7 @@
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
+import org.neo4j.graphdb.Direction;
+import org.springframework.data.neo4j.annotation.*;
 
 /**
  * Created by arash on 14/01/2015.
@@ -19,6 +18,10 @@ public class NodalHeader {
     private String description;
     private String owner;
     private String date;
+
+    @RelatedTo(type = Links.VERSION_NODAL_HEADER, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Default Constructor.
@@ -48,5 +51,13 @@ public class NodalHeader {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

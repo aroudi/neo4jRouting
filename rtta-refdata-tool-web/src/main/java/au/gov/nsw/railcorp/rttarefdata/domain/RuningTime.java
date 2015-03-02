@@ -2,6 +2,7 @@
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
 import org.neo4j.graphdb.Direction;
+import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedTo;
@@ -24,6 +25,9 @@ public class RuningTime {
 
     @RelatedTo(type = Links.NODE_LINK_RUN_TIME, direction = Direction.INCOMING)
     private NodeLink nodeLink;
+    @RelatedTo(type = Links.VERSION_RUN_TIME, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Constructor.
@@ -79,5 +83,13 @@ public class RuningTime {
 
     public void setSbId(String sbId) {
         this.sbId = sbId;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

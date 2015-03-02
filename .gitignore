@@ -91,7 +91,8 @@ local.properties
 *.mdb
 *.mdw
 .idea/misc.xml
-
+#logback
+*-test.xml
 #
 # Unit test output files
 #

@@ -1,9 +1,8 @@
 // RailCorp 2014
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
+import org.neo4j.graphdb.Direction;
+import org.springframework.data.neo4j.annotation.*;
 
 /**
  * Created by arash on 3/11/14.
@@ -20,6 +19,9 @@ public class TrackSection {
     private String id;
     private boolean upDirection;
     private boolean permissive;
+    @RelatedTo(type = Links.VERSION_TRACK_SECTION, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Constructor.
@@ -73,4 +75,11 @@ public class TrackSection {
         this.id = id;
     }
 
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
+    }
 }

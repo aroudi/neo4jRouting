@@ -53,7 +53,11 @@ var service_uri = {
     'EDIT_LOCATION_URI' : 'locations/edit',
     'DEL_LOCATION_URI' : 'locations/delete',
     'VIS_NETWORK_URI' : 'networks/visualize',
-    'TRAVERSAL_URI' : 'nodes/traverse'
+    'TRAVERSAL_URI' : 'nodes/traverse',
+    'ALL_VERSION_URI' : 'versions/all',
+    'ADD_VERSION_URI' : 'versions/add',
+    'EDIT_VERSION_URI' : 'versions/edit',
+    'DEL_VERSION_URI' : 'versions/delete'
 }
 
 var response_status = {
@@ -176,6 +180,17 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
             });
             return promise;
         },
+        refreshRows: function (allRowUri) {
+            serviceUrl = configService.getAddress() + allRowUri;
+            var promise = $http({
+                url: serviceUrl ,
+                method: 'GET'
+            }).success(function (data) {
+                return data;
+            }).error(function (data) {
+            });
+            return promise;
+        },
         addRow: function (rowObject, addRowUri) {
             serviceUrl = configService.getAddress() + addRowUri;
             var div = $q.defer();
@@ -239,6 +254,32 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
             if (angular.isArray(arr)) {
                 for (var i = 0; i < arr.length; i++) {
                     if ( arr[i].refDataId==refDataId  ) {
+                        return arr[i];
+                    }
+                }
+            }
+            return selectedItem
+        },
+        populateBaseVersion: function (refDataId, sourceData) {
+            selectedItem = sourceData[0];
+            if (refDataId==undefined )
+                return selectedItem;
+            arr=sourceData;
+            if (angular.isArray(arr)) {
+                for (var i = 0; i < arr.length; i++) {
+                    if ( arr[i].baseVersion==refDataId  ) {
+                        return arr[i];
+                    }
+                }
+            }
+            return selectedItem
+        },
+        populateActiveVersion: function (sourceData) {
+            selectedItem = sourceData[0];
+            arr=sourceData;
+            if (angular.isArray(arr)) {
+                for (var i = 0; i < arr.length; i++) {
+                    if ( arr[i].active==true  ) {
                         return arr[i];
                     }
                 }

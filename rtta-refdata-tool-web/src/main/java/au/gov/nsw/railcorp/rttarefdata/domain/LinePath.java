@@ -32,6 +32,11 @@ public class LinePath {
     @RelatedToVia (type = Links.LINE_PATH_STATION, direction = Direction.OUTGOING)
     private Collection<PathStation> pathStations;
 
+    @RelatedTo(type = Links.VERSION_PATH, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
+
+
     /**
      * Constructor.
      * @param name name
@@ -127,5 +132,13 @@ public class LinePath {
 
     public void setPowerTypes(Set<PowerType> powerTypes) {
         this.powerTypes = powerTypes;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }
