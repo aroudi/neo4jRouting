@@ -57,7 +57,8 @@ var service_uri = {
     'ALL_VERSION_URI' : 'versions/all',
     'ADD_VERSION_URI' : 'versions/add',
     'EDIT_VERSION_URI' : 'versions/edit',
-    'DEL_VERSION_URI' : 'versions/delete'
+    'DEL_VERSION_URI' : 'versions/delete',
+    'SET_WORKING_VERSION_URI' : 'versions/setWorkingVersion'
 }
 
 var response_status = {

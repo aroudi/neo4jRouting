@@ -81,6 +81,12 @@
         </ul>
     </div>
     <div class="actionBar">
+        <div class="userName">
+            <b>Version :</b>
+            <select name="workingVersion" data-ng-model="workingVersion"
+                    ng-options="configData.name for configData in  versionSet" ng-change = "onVersionChange()">
+            </select>
+        </div>
         <div class="actionTools">
         </div>
     </div>

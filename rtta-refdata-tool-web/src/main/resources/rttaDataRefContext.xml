@@ -57,7 +57,7 @@
         <property name="transactionManager" ref="neo4jTransactionManagerService" />
         <property name="userTransaction" ref="neo4jUserTransactionService" />
     </bean>
-    <bean id="sessionState" class="au.gov.nsw.railcorp.rttarefdata.session.SessionState" scope="session">
+    <bean id="sessionState" class="au.gov.nsw.railcorp.rttarefdata.session.SessionState" scope="singleton">
     </bean>
     <tx:annotation-driven transaction-manager="neo4jTransactionManager" />
 </beans>

@@ -163,4 +163,19 @@ public class DataVersionService {
     public List<DataVersionModel> getAllDataVersions() {
         return dataVersionManager.getAllDataVersion();
     }
+
+    /**
+     * set working version on session state object.
+     * @param id id
+     */
+    public void setWorkingVersion(long id) {
+        try {
+            final DataVersion dataVersion = dataVersionManager.getDataVersionById(id);
+            if (dataVersion != null) {
+                sessionState.setWorkingVersion(dataVersion);
+            }
+        } catch (Exception e) {
+            logger.error("Exception in setting working version: ", e);
+        }
+    }
 }

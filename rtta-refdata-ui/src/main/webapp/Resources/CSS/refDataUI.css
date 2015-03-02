@@ -148,7 +148,7 @@ h1 {
 .actionBar {
     float: left;
     border: 0px;
-    height: 1%;
+    height: 3%;
     width: 85%;
     background-color: #00205b;
     position: relative;
@@ -167,6 +167,7 @@ h1 {
     position: absolute;
     bottom: 0;
     left: 0;
+    color: white;
 }
 
 .actionText {

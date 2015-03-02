@@ -1,4 +1,4 @@
-function MainController($scope, generalService) {
+function MainController($scope, generalService, ALL_VERSION_URI, SET_WORKING_VERSION_URI) {
     $scope.menuItems = [
         { name: 'Manage Versions', path:'version'},
         { name: 'Display Network', path:'visNetwork'},
@@ -19,6 +19,23 @@ function MainController($scope, generalService) {
     {
         return generalService.getChosenMenuItem();
     };
+
+    /**
+     * retreive network list from server
+     */
+    getAllVersions();
+    function getAllVersions() {
+        generalService.getAllRows(ALL_VERSION_URI).then(function(response){
+            $scope.versionSet = response.data;
+            $scope.workingVersion= generalService.populateActiveVersion($scope.versionSet);
+
+        });
+
+    };
+    $scope.onVersionChange = function() {
+        var uri =SET_WORKING_VERSION_URI + '/' + $scope.workingVersion.id;
+        generalService.refreshRows(uri);
+    }
 
 }
 

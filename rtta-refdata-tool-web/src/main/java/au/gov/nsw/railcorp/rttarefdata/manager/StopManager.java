@@ -10,6 +10,7 @@ import au.gov.nsw.railcorp.rttarefdata.mapresult.*;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PlatformRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationTripletRepository;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import com.google.common.collect.Lists;
@@ -53,6 +54,9 @@ public class StopManager implements IStopManager {
 
     @Autowired
     private IDataTypeManager dataTypeManager;
+
+    @Autowired
+    private SessionState sessionState;
     /**
      * create station.
      * @param shortName shortName

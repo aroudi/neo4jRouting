@@ -82,4 +82,13 @@ public class VersionService {
         return dataVersionService.removeDataVersion(id);
     }
 
+    /**
+     * delete dataversion based on id.
+     * @param id id
+     */
+    @GET
+    @Path("/setWorkingVersion/{id}")
+    public void setWorkingVersion (@PathParam("id") long id) {
+        dataVersionService.setWorkingVersion(id);
+    }
 }

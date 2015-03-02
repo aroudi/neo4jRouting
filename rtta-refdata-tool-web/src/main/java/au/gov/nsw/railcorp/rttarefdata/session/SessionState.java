@@ -1,10 +1,12 @@
 package au.gov.nsw.railcorp.rttarefdata.session;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.DataVersion;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by arash on 2/03/2015.
  */
+@Component
 public class SessionState {
     private DataVersion workingVersion;
     private DataVersion activeVersion;
