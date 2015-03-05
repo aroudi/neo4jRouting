@@ -7,6 +7,7 @@ import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.request.PlatformModel;
 import au.gov.nsw.railcorp.rttarefdata.response.PlatformResponse;
 import au.gov.nsw.railcorp.rttarefdata.service.StopService;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,9 @@ public class platformService {
     private StationRepository stationRepository;
     @Autowired
     private StopService stopService;
+
+    @Autowired
+    private SessionState sessionState;
     /**
      * Return station list in Json format.
      * @return Station List
@@ -74,14 +78,14 @@ public class platformService {
                 return response;
             }
             //check if platform allready exists.
-            Platform platform = platformRepository.findBySchemaPropertyValue("name", platformModel.getPlatformName());
+            Platform platform = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), platformModel.getPlatformName());
             if (platform != null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("platform code " + platformModel.getPlatformName() + " already exists");
                 return response;
             }
             platform = new Platform();
-            final Station station = stationRepository.findBySchemaPropertyValue("stationId", platformModel.getStation().getRefDataId());
+            final Station station = stationRepository.getStationPerStationId(sessionState.getWorkingVersion().getName(), platformModel.getStation().getRefDataId());
             if (station == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("not able to find station :" + platformModel.getStation().getRefDataName());
@@ -92,6 +96,7 @@ public class platformService {
             platform.setLongName(platformModel.getPlatformLongName());
             platform.setPlatformNo(platformModel.getPlatformNo());
             platform.setGtfsStopId(platformModel.getPlatformStopId());
+            platform.setVersion(sessionState.getWorkingVersion());
             if (platformModel.getLatitude() == null) {
                 platform.setLatitude(0.0);
             } else {
@@ -134,13 +139,14 @@ public class platformService {
                 response.setMessage("station object is null");
                 return response;
             }
-            final Platform platform = platformRepository.findBySchemaPropertyValue("name", platformModel.getPlatformName());
+            logger.info("edit platform --> version =" + sessionState.getWorkingVersion().getName());
+            final Platform platform = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), platformModel.getPlatformName());
             if (platform == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("not able to find platform :" + platformModel.getPlatformName());
                 return response;
             }
-            final Station station = stationRepository.findBySchemaPropertyValue("stationId", platformModel.getStation().getRefDataId());
+            final Station station = stationRepository.getStationPerStationId(sessionState.getWorkingVersion().getName(), platformModel.getStation().getRefDataId());
             if (station == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("not able to find station :" + platformModel.getStation().getRefDataName());
@@ -151,6 +157,7 @@ public class platformService {
             platform.setLongName(platformModel.getPlatformLongName());
             platform.setPlatformNo(platformModel.getPlatformNo());
             platform.setGtfsStopId(platformModel.getPlatformStopId());
+            platform.setVersion(sessionState.getWorkingVersion());
             if (platformModel.getLatitude() == null) {
                 platform.setLatitude(0.0);
             } else {
@@ -181,7 +188,7 @@ public class platformService {
     public PlatformResponse deletePlatform (@PathParam("platformName") String platformName) {
         final PlatformResponse response = new PlatformResponse();
         try {
-            final Platform platform = platformRepository.findBySchemaPropertyValue("name", platformName);
+            final Platform platform = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), platformName);
             if (platform == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("platform " + platformName + " not found");

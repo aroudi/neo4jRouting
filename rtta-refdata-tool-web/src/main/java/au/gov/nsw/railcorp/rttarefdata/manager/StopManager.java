@@ -13,7 +13,6 @@ import au.gov.nsw.railcorp.rttarefdata.repositories.StationTripletRepository;
 import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,20 +66,26 @@ public class StopManager implements IStopManager {
      * @return Station station
      */
     public Station createStation(String shortName, String longName, int gtfsStopId, Double latt, Double longt) {
-        //try to find station if not found create it.
-        Station station = stationRepository.findBySchemaPropertyValue("gtfsStopId", gtfsStopId);
-        if (station == null) {
-            station = new Station();
-            station.setStationId(entitySequenceManager.getNextStationSequence());
-            station.setGtfsStopId(gtfsStopId);
+        try {
+            //try to find station if not found create it.
+            Station station = stationRepository.getStationPerGtfsStopId(sessionState.getWorkingVersion().getName(), gtfsStopId);
+            if (station == null) {
+                station = new Station();
+                station.setStationId(entitySequenceManager.getNextStationSequence());
+                station.setGtfsStopId(gtfsStopId);
+            }
+            station.setShortName(shortName);
+            station.setLongName(longName);
+            station.setLatitude(latt);
+            station.setLongtitude(longt);
+            station.setInterchangePoint(false);
+            station.setVersion(sessionState.getWorkingVersion());
+            stationRepository.save(station);
+            return station;
+        } catch (Exception e) {
+            logger.error("Exception in creating station :", e);
+            return null;
         }
-        station.setShortName(shortName);
-        station.setLongName(longName);
-        station.setLatitude(latt);
-        station.setLongtitude(longt);
-        station.setInterchangePoint(false);
-        stationRepository.save(station);
-        return station;
     }
 
     /**
@@ -96,25 +101,33 @@ public class StopManager implements IStopManager {
      * @return Platform platform
      */
     public Platform createPlatform(int parentStopId, int gtfsStopId, String nodeName, String longName, int platformNo, String platformName, double latt, double longt) {
+        try {
 
-        Platform platform = platformRepository.findBySchemaPropertyValue("gtfsStopId", gtfsStopId);
-        if (platform == null) {
-            platform = new Platform();
+            Platform platform = platformRepository.getPlatformPerGtfsStopId("gtfsStopId", gtfsStopId);
+            if (platform == null) {
+                platform = new Platform();
+            }
+            platform.setGtfsStopId(gtfsStopId);
+            platform.setPlatformNo(platformNo);
+            platform.setName(nodeName);
+            platform.setPlatfromName(platformName);
+            platform.setLongName(longName);
+            platform.setLatitude(latt);
+            platform.setLongitude(longt);
+            logger.info("createPlatform parentStopId = " + parentStopId);
+            final Station station = stationRepository.getStationPerGtfsStopId(sessionState.getWorkingVersion().getName(), parentStopId);
+            if (station != null) {
+                logger.info("station = " + station.getShortName());
+                platform.setStation(station);
+            }
+            platform.setVersion(sessionState.getWorkingVersion());
+            platformRepository.save(platform);
+            return platform;
+        } catch (Exception e) {
+            logger.error("Exception in crating platform :", e);
+            return null;
         }
-        platform.setGtfsStopId(gtfsStopId);
-        platform.setPlatformNo(platformNo);
-        platform.setName(nodeName);
-        platform.setPlatfromName(platformName);
-        platform.setLongName(longName);
-        platform.setLatitude(latt);
-        platform.setLongitude(longt);
 
-        final Station station = stationRepository.findBySchemaPropertyValue("gtfsStopId", parentStopId);
-        if (station != null) {
-            platform.setStation(station);
-        }
-        platformRepository.save(platform);
-        return platform;
     }
 
     /**
@@ -130,15 +143,15 @@ public class StopManager implements IStopManager {
 
         //search for triplet if fount then delete and recreate it.
 
-        StationTriplet stationTriplet = stationTripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(inStopId, stopId, outStopId);
+        StationTriplet stationTriplet = stationTripletRepository.getTriplet(sessionState.getWorkingVersion().getName(), inStopId, stopId, outStopId);
         if (stationTriplet != null) {
             stationTripletRepository.delete(stationTriplet);
         }
         stationTriplet = new StationTriplet();
 
-        final Station mainStation = stationRepository.findBySchemaPropertyValue("gtfsStopId", stopId);
-        final Station fromStation = stationRepository.findBySchemaPropertyValue("gtfsStopId", inStopId);
-        final Station toStation = stationRepository.findBySchemaPropertyValue("gtfsStopId", outStopId);
+        final Station mainStation = stationRepository.getStationPerGtfsStopId(sessionState.getWorkingVersion().getName(), stopId);
+        final Station fromStation = stationRepository.getStationPerGtfsStopId(sessionState.getWorkingVersion().getName(), inStopId);
+        final Station toStation = stationRepository.getStationPerGtfsStopId(sessionState.getWorkingVersion().getName(), outStopId);
 
         //all nodes must be exists. otherwise return
         if (mainStation == null || fromStation == null || toStation == null) {
@@ -156,6 +169,7 @@ public class StopManager implements IStopManager {
                 stationTriplet.addPowerType(powerType);
             }
         }
+        stationTriplet.setVersion(sessionState.getWorkingVersion());
         stationTripletRepository.save(stationTriplet);
         return stationTriplet;
     }
@@ -169,7 +183,7 @@ public class StopManager implements IStopManager {
         final List<IStationData> stations;
         StationData stationData;
         try {
-            stations = stationRepository.getAllStations();
+            stations = stationRepository.getAllStations(sessionState.getWorkingVersion().getName());
             for (IStationData station: stations) {
                 stationData = new StationData();
                 stationData.setStationId(station.getStationId());
@@ -204,7 +218,7 @@ public class StopManager implements IStopManager {
         final List<StationPlatformData> result = new ArrayList<StationPlatformData>();
         StationPlatformData stationPlatformData;
         try {
-            platformList = platformRepository.getAllPlatforms();
+            platformList = platformRepository.getAllPlatforms(sessionState.getWorkingVersion().getName());
             for (IStationPlatformData platformData: platformList) {
                 stationPlatformData = new StationPlatformData();
                 stationPlatformData.setStationId(platformData.getStationId());
@@ -231,7 +245,7 @@ public class StopManager implements IStopManager {
      */
     public List getAllTriplets() {
         try {
-            return stationTripletRepository.getAllTriplets();
+            return stationTripletRepository.getAllTriplets(sessionState.getWorkingVersion().getName());
         } catch (Exception e) {
             logger.error("Exception in returning triplet list ", e);
             return null;
@@ -247,7 +261,7 @@ public class StopManager implements IStopManager {
      */
     public List getTripletPowerTypes(int inSTopId, int stopId, int outStopId) {
         try {
-            return stationTripletRepository.getTripletPowerTypes(inSTopId, stopId, outStopId);
+            return stationTripletRepository.getTripletPowerTypes(sessionState.getWorkingVersion().getName(), inSTopId, stopId, outStopId);
         } catch (Exception e) {
             logger.error("Exception in returning triplet list ", e);
             return null;
@@ -260,10 +274,8 @@ public class StopManager implements IStopManager {
      */
     @Transactional
     public List<Station> getAllStops() {
-        List<Station> result = null;
         try {
-            result = Lists.newArrayList(stationRepository.findAll().iterator());
-            return result;
+            return stationRepository.getAllStationsPerVersion(sessionState.getWorkingVersion().getName());
         } catch (Exception e) {
             logger.error("Error in fetching platform list ", e);
             return null;
@@ -301,6 +313,7 @@ public class StopManager implements IStopManager {
                 if (station.getPlatforms() == null) {
                     continue;
                 }
+                //ToDo fetch platform for station
                 for (Platform platform: station.getPlatforms()) {
                     refStop = new RefStop();
                     refStop.setStopId(StringUtil.intToStr(platform.getGtfsStopId()));

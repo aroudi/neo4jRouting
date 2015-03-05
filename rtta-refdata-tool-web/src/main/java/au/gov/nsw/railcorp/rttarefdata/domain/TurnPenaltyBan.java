@@ -25,6 +25,9 @@ public class TurnPenaltyBan {
     private String fromNodeName;
     private String toNodeName;
 
+    @Indexed
+    private String version;
+
     /**
      * Constructor.
      * @param fromNode fromNode
@@ -97,5 +100,13 @@ public class TurnPenaltyBan {
 
     public void setToNodeName(String toNodeName) {
         this.toNodeName = toNodeName;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

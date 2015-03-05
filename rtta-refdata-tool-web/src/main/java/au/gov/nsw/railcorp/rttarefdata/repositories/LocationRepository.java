@@ -12,10 +12,21 @@ import java.util.List;
 public interface LocationRepository extends GraphRepository<Location> {
     /**
      * Return all Locations.
+     * @param version version
      * @return List of Location
      */
     @Query(
-            "MATCH (location:Location) RETURN location "
+            "MATCH (version:DataVersion{name:{0}})-[:VERSION_LOCATION]-(location:Location) RETURN location "
     )
-    List<Location> getAllLocations();
+    List<Location> getAllLocations(String version);
+    /**
+     * Return location per name.
+     * @param version version
+     * @param name name
+     * @return Location
+     */
+    @Query(
+            "MATCH (version:DataVersion{name:{0}})-[:VERSION_LOCATION]-(location:Location{name:{1}}) RETURN location "
+    )
+    Location getLocationByName(String version, String name);
 }

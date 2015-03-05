@@ -15,13 +15,14 @@ public interface PathStationRepository extends GraphRepository<PathStation> {
     /**
      * get all line path station.
      * @param linePathName linePathName
+     * @param version version
      * @return ILinePath
      */
-    @Query("MATCH (linePath:LinePath)-[lps:LINE_PATH_STATION]->(station:Station) where linePath.name={0} RETURN station.stationId as stationId,"
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_PATH]-(linePath:LinePath)-[lps:LINE_PATH_STATION]->(station:Station) where linePath.name={1} RETURN station.stationId as stationId,"
             + " station.gtfsStopId as gtfsStopId, station.shortName as name, station.longName as longName, station.latitude AS latitude,"
             + " station.longtitude AS longtitude, station.interchangePoint as interchangePoint, "
             + "lps.pathMatchInclude AS pathMatchInclude,  lps.sequence AS sequence order by sequence"
     )
-    List<ILinePathStation> getAllLinePathStations(String linePathName);
+    List<ILinePathStation> getAllLinePathStations(String version, String linePathName);
 
 }

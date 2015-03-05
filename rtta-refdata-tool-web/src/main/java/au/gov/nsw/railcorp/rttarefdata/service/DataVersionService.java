@@ -170,7 +170,9 @@ public class DataVersionService {
      */
     public void setWorkingVersion(long id) {
         try {
+            logger.info("setWorkingVersion id= " + id);
             final DataVersion dataVersion = dataVersionManager.getDataVersionById(id);
+            logger.info("dataVersion= " + dataVersion.getName());
             if (dataVersion != null) {
                 sessionState.setWorkingVersion(dataVersion);
             }

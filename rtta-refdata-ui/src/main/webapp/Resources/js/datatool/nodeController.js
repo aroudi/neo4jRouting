@@ -58,6 +58,9 @@ function NodeController($scope, generalService, SUCCESS, ALL_NODE_URI, ADD_NODE_
     /**
      * retreive network list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllNodes();
+    });
     getAllNodes();
     function getAllNodes() {
         generalService.getAllRows(ALL_NODE_URI).then(function(response){

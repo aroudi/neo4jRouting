@@ -45,6 +45,9 @@ function LinePathController($scope, generalService,drawNetworkService, SUCCESS, 
     /**
      * retreive path list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllPaths();
+    });
     getAllPaths();
     function getAllPaths() {
         generalService.getAllRows(ALL_PATH_URI).then(function(response){

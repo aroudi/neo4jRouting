@@ -10,6 +10,7 @@ import au.gov.nsw.railcorp.rttarefdata.request.StationModel;
 import au.gov.nsw.railcorp.rttarefdata.repositories.StationRepository;
 import au.gov.nsw.railcorp.rttarefdata.response.StationResponse;
 import au.gov.nsw.railcorp.rttarefdata.service.StopService;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class StationService {
 
     @Autowired
     private StopService stopService;
+    @Autowired
+    private SessionState sessionState;
     public StationRepository getStationRepository() {
         return stationRepository;
     }
@@ -79,7 +82,7 @@ public class StationService {
                 response.setMessage("received object is null");
                 return response;
             }
-            Station station = stationRepository.findBySchemaPropertyValue("shortName", stationModel.getShortName());
+            Station station = stationRepository.getStationPerName(sessionState.getWorkingVersion().getName(), stationModel.getShortName());
             if (station != null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("station " + stationModel.getShortName() + " already exists");
@@ -91,6 +94,7 @@ public class StationService {
             station.setShortName(stationModel.getShortName());
             station.setLongName(stationModel.getLongName());
             station.setGtfsStopId(stationModel.getGtfsStopId());
+            station.setVersion(sessionState.getWorkingVersion());
             if (stationModel.getLatitude() == null) {
                 station.setLatitude(0.0);
             } else {
@@ -129,7 +133,7 @@ public class StationService {
                 response.setMessage("received object is null");
                 return response;
             }
-            final Station station = stationRepository.findBySchemaPropertyValue("stationId", stationModel.getStationId());
+            final Station station = stationRepository.getStationPerStationId(sessionState.getWorkingVersion().getName(), stationModel.getStationId());
             if (station != null) {
                 station.setShortName(stationModel.getShortName());
                 station.setLongName(stationModel.getLongName());
@@ -137,6 +141,7 @@ public class StationService {
                 station.setLatitude(stationModel.getLatitude());
                 station.setLongtitude(stationModel.getLongtitude());
                 station.setInterchangePoint(stationModel.isInterchangePoint());
+                station.setVersion(sessionState.getWorkingVersion());
                 stationRepository.save(station);
                 response.setStatus(IConstants.RESPONSE_SUCCESS);
             } else {
@@ -160,7 +165,7 @@ public class StationService {
     public StationResponse deleteStation (@PathParam("stationId") int stationId) {
         final StationResponse response = new StationResponse();
         try {
-            final Station station = stationRepository.findBySchemaPropertyValue("stationId", stationId);
+            final Station station = stationRepository.getStationPerStationId(sessionState.getWorkingVersion().getName(), stationId);
             if (station == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("station not found");
@@ -187,7 +192,7 @@ public class StationService {
         final List<RefData> result = new ArrayList<RefData>();
         RefData refData;
         try {
-            refDataList = stationRepository.getStationsAsRefData();
+            refDataList = stationRepository.getStationsAsRefData(sessionState.getWorkingVersion().getName());
             for (IRefData data: refDataList) {
                 refData = new RefData();
                 refData.setRefDataId(data.getRefDataId());

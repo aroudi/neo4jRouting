@@ -4,6 +4,7 @@ import au.gov.nsw.railcorp.rttarefdata.domain.Location;
 import au.gov.nsw.railcorp.rttarefdata.domain.Node;
 import au.gov.nsw.railcorp.rttarefdata.repositories.LocationRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NodeRepository;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class LocationManager implements ILocationManager {
     @Autowired
     private NodeRepository nodeRepository;
 
+    @Autowired
+    private SessionState sessionState;
+
     /**
      * create a location.
      * @param name name
@@ -42,7 +46,7 @@ public class LocationManager implements ILocationManager {
                 logger.error("location name is empty");
                 return null;
             }
-            Location location = locationRepository.findBySchemaPropertyValue("name", name);
+            Location location = locationRepository.getLocationByName(sessionState.getWorkingVersion().getName(), name);
             if (location == null) {
                 location = new Location();
             }
@@ -52,13 +56,14 @@ public class LocationManager implements ILocationManager {
             location.setLatitude(latitude);
             location.setNodeName(nodeName);
             if (nodeName != null || !nodeName.isEmpty()) {
-                final Node node = nodeRepository.findBySchemaPropertyValue("name", nodeName);
+                final Node node = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), nodeName);
                 if (node == null) {
                     logger.error("not able to locate node " + nodeName);
                 }
                 location.setNode(node);
             }
             location.setExcludeFringe(excludeFringe);
+            location.setVersion(sessionState.getWorkingVersion());
             return locationRepository.save(location);
         } catch (Exception e) {
             logger.error("Unable to create location : ", e);
@@ -72,7 +77,10 @@ public class LocationManager implements ILocationManager {
      */
     public List<Location> getAllLocations() {
         try {
-            return locationRepository.getAllLocations();
+            logger.info("sessionState = " + sessionState);
+            logger.info("working version = " + sessionState.getWorkingVersion());
+            logger.info("working version name = " + sessionState.getWorkingVersion().getName());
+            return locationRepository.getAllLocations(sessionState.getWorkingVersion().getName());
         } catch (Exception e) {
             logger.error("error in retrieving location list: ", e);
             return  null;
@@ -86,7 +94,7 @@ public class LocationManager implements ILocationManager {
      */
     public Location getLocationByName(String name) {
         try {
-            return locationRepository.findBySchemaPropertyValue("name", name);
+            return locationRepository.getLocationByName(sessionState.getWorkingVersion().getName(), name);
         } catch (Exception e) {
             logger.error("Error in finding location by name: ", e);
             return null;

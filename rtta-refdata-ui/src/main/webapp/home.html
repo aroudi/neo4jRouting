@@ -86,6 +86,8 @@
             <select name="workingVersion" data-ng-model="workingVersion"
                     ng-options="configData.name for configData in  versionSet" ng-change = "onVersionChange()">
             </select>
+            &nbsp; &nbsp; &nbsp;
+                <b style="color: lawngreen;">Active Version: {{activeVersion.name}} </b>
         </div>
         <div class="actionTools">
         </div>

@@ -23,18 +23,22 @@ function MainController($scope, generalService, ALL_VERSION_URI, SET_WORKING_VER
     /**
      * retreive network list from server
      */
+    $scope.$on('versionListChange', function(event, data) {
+        getAllVersions();
+    });
     getAllVersions();
     function getAllVersions() {
         generalService.getAllRows(ALL_VERSION_URI).then(function(response){
             $scope.versionSet = response.data;
-            $scope.workingVersion= generalService.populateActiveVersion($scope.versionSet);
+            $scope.activeVersion = generalService.populateActiveVersion($scope.versionSet);
+            $scope.workingVersion= $scope.activeVersion;
 
         });
 
     };
     $scope.onVersionChange = function() {
         var uri =SET_WORKING_VERSION_URI + '/' + $scope.workingVersion.id;
-        generalService.refreshRows(uri);
+        generalService.getWorkingVersion($scope, uri);
     }
 
 }
@@ -91,6 +95,10 @@ function StationController($scope, generalService, SUCCESS, FAILURE, ALL_STATION
     /**
      * retreive station list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllStations();
+    });
+
     getAllStations();
     function getAllStations() {
         generalService.getAllRows(ALL_STATION_URI).then(function(response){

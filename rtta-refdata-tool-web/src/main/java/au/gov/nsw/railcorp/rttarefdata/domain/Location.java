@@ -1,5 +1,6 @@
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
 
@@ -16,7 +17,8 @@ public class Location {
     @GraphId
     private Long id;
 
-    @Indexed(unique = true)
+    @Indexed
+    //(unique = true)
     private String name;
     private String systemName;
     private double longtitude;
@@ -25,8 +27,10 @@ public class Location {
     @RelatedTo(type = Links.NODE_LOCATION, direction = Direction.BOTH)
     private Node node;
     private String nodeName;
+
     @RelatedTo(type = Links.VERSION_LOCATION, direction = Direction.BOTH)
     @Fetch
+    @JsonIgnore
     private DataVersion version;
 
     /**

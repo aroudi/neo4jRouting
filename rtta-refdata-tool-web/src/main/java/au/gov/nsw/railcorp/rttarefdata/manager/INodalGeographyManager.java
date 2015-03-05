@@ -133,30 +133,36 @@ public interface INodalGeographyManager {
 
     /**
      * Remove all runningtime records.
+     * @param version version
      */
-    void emptyRunningTimes ();
+    void emptyRunningTimes (String version);
 
     /**
      * Remove All NodeLinks.
+     * @param version version
      */
-    void emptyNodeLinks ();
+    void emptyNodeLinks (String version);
     /**
      * Remove All TurnPenaltyBan.
+     * @param version version
      */
-    void emptyNodeTurnPenaltyBan ();
+    void emptyNodeTurnPenaltyBan (String version);
     /**
      * Remove All NodeLinkages.
+     * @param version version
      */
-    void emptyNodeNodeLinkages ();
+    void emptyNodeNodeLinkages (String version);
 
     /**
      * Remove All SpeedBands.
+     * @param version version
      */
-    void emptySpeedBands ();
+    void emptySpeedBands (String version);
     /**
      * Remove All TrackSection.
+     * @param version version
      */
-    void emptyTrackSections ();
+    void emptyTrackSections (String version);
 
     /**
      * create NodalHeader.
@@ -169,8 +175,9 @@ public interface INodalGeographyManager {
 
     /**
      * remove NodalHeader.
+     * @param version version
      */
-    void emptyNodalHeader ();
+    void emptyNodalHeader (String version);
 
     /**
      * export NodalGeography.
@@ -204,7 +211,8 @@ public interface INodalGeographyManager {
 
     /**
      * Remove All NodeLinks.
+     * @param version version
      */
-    void emptyNodeLinkages ();
+    void emptyNodeLinkages (String version);
 
 }

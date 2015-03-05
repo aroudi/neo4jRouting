@@ -57,14 +57,14 @@ public class TestQuery {
 
 
 
-        StationTriplet stationTriplet = tripletRepository.getTriplet(234012,23521,23541);
-        stationTriplet = tripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(234012, 23521, 23541);
+        StationTriplet stationTriplet = tripletRepository.getTriplet("", 234012,23521,23541);
+        //stationTriplet = tripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(234012, 23521, 23541);
         
         System.out.println("isReversible: " + stationTriplet.isReversible());
         System.out.println("fromStation : " + stationTriplet.getFromStation().getGtfsStopId());
         System.out.println("toStation : " + stationTriplet.getToStation().getGtfsStopId());
 
-        stationTriplet = tripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(233610,233710,23381);
+        //stationTriplet = tripletRepository.findByFromStationGtfsStopIdAndStationGtfsStopIdAndToStationGtfsStopId(233610,233710,23381);
         System.out.println("isReversible: " + stationTriplet.isReversible());
         System.out.println("fromStation : " + stationTriplet.getFromStation().getGtfsStopId());
         System.out.println("toStation : " + stationTriplet.getToStation().getGtfsStopId());
@@ -84,7 +84,7 @@ public class TestQuery {
     public static void removeNodeLink() {
 
 
-        NodeLink nodeLink = nodelinkRepository.getNodeLink("BTN1", "BTJB");
+        NodeLink nodeLink = nodelinkRepository.getNodeLink("", "BTN1", "BTJB");
         //NodeLink nodeLink = nodelinkRepository.findByFromNodeNameAndToNodeName("BTN1", "BTJB");
         //System.out.println(nodeLink.getFromNode().getName());
         if (nodeLink !=null ){
@@ -121,13 +121,13 @@ public class TestQuery {
         }
     }
     public static void queryNodeLinkage(){
-        NodeLinkage nodeLinkage= nodeLinkageRepository.getNodeLinkage("GRDA", "GRDC");
+        NodeLinkage nodeLinkage= nodeLinkageRepository.getNodeLinkage("", "GRDA", "GRDC");
         if (nodeLinkage != null) {
             System.out.println("nodeLinkage =" + nodeLinkage.getLength());
         }
     }
     public static void queryPlatforms(){
-        List<IStationPlatformData> platformDataList= platformRepository.getAllPlatforms();
+        List<IStationPlatformData> platformDataList= platformRepository.getAllPlatforms("");
         if (platformDataList == null) {
             System.out.println("list is null");
         }
@@ -137,12 +137,12 @@ public class TestQuery {
     }
     public static void queryNodeLinkReposiory(){
         System.out.print("befor returning nodeList ");
-        List<INodeLinkData> nodeLinkDatas = nodeLinkRepository.getAllNodeLinks();
+        List<INodeLinkData> nodeLinkDatas = nodeLinkRepository.getAllNodeLinks("");
         int i=0;
         for (INodeLinkData nodeLinkData:nodeLinkDatas) {
             i = i+1;
             System.out.println("for nodeLink: " + i);
-            List<RuningTime> runingTimes = nodeLinkRepository.getNodeLinkRunningTimes(nodeLinkData.getNodeLinkId());
+            List<RuningTime> runingTimes = nodeLinkRepository.getNodeLinkRunningTimes("", nodeLinkData.getNodeLinkId());
         }
         System.out.print("after returning nodeList ");
     }

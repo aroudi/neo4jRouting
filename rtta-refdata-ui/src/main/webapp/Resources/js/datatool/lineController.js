@@ -65,6 +65,11 @@ function NetworkLineController($scope, generalService, SUCCESS, FAILURE, ALL_LIN
     /**
      * retreive platform list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllLines();
+        getNetworkRef();
+        getServiceTypeRef();
+    });
     getAllLines();
     getNetworkRef();
     getServiceTypeRef();

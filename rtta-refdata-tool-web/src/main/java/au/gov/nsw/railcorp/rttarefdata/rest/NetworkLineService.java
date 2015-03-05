@@ -8,6 +8,7 @@ import au.gov.nsw.railcorp.rttarefdata.request.NetworkLineModel;
 import au.gov.nsw.railcorp.rttarefdata.response.NetworkLineResponse;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
 import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,8 @@ public class NetworkLineService {
     private ServiceTypeRepository serviceTypeRepository;
     @Autowired
     private TopologyService topologyService;
+    @Autowired
+    private SessionState sessionState;
 
     /**
      * get All Network Lines.
@@ -84,13 +87,13 @@ public class NetworkLineService {
                 return response;
             }
             //check if platform allready exists.
-            NetworkLine networkLine = networklineRepository.findBySchemaPropertyValue("name", networkLineModel.getName());
+            NetworkLine networkLine = networklineRepository.getLinePerName(sessionState.getWorkingVersion().getName(), networkLineModel.getName());
             if (networkLine != null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("network name " + networkLineModel.getName() + " already exists");
                 return response;
             }
-            final Network network = networkRepository.findBySchemaPropertyValue("name", networkLineModel.getNetwork().getRefDataCode());
+            final Network network = networkRepository.getNetworkPerName(sessionState.getWorkingVersion().getName(), networkLineModel.getNetwork().getRefDataCode());
             if (network == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("not able to find network :" + networkLineModel.getNetwork().getRefDataName());
@@ -109,8 +112,9 @@ public class NetworkLineService {
             networkLine.setLongName(networkLineModel.getLongName());
             networkLine.setBackgroundColourHex(networkLineModel.getBackgroundColourHex());
             networkLine.setTextColourHex(networkLineModel.getTextColourHex());
+            networkLine.setVersion(sessionState.getWorkingVersion());
             networklineRepository.save(networkLine);
-            final NetworkLine savedOne = networklineRepository.findBySchemaPropertyValue("name", networkLineModel.getName());
+            final NetworkLine savedOne = networklineRepository.getLinePerName(sessionState.getWorkingVersion().getName(), networkLineModel.getName());
             response.setLineId(savedOne.getNetworkLineId());
             response.setStatus(IConstants.RESPONSE_SUCCESS);
         } catch (Exception e) {
@@ -147,7 +151,7 @@ public class NetworkLineService {
                 response.setMessage("se.rviceType object is null");
                 return response;
             }
-            final Network network = networkRepository.findBySchemaPropertyValue("name", networkLineModel.getNetwork().getRefDataCode());
+            final Network network = networkRepository.getNetworkPerName(sessionState.getWorkingVersion().getName(), networkLineModel.getNetwork().getRefDataCode());
             if (network == null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("not able to find network :" + networkLineModel.getNetwork().getRefDataName());
@@ -171,6 +175,7 @@ public class NetworkLineService {
             networkLine.setName(networkLineModel.getName());
             networkLine.setLongName(networkLineModel.getLongName());
             networkLine.setBackgroundColourHex(networkLineModel.getBackgroundColourHex());
+            networkLine.setVersion(sessionState.getWorkingVersion());
             networkLine.setTextColourHex(networkLineModel.getTextColourHex());
             networklineRepository.save(networkLine);
             response.setStatus(IConstants.RESPONSE_SUCCESS);

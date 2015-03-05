@@ -15,30 +15,42 @@ import java.util.List;
 public interface LinePathRepository extends GraphRepository<LinePath> {
     /**
      * get all line path.
+     * @param version version
      * @return ILinePath
      */
-    @Query("MATCH (line:NetworkLine)-[:LINE_PATH]->(linePath:LinePath) RETURN id(linePath) AS pathId, linePath.name AS name,"
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_LINE]-(line:NetworkLine)-[:LINE_PATH]->(linePath:LinePath) RETURN id(linePath) AS pathId, linePath.name AS name,"
             + "linePath.longName AS longName, line.name AS lineName, line.longName AS lineLongName, "
             + "line.backgroundColourHex AS backgroundColourHex, line.textColourHex AS textColourHex"
     )
-    List<ILinePath> getAllLinePaths();
+    List<ILinePath> getAllLinePaths(String version);
 
     /**
      * get all line path for specific network.
      * @param networkName networkName
+     * @param version version
      * @return ILinePath
      */
-    @Query("MATCH (network:Network{name:{0}})-[:NETWORK_LINE]->(line:NetworkLine)-[:LINE_PATH]->(linePath:LinePath) RETURN id(linePath) AS pathId, linePath.name AS name,"
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NETWORK]-(network:Network{name:{1}})-[:NETWORK_LINE]->(line:NetworkLine)-[:LINE_PATH]->(linePath:LinePath)"
+            + " RETURN id(linePath) AS pathId, linePath.name AS name,"
             + "linePath.longName AS longName, line.name AS lineName, line.longName AS lineLongName, "
             + "line.backgroundColourHex AS backgroundColourHex, line.textColourHex AS textColourHex"
     )
-    List<ILinePath> getAllLinePathsPerNetwork(String networkName);
+    List<ILinePath> getAllLinePathsPerNetwork(String version, String networkName);
     /**
      * get linePath power type.
      * @param linePath linePath
+     * @param version version
      * @return Power Type
      */
-    @Query("MATCH (linePath:LinePath{name:{0}})-[:LINE_PATH_POWER]->(pt:PowerType) RETURN pt")
-    List<PowerType> getLinePathPowerType(String linePath);
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_PATH]-(linePath:LinePath{name:{1}})-[:LINE_PATH_POWER]->(pt:PowerType) RETURN pt")
+    List<PowerType> getLinePathPowerType(String version, String linePath);
 
+    /**
+     * get linePath per name.
+     * @param linePath linePath
+     * @param version version
+     * @return LinePath
+     */
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_PATH]-(linePath:LinePath{name:{1}}) RETURN linePath")
+    LinePath getLinePathPerName(String version, String linePath);
 }

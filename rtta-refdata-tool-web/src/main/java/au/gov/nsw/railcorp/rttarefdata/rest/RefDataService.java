@@ -7,6 +7,7 @@ import au.gov.nsw.railcorp.rttarefdata.mapresult.RefData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkLineRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NetworkRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.ServiceTypeRepository;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class RefDataService {
     private NetworkRepository networkRepository;
     @Autowired
     private NetworkLineRepository networkLineRepository;
+    @Autowired
+    private SessionState sessionState;
     /**
      * Return network list in Json format.
      * @return network List
@@ -53,7 +56,7 @@ public class RefDataService {
         final List<RefData> result = new ArrayList<RefData>();
         RefData refData;
         try {
-            refDataList = networkRepository.getNetworksAsRefData();
+            refDataList = networkRepository.getNetworksAsRefData(sessionState.getWorkingVersion().getName());
             for (IRefData data: refDataList) {
                 refData = new RefData();
                 refData.setRefDataId(data.getRefDataId());
@@ -106,7 +109,7 @@ public class RefDataService {
         final List<LineData> result = new ArrayList<LineData>();
         LineData lineData;
         try {
-            lineDataList = networkLineRepository.getAllLinesAsRefData();
+            lineDataList = networkLineRepository.getAllLinesAsRefData(sessionState.getWorkingVersion().getName());
             for (ILineData data: lineDataList) {
                 lineData = new LineData();
                 lineData.setLineId(data.getLineId());

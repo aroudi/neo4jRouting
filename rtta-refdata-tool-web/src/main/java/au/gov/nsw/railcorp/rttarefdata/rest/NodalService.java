@@ -6,6 +6,7 @@ import au.gov.nsw.railcorp.rttarefdata.request.NodeModel;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
 import au.gov.nsw.railcorp.rttarefdata.service.NodalGeographyService;
 import au.gov.nsw.railcorp.rttarefdata.service.NodeService;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,9 @@ public class NodalService {
 
     @Autowired
     private NodalGeographyService nodalGeographyService;
+
+    @Autowired
+    private SessionState sessionState;
     /**
      * Return node list in Json format.
      * @return Node List
@@ -73,7 +77,7 @@ public class NodalService {
                 response.setMessage("node " + nodeModel.getNodeId() + " already exists");
                 return response;
             }
-            node = nodeRepository.findBySchemaPropertyValue("name", nodeModel.getName());
+            node = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), nodeModel.getName());
             if (node != null) {
                 response.setStatus(IConstants.RESPONSE_FAILURE);
                 response.setMessage("node " + nodeModel.getName() + " already exists");
@@ -92,6 +96,7 @@ public class NodalService {
             node.setUpRecoveryDuration(nodeModel.getUpRecoveryDuration());
             node.setDownRecoveryDuration(nodeModel.getDownRecoveryDuration());
             node.setLength(nodeModel.getLength());
+            node.setVersion(sessionState.getWorkingVersion());
             if (nodeModel.getLatitude() == null) {
                 node.setLatitude(0.0);
             } else {
@@ -129,7 +134,7 @@ public class NodalService {
                 response.setMessage("received object is null");
                 return response;
             }
-            final Node node = nodeRepository.findBySchemaPropertyValue("name", nodeModel.getName());
+            final Node node = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), nodeModel.getName());
             if (node != null) {
                 node.setName(nodeModel.getName());
                 node.setLongName(nodeModel.getLongName());
@@ -143,6 +148,7 @@ public class NodalService {
                 node.setUpRecoveryDuration(nodeModel.getUpRecoveryDuration());
                 node.setDownRecoveryDuration(nodeModel.getDownRecoveryDuration());
                 node.setLength(nodeModel.getLength());
+                node.setVersion(sessionState.getWorkingVersion());
                 if (nodeModel.getLatitude() == null) {
                     node.setLatitude(0.0);
                 } else {

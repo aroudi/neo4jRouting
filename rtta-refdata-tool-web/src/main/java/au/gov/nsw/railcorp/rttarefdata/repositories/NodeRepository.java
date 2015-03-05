@@ -14,53 +14,67 @@ import java.util.List;
 public interface NodeRepository extends GraphRepository<Node> {
 
     /**
-     * Return all RailNet Nodes.
+     * Return all RailNet Nodes per version.
+     * @param version version
      * @return INodeData
      */
     @Query(
-            "MATCH (n:Node{railNetNode:true}) RETURN id(n) AS nodeId,  n.name AS name, n.longName AS longName, n.platfromName AS  platformName"
+            "MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(n:Node{railNetNode:true}) RETURN id(n) AS nodeId,  n.name AS name, n.longName AS longName, n.platfromName AS  platformName"
                     + ", n.isDummy AS dummy, n.isJunction AS junction, n.isWorkingTimingPoint AS  workingTimingPoint, n.isPublicTimingPoint AS publicTimingPoint"
                     + ", n.isEndOfLine AS endOfLine, n.dWellDuration AS wellDuration, n.upRecoveryDuration AS upRecoveryDuration, n.downRecoveryDuration AS downRecoveryDuration"
                     + ", n.length AS length, n.latitude AS latitude, n.longitude AS longtitude, n.masterJunctionName as masterJunctionName, n.masterTimingPointName as masterTimingPointName"
     )
-    List<INodeData> getAllRailNetNodes();
+    List<INodeData> getAllRailNetNodes(String version);
 
     /**
      * Return all Nodes.
+     * @param version version
      * @return INodeData
      */
     @Query(
-            "MATCH (n:Node) RETURN id(n) AS nodeId,  n.name AS name, n.longName AS longName, n.platfromName AS  platformName"
+            "MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(n:Node) RETURN id(n) AS nodeId,  n.name AS name, n.longName AS longName, n.platfromName AS  platformName"
                     + ", n.isDummy AS dummy, n.isJunction AS junction, n.isWorkingTimingPoint AS  workingTimingPoint, n.isPublicTimingPoint AS publicTimingPoint"
                     + ", n.isEndOfLine AS endOfLine, n.dWellDuration AS wellDuration, n.upRecoveryDuration AS upRecoveryDuration, n.downRecoveryDuration AS downRecoveryDuration"
                     + ", n.length AS length, n.latitude AS latitude, n.longitude AS longtitude, n.masterJunctionName as masterJunctionName, n.masterTimingPointName as masterTimingPointName "
                     + ", n.gtfsStopId as gtfsStopId"
     )
-    List<INodeData> getAllNodes();
+    List<INodeData> getAllNodes(String version);
 
     /**
      * Return all Nodes.
+     * @param version version
      * @param fromNode fromNode
      * @param toNode toNode
      * @return List of nodes
      */
-    @Query(
-            "MATCH p=allShortestPaths((fromNode:Node{name:{0}})-[r:NODE_LINKAGE*..500]->(toNode:Node{name:{1}})) RETURN extract(n IN nodes(p)| n) AS paths"
-    )
-    List<List<org.neo4j.graphdb.Node>> findAllShortestPaths(String fromNode, String toNode);
+    //ToDo add version to shortest path
+    @Query("MATCH sp = allShortestPaths((fromNode:Node{name:{1}})-[:NODE_LINKAGE*..1000{version:{0}}]->(toNode:Node{name:{2}})) RETURN extract(n IN nodes(sp)| n) AS paths")
+    List<List<org.neo4j.graphdb.Node>> findAllShortestPaths(String version, String fromNode, String toNode);
     /**
      * Return Master Timing Point for a node.
+     * @param version version
      * @param nodeName nodeName
      * @return Master Timing Point Node
      */
-    @Query("MATCH (node:Node{name:{0}})-[:MASTER_TIMING_POINT]->(mtp:Node) RETURN mtp")
-    Node getMasterTimingPointNode(String nodeName);
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(node:Node{name:{1}})-[:MASTER_TIMING_POINT]->(mtp:Node) RETURN mtp")
+    Node getMasterTimingPointNode(String version, String nodeName);
 
     /**
      * Return Master Timing Point for a node.
+     * @param version version
      * @param nodeName nodeName
      * @return Master Timing Point Node
      */
-    @Query("MATCH (node:Node{name:{0}})-[:MASTER_JUNCTION]->(mj:Node) RETURN mj")
-    Node getMasterJunctionNode(String nodeName);
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(node:Node{name:{1}})-[:MASTER_JUNCTION]->(mj:Node) RETURN mj")
+    Node getMasterJunctionNode(String version, String nodeName);
+
+    /**
+     * Return node per name.
+     * @param version version
+     * @param nodeName nodeName
+     * @return node
+     */
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(node:Node{name:{1}}) RETURN node")
+    Node getNodePerName(String version, String nodeName);
+
 }

@@ -17,30 +17,32 @@ public interface StationTripletRepository extends GraphRepository<StationTriplet
 
     /**
      * return triplet based on station nodes.
+     * @param version version
      * @param fromGtfsStopId fromGtfsStopId
      * @param gtfsStopId gtfsStopId
      * @param toGtfsStopId toGtfsStopId
      * @return StationTriplet
      */
-    @Query("MATCH (mainNode:Station{gtfsStopId:{1}})-[:MAIN_NODE]->(triplet)<-[:FROM_NODE]-(fromNode:Station{gtfsStopId:{0}}) "
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_STATION]-(mainNode:Station{gtfsStopId:{2}})-[:MAIN_NODE]->(triplet)<-[:FROM_NODE]-(fromNode:Station{gtfsStopId:{1}}) "
             + "WITH mainNode,fromNode,triplet "
-                + "MATCH (toNode:Station{gtfsStopId:{2}})-[:TO_NODE]->(triplet) "
+                + "MATCH (toNode:Station{gtfsStopId:{3}})-[:TO_NODE]->(triplet) "
             + "RETURN triplet")
-    StationTriplet  getTriplet(int fromGtfsStopId, int gtfsStopId, int toGtfsStopId);
+    StationTriplet  getTriplet(String version, int fromGtfsStopId, int gtfsStopId, int toGtfsStopId);
 
 
     /**
      * return powertype for triplet.
+     * @param version version
      * @param fromGtfsStopId fromGtfsStopId
      * @param gtfsStopId gtfsStopId
      * @param toGtfsStopId toGtfsStopId
      * @return StationTriplet
      */
-    @Query("MATCH (mainNode:Station{gtfsStopId:{1}})-[:MAIN_NODE]->(triplet)<-[:FROM_NODE]-(fromNode:Station{gtfsStopId:{0}}) "
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_STATION]-(mainNode:Station{gtfsStopId:{2}})-[:MAIN_NODE]->(triplet)<-[:FROM_NODE]-(fromNode:Station{gtfsStopId:{1}}) "
             + "WITH mainNode,fromNode,triplet "
-            + "MATCH (toNode:Station{gtfsStopId:{2}})-[:TO_NODE]->(triplet)-[:STATION_LINK_POWER]->(powerType:PowerType) "
+            + "MATCH (toNode:Station{gtfsStopId:{3}})-[:TO_NODE]->(triplet)-[:STATION_LINK_POWER]->(powerType:PowerType) "
             + "RETURN powerType")
-    List<PowerType> getTripletPowerTypes(int fromGtfsStopId, int gtfsStopId, int toGtfsStopId);
+    List<PowerType> getTripletPowerTypes(String version, int fromGtfsStopId, int gtfsStopId, int toGtfsStopId);
 
 
     /**
@@ -54,13 +56,14 @@ public interface StationTripletRepository extends GraphRepository<StationTriplet
 
     /**
      * get all station triplets.
+     * @param version version
      * @return List of station triplet
      */
-    @Query("MATCH (mainNode:Station)-[:MAIN_NODE]->(triplet)<-[:FROM_NODE]-(fromNode:Station) "
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_STATION]-(mainNode:Station)-[:MAIN_NODE]->(triplet)<-[:FROM_NODE]-(fromNode:Station) "
             + "WITH mainNode,fromNode,triplet MATCH (toNode:Station)-[:TO_NODE]->(triplet) "
             + "RETURN fromNode.gtfsStopId as inStopId, mainNode.gtfsStopId as stopId, toNode.gtfsStopId as outStopId, "
             + "fromNode.shortName as inStopName, mainNode.shortName as stopName, toNode.shortName as outStopName, triplet.isReversible as reversible"
     )
-    List<ITriplet> getAllTriplets();
+    List<ITriplet> getAllTriplets(String version);
 
 }

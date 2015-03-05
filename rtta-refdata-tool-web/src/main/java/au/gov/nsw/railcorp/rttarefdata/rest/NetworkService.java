@@ -6,6 +6,7 @@ import au.gov.nsw.railcorp.rttarefdata.request.NetworkModel;
 import au.gov.nsw.railcorp.rttarefdata.request.NetworkVisModel;
 import au.gov.nsw.railcorp.rttarefdata.response.NetworkResponse;
 import au.gov.nsw.railcorp.rttarefdata.service.TopologyService;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ public class NetworkService {
     @Autowired
     private TopologyService topologyService;
 
+    @Autowired
+    private SessionState sessionState;
     /**
      * Return All Networks.
      * @return List of Network
@@ -78,6 +81,7 @@ public class NetworkService {
                 network.setLang(networkModel.getLang());
                 network.setFareUrl(networkModel.getFareUrl());
                 network.setTimeZone(networkModel.getTimeZone());
+                network.setVersion(sessionState.getWorkingVersion());
                 networkRepository.save(network);
                 response.setStatus(IConstants.RESPONSE_SUCCESS);
             } else {
@@ -115,8 +119,9 @@ public class NetworkService {
             network.setLang(networkModel.getLang());
             network.setFareUrl(networkModel.getFareUrl());
             network.setTimeZone(networkModel.getTimeZone());
+            network.setVersion(sessionState.getWorkingVersion());
             networkRepository.save(network);
-            final Network savedNetwork = networkRepository.findBySchemaPropertyValue("name", network.getName());
+            final Network savedNetwork = networkRepository.getNetworkPerName(sessionState.getWorkingVersion().getName(), network.getName());
             response.setStatus(IConstants.RESPONSE_SUCCESS);
             response.setNetworkId(savedNetwork.getNetworkId());
         } catch (Exception e) {

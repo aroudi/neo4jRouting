@@ -164,4 +164,12 @@ public interface Links {
      * Link between (DataVersion) -[BASE_VERSION]-> (DataVersion).
      */
     String BASE_VERSION = "BASE_VERSION";
+    /**
+     * Link between (DataVersion) -[VERSION_TRIPLET-> (StationTriplet).
+     */
+    String VERSION_TRIPLET = "VERSION_TRIPLET";
+    /**
+     * Link between (DataVersion) -[VERSION_SPEEDBAND]-> (SpeedBand).
+     */
+    String VERSION_SPEEDBAND = "VERSION_SPEEDBAND";
 }

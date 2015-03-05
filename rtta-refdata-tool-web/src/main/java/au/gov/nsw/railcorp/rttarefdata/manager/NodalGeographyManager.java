@@ -22,6 +22,7 @@ import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeLinkRunTimeData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import au.gov.nsw.railcorp.rttarefdata.request.NodeModel;
 import au.gov.nsw.railcorp.rttarefdata.request.TraverseModel;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.neo4j.graphalgo.GraphAlgoFactory;
@@ -83,7 +84,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
     private GraphDatabaseService graphDatabaseService;
     private boolean metEndNode;
     private boolean timedOut;
-
+    @Autowired
+    private SessionState sessionState;
     /**
      * Create SpeedBand Record.
      * @param id id
@@ -96,6 +98,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         speedBand.setId(id);
         speedBand.setName(name);
         speedBand.setDescription(description);
+        speedBand.setVersion(sessionState.getWorkingVersion());
         speedBandRepository.save(speedBand);
         return speedBand;
     }
@@ -112,6 +115,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         final RuningTime runingTime = new RuningTime(stopToStop, passToPass);
         runingTime.setSbId(speedBandId);
         runingTime.setNodeLink(nodeLink);
+        runingTime.setVersion(sessionState.getWorkingVersion());
         runingTimeRepository.save(runingTime);
         return runingTime;
     }
@@ -130,6 +134,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         trackSection.setName(name);
         trackSection.setUpDirection(isUp);
         trackSection.setPermissive(isPermissive);
+        trackSection.setVersion(sessionState.getWorkingVersion());
         trackSectionRepository.save(trackSection);
         return trackSection;
     }
@@ -175,6 +180,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         nodeLink.setNarrowGauge(isNarrowGauge);
         nodeLink.setStandardGauge(isStandardGauge);
         nodeLink.setBroadGauge(isBroadGauge);
+        nodeLink.setVersion(sessionState.getWorkingVersion());
         nodeLinkRepository.save(nodeLink);
         return nodeLink;
     }
@@ -204,8 +210,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
                                          boolean isNarrowGauge, boolean isStandardGauge,
                                          boolean isBroadGauge, boolean isSiding, boolean isCrossOver, boolean isRunningLine, int trackSectionId)
     {
-        final Node fromNode = nodeRepository.findBySchemaPropertyValue("name", fromNodeName);
-        final Node toNode = nodeRepository.findBySchemaPropertyValue("name", toNodeName);
+        final Node fromNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), fromNodeName);
+        final Node toNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), toNodeName);
         if (fromNode == null || toNode == null) {
             return null;
         }
@@ -220,7 +226,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         }
         */
         TrackSection trackSection = null;
-        trackSection = trackSectionRepository.findBySchemaPropertyValue("id", trackSectionId);
+        trackSection = trackSectionRepository.getTrackSectionPerId(sessionState.getWorkingVersion().getName(), trackSectionId);
         nodeLinkage = new NodeLinkage();
         nodeLinkage.setFromNode(fromNode);
         nodeLinkage.setToNode(toNode);
@@ -237,6 +243,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         nodeLinkage.setCrossOver(isCrossOver);
         nodeLinkage.setRunningLine(isRunningLine);
         nodeLinkage.setTrackSectionId(trackSectionId);
+        nodeLinkage.setVersion(sessionState.getWorkingVersion().getName());
         if (trackSection != null) {
             nodeLinkage.setDirection(trackSection.isUpDirection() ? IConstants.TRACK_UP_DIRECTION : IConstants.TRACK_DOWN_DIRECTION);
         } else {
@@ -268,7 +275,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                            String upRecoveryDuration, String downRecoveryDuration, double length, String masterTimingPoint, String masterJunction)
     {
         Node node;
-        node = nodeRepository.findBySchemaPropertyValue("name", name);
+        node = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), name);
         if (node == null) {
             node = new Node();
         }
@@ -289,6 +296,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         node.setMasterTimingPointName(masterTimingPoint);
         node.setMasterJunctionName(masterJunction);
         node.setRailNetNode(true);
+        node.setVersion(sessionState.getWorkingVersion());
         //node.setIncomingTurnPenaltyBans(null);
         //node.setOutGoingNodeLinks(null);
         //
@@ -302,8 +310,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param masterTimingPointNodeName masterTimingPointNodeName
      */
     public void defineNodeMasterTimingPoint(String nodeName, String masterTimingPointNodeName) {
-        final Node fromNode = nodeRepository.findBySchemaPropertyValue("name", nodeName);
-        final Node toNode = nodeRepository.findBySchemaPropertyValue("name", masterTimingPointNodeName);
+        final Node fromNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), nodeName);
+        final Node toNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), masterTimingPointNodeName);
         if (fromNode != null && toNode != null) {
             fromNode.setMasterTimingPoint(toNode);
             nodeRepository.save(fromNode);
@@ -316,8 +324,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @param masterJunctionNodeName masterJunctionNodeName
      */
     public void defineNodeMasterJunction(String nodeName, String masterJunctionNodeName) {
-        final Node fromNode = nodeRepository.findBySchemaPropertyValue("name", nodeName);
-        final Node toNode = nodeRepository.findBySchemaPropertyValue("name", masterJunctionNodeName);
+        final Node fromNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), nodeName);
+        final Node toNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), masterJunctionNodeName);
         if (fromNode != null && toNode != null) {
             fromNode.setMasterJunction(toNode);
             nodeRepository.save(fromNode);
@@ -333,13 +341,13 @@ public class NodalGeographyManager implements INodalGeographyManager {
      * @return TurnPenaltyBan turnPenaltyBan
      */
     public TurnPenaltyBan createTurnPenaltyBan(String viaNodeName, String fromNodeName, String toNodeName, String penaltyBan) {
-        final Node fromNode = nodeRepository.findBySchemaPropertyValue("name", fromNodeName);
-        final Node toNode = nodeRepository.findBySchemaPropertyValue("name", toNodeName);
+        final Node fromNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), fromNodeName);
+        final Node toNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), toNodeName);
         if (fromNode == null || toNode == null) {
             return null;
         }
 
-        TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(fromNodeName, viaNodeName, toNodeName);
+        TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
         if (turnPenaltyBan == null) {
             turnPenaltyBan = new TurnPenaltyBan();
         }
@@ -349,6 +357,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         turnPenaltyBan.setPenalty(penaltyBan);
         turnPenaltyBan.setFromNodeName(fromNodeName);
         turnPenaltyBan.setToNodeName(toNodeName);
+        turnPenaltyBan.setVersion(sessionState.getWorkingVersion().getName());
         turnPenaltyBanRepository.save(turnPenaltyBan);
         return turnPenaltyBan;
     }
@@ -381,7 +390,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
     public Nodes exportNodes() {
         final Nodes exportNodeList = new CgGeography.Geov10RC.Nodes();
         try {
-            final List<INodeData> nodeDataList = nodeRepository.getAllRailNetNodes();
+            final List<INodeData> nodeDataList = nodeRepository.getAllRailNetNodes(sessionState.getWorkingVersion().getName());
             List<TurnPenaltyBan> turnPenaltyBanList = null;
             Nodes.Node node;
             NodeTurnPenaltyBan nodeTurnPenaltyBan = null;
@@ -433,7 +442,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 node.getNodeMasterTimingPoint().add(nodeMasterTimingPoint);
                 node.getNodeMasterJunction().add(nodeMasterJunction);
                 //fetch NodeTurnPenaltyBan
-                turnPenaltyBanList = turnPenaltyBanRepository.getAllTurnPenaltyBansPerNode(node.getName());
+                turnPenaltyBanList = turnPenaltyBanRepository.getAllTurnPenaltyBansPerNode(sessionState.getWorkingVersion().getName(), node.getName());
                 nodeTurnPenaltyBans = new NodeTurnPenaltyBans();
                 for (TurnPenaltyBan turnPenaltyBan : turnPenaltyBanList) {
                     nodeTurnPenaltyBan = new NodeTurnPenaltyBan();
@@ -466,7 +475,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         final SpeedBands speedBands = new SpeedBands();
         try {
             SpeedBands.SpeedBand speedBand = new SpeedBands.SpeedBand();
-            final List<SpeedBand> speedBandList = speedBandRepository.getAllSpeedBands();
+            final List<SpeedBand> speedBandList = speedBandRepository.getAllSpeedBands(sessionState.getWorkingVersion().getName());
             for (SpeedBand speedBand1 : speedBandList) {
                 speedBand = new SpeedBands.SpeedBand();
                 speedBand.setId(StringUtil.intToStr(speedBand1.getId()));
@@ -489,7 +498,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         final TrackSections trackSections = new TrackSections();
         try {
             TrackSections.TrackSection trackSection = null;
-            final List<TrackSection> trackSectionList = trackSectionRepository.getAllTrackSections();
+            final List<TrackSection> trackSectionList = trackSectionRepository.getAllTrackSections(sessionState.getWorkingVersion().getName());
             for (TrackSection trackSection1 : trackSectionList) {
                 trackSection = new TrackSections.TrackSection();
                 trackSection.setName(trackSection1.getName());
@@ -518,7 +527,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         RunningTimes runningTimes = null;
         RunningTime runningTime = null;
         try {
-            final List<INodeLinkRunTimeData> nodeLinkRunTimeDataList = nodeLinkRepository.getAllNodeLinksAndRunningTimes();
+            final List<INodeLinkRunTimeData> nodeLinkRunTimeDataList = nodeLinkRepository.getAllNodeLinksAndRunningTimes(sessionState.getWorkingVersion().getName());
             logger.info("NodalGeographyManager: after returning NodeLinkRunTimeData");
             if (nodeLinkRunTimeDataList == null) {
                 return links;
@@ -593,14 +602,14 @@ public class NodalGeographyManager implements INodalGeographyManager {
     public Geov10RC exportNodalHeader() {
         final Geov10RC geov10RC = new Geov10RC();
         try {
-            final Iterator iterator = nodalHeaderRepository.findAll().iterator();
-            NodalHeader nodalHeader;
-            if (iterator != null && iterator.hasNext()) {
-                nodalHeader = (NodalHeader) iterator.next();
-                geov10RC.setDescription(nodalHeader.getDescription());
-                geov10RC.setOwner(nodalHeader.getOwner());
-                geov10RC.setDate(StringUtil.stringToXmlGregorianCalendar(nodalHeader.getDate()));
+            final List<NodalHeader> nodalHeaders = nodalHeaderRepository.getAllNodalHeaderPerVersion(sessionState.getWorkingVersion().getName());
+            if (nodalHeaders == null || nodalHeaders.size() < 1) {
+                return null;
             }
+            final NodalHeader nodalHeader = nodalHeaders.get(0);
+            geov10RC.setDescription(nodalHeader.getDescription());
+            geov10RC.setOwner(nodalHeader.getOwner());
+            geov10RC.setDate(StringUtil.stringToXmlGregorianCalendar(nodalHeader.getDate()));
             return geov10RC;
         } catch (Exception e) {
             logger.error("Exception in exporting NodalHeader :", e);
@@ -609,48 +618,55 @@ public class NodalGeographyManager implements INodalGeographyManager {
     }
     /**
      * Remove all runningtime records.
+     * @param version version
      */
-    public void emptyRunningTimes () {
-        runingTimeRepository.deleteAll();
+    public void emptyRunningTimes (String version) {
+        runingTimeRepository.deleteRunningTimePerVersion(version);
     }
 
     /**
      * Remove All NodeLinks.
+     * @param version version
      */
-    public void emptyNodeLinks () {
-        nodeLinkRepository.deleteAll();
+    public void emptyNodeLinks (String version) {
+        nodeLinkRepository.deleteNodeLinkPerVersion(version);
     }
 
     /**
      * Remove All NodeLinks.
+     * @param version version
      */
-    public void emptyNodeLinkages () {
-        nodeLinkageRepository.deleteAll();
+    public void emptyNodeLinkages (String version) {
+        nodeLinkageRepository.deleteNodeLinkagePerVersion(version);
     }
 
     /**
      * Remove All TurnPenaltyBan.
+     * @param version version
      */
-    public void emptyNodeTurnPenaltyBan () {
-        turnPenaltyBanRepository.deleteAll();
+    public void emptyNodeTurnPenaltyBan (String version) {
+        turnPenaltyBanRepository.deleteTurnPenaltyBanPerVersion(version);
     }
     /**
      * Remove All NodeLinkages.
+     * @param version version
      */
-    public void emptyNodeNodeLinkages () {
-        nodeLinkageRepository.deleteAll();
+    public void emptyNodeNodeLinkages (String version) {
+        nodeLinkageRepository.deleteNodeLinkagePerVersion(version);
     }
     /**
      * Remove All SpeedBands.
+     * @param version version
      */
-    public void emptySpeedBands () {
-        speedBandRepository.deleteAll();
+    public void emptySpeedBands (String version) {
+        speedBandRepository.deleteSpeedBandPerVersion(version);
     }
     /**
      * Remove All TrackSection.
+     * @param version version
      */
-    public void emptyTrackSections () {
-        trackSectionRepository.deleteAll();
+    public void emptyTrackSections (String version) {
+        trackSectionRepository.deleteTrackSectionPerVersion(version);
     }
 
     /**
@@ -665,15 +681,17 @@ public class NodalGeographyManager implements INodalGeographyManager {
         nodalHeader.setDescription(description);
         nodalHeader.setOwner(owner);
         nodalHeader.setDate(date);
+        nodalHeader.setVersion(sessionState.getWorkingVersion());
         return nodalHeaderRepository.save(nodalHeader);
 
     }
 
     /**
      * remove NodalHeader.
+     * @param version version
      */
-    public void emptyNodalHeader () {
-        nodalHeaderRepository.deleteAll();
+    public void emptyNodalHeader (String version) {
+        nodalHeaderRepository.deleteNodalHeaderPerVersion(version);
     }
 
     /**
@@ -693,9 +711,9 @@ public class NodalGeographyManager implements INodalGeographyManager {
         org.neo4j.graphdb.Node fromNode;
         final org.neo4j.graphdb.Node toNode;
         final long startTime = System.currentTimeMillis();
-        fromNode = graphDatabaseService.getNodeById(nodeRepository.findBySchemaPropertyValue("name", fromNodeName).getNodeId());
+        fromNode = graphDatabaseService.getNodeById(nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), fromNodeName).getNodeId());
         toNode = graphDatabaseService.getNodeById(
-                    nodeRepository.findBySchemaPropertyValue("name", toNodeName).getNodeId());
+                    nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), toNodeName).getNodeId());
         Evaluator penaltyBanEvaluator = new Evaluator() {
             @Override
             public Evaluation evaluate(Path path) {
@@ -713,7 +731,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 final String fromNodeName = (String) node.getProperty("name");
                 logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
 
-                final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(fromNodeName, viaNodeName, toNodeName);
+                final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
 
                 if (turnPenaltyBan != null && "PT99999S".equals(turnPenaltyBan.getPenalty())) {
                     logger.info("       PATH excluded");
@@ -909,9 +927,9 @@ public class NodalGeographyManager implements INodalGeographyManager {
         org.neo4j.graphdb.Node fromNode;
         final org.neo4j.graphdb.Node toNode;
 
-        fromNode = graphDatabaseService.getNodeById(nodeRepository.findBySchemaPropertyValue("name", startNodeName).getNodeId());
+        fromNode = graphDatabaseService.getNodeById(nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), startNodeName).getNodeId());
         toNode = graphDatabaseService.getNodeById(
-                nodeRepository.findBySchemaPropertyValue("name", endNodeName).getNodeId());
+                nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), endNodeName).getNodeId());
 
         final RelationshipType relationshipType = DynamicRelationshipType.withName("NODE_LINKAGE");
 
@@ -920,7 +938,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 .evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         */
 
-        final TurnPenaltyBanExpander expander = new TurnPenaltyBanExpander(relationshipType, Direction.OUTGOING, turnPenaltyBanRepository);
+        final TurnPenaltyBanExpander expander = new TurnPenaltyBanExpander(relationshipType, Direction.OUTGOING, turnPenaltyBanRepository, sessionState);
         final PathFinder<Path> finder = GraphAlgoFactory.shortestPath(expander, 100);
         final Iterable<Path> pathIterator = finder.findAllPaths(fromNode, toNode);
         Path path;
@@ -971,15 +989,16 @@ public class NodalGeographyManager implements INodalGeographyManager {
     public List findAllShortestPaths(String fromNodeName, final String toNodeName) {
         //check if both nodes are platform.
         Node node1;
-        node1 = platformRepository.findBySchemaPropertyValue("name", fromNodeName);
+        node1 = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), fromNodeName);
         if (node1 == null) {
             return  null;
         }
-        node1 = platformRepository.findBySchemaPropertyValue("name", toNodeName);
+        node1 = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), toNodeName);
         if (node1 == null) {
             return null;
         }
-        final List<List<org.neo4j.graphdb.Node>> shortestPaths = nodeRepository.findAllShortestPaths(fromNodeName, toNodeName);
+        logger.info("findAllShortestPath: version= " + sessionState.getWorkingVersion().getName() + " - fromNode =" + fromNodeName + " toNode =" + toNodeName);
+        final List<List<org.neo4j.graphdb.Node>> shortestPaths = nodeRepository.findAllShortestPaths(sessionState.getWorkingVersion().getName(), fromNodeName, toNodeName);
         List<TraverseModel> result;
         List<org.neo4j.graphdb.Node> subsequentPlatformPath;
         TraverseModel traverseModel = null;
@@ -1113,7 +1132,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
             window.add(traverseModel.getNodes().get(traverseModel.getNodes().size() - 2));
             window.add(traverseModel.getNodes().get(traverseModel.getNodes().size() - 1));
             //traverseModel.getNodes().subList(traverseModel.getNodes().size() - 3, traverseModel.getNodes().size() - 1);
-            final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(window.get(0).getName(), window.get(1).getName(), window.get(2).getName());
+            final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), window.get(0).getName(),
+                    window.get(1).getName(), window.get(2).getName());
             //there is an invalid link so try to find another valid path between the two subsequent platforms which invalid link is belong to
             logger.info("checking penalty ban for fromNode = " + window.get(0).getName() + " viaNode = " + window.get(1).getName() + " toNode = " + window.get(2).getName());
             if (turnPenaltyBan != null) {

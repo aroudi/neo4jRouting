@@ -61,6 +61,11 @@ function PlatformController($scope, generalService, SUCCESS, FAILURE, ALL_PLATFO
     /**
      * retreive platform list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllPlatforms();
+        getStationRef();
+    });
+
     getAllPlatforms();
     getStationRef();
     function getAllPlatforms() {

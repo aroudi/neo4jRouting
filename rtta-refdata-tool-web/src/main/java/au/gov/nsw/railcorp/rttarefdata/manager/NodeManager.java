@@ -11,6 +11,7 @@ import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.NodeData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.NodeRepository;
 import au.gov.nsw.railcorp.rttarefdata.repositories.PlatformRepository;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,8 @@ public class NodeManager implements INodeManager {
     @Autowired
     private NodeRepository nodeRepository;
 
+    @Autowired
+    private SessionState sessionState;
     /**
      * create platform.
      * @param nodeName nodeName
@@ -47,7 +50,7 @@ public class NodeManager implements INodeManager {
      */
     public Platform createPlatform(String nodeName, String longName, int platformNo, String platformName, double latt, double longt) {
 
-        Platform platform = platformRepository.findBySchemaPropertyValue("name", nodeName);
+        Platform platform = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), nodeName);
         if (platform == null) {
             platform = new Platform();
         }
@@ -57,6 +60,7 @@ public class NodeManager implements INodeManager {
         platform.setLongName(longName);
         platform.setLatitude(latt);
         platform.setLongitude(longt);
+        platform.setVersion(sessionState.getWorkingVersion());
         platformRepository.save(platform);
         return platform;
     }
@@ -72,7 +76,8 @@ public class NodeManager implements INodeManager {
      */
     public Node createNode(String nodeName, String longName, String platformName, double latt, double longt) {
 
-        Node node = nodeRepository.findBySchemaPropertyValue("name", nodeName);
+        logger.info("createNode: working version =" + sessionState.getWorkingVersion().getName());
+        Node node = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), nodeName);
         if (node == null) {
             node = new Platform();
         }
@@ -82,7 +87,9 @@ public class NodeManager implements INodeManager {
         node.setLatitude(latt);
         node.setLongitude(longt);
         node.setRailNetNode(false);
+        node.setVersion(sessionState.getWorkingVersion());
         nodeRepository.save(node);
+        logger.info("node Saved");
         return node;
     }
 
@@ -95,7 +102,7 @@ public class NodeManager implements INodeManager {
         final List<INodeData> nodes;
         NodeData nodeData;
         try {
-            nodes = nodeRepository.getAllNodes();
+            nodes = nodeRepository.getAllNodes(sessionState.getWorkingVersion().getName());
             for (INodeData node: nodes) {
                 nodeData = new NodeData();
                 nodeData.setNodeId(node.getNodeId());
@@ -142,7 +149,7 @@ public class NodeManager implements INodeManager {
      */
     public Node getNodeByName (String name) {
         try {
-            return nodeRepository.findBySchemaPropertyValue("name", name);
+            return nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), name);
         } catch (Exception e) {
             logger.error ("Exception in getting node by name:", e);
             return null;

@@ -33,6 +33,9 @@ public class StationTriplet {
     @RelatedTo (type = Links.STATION_LINK_POWER, direction = Direction.BOTH)
     private Set<PowerType> powerTypes;
 
+    @RelatedTo(type = Links.VERSION_TRIPLET, direction = Direction.BOTH)
+    @Fetch
+    private DataVersion version;
 
     /**
      * Constuctor.
@@ -112,5 +115,13 @@ public class StationTriplet {
 
     public void setStation(Station station) {
         this.station = station;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

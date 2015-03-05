@@ -29,7 +29,8 @@ public class Station {
     private String shortName;
     private String longName;
 
-    @Indexed(unique = true)
+    @Indexed
+    //(unique = true)
     private int gtfsStopId;
 
     private Double latitude;
@@ -59,7 +60,7 @@ public class Station {
 
     @JsonIgnore
     @RelatedTo(type = Links.STATION_PLATFORM, direction = OUTGOING)
-    @Fetch
+    //@Fetch
     private Collection<Platform> platforms;
 
     @RelatedTo(type = Links.VERSION_STATION, direction = Direction.BOTH)

@@ -192,6 +192,18 @@ myApp.service('generalService', function ($location, $http, $q, configService, l
             });
             return promise;
         },
+        getWorkingVersion: function ($scope, allRowUri) {
+            serviceUrl = configService.getAddress() + allRowUri;
+            var promise = $http({
+                url: serviceUrl ,
+                method: 'GET'
+            }).success(function (data) {
+                $scope.$broadcast('versionChange');
+                return data;
+            }).error(function (data) {
+            });
+            return promise;
+        },
         addRow: function (rowObject, addRowUri) {
             serviceUrl = configService.getAddress() + addRowUri;
             var div = $q.defer();

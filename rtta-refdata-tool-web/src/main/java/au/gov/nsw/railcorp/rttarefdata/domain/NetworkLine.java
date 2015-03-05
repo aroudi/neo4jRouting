@@ -16,7 +16,8 @@ public class NetworkLine {
 
     @GraphId private Long networkLineId;
 
-    @Indexed(unique = true)
+    @Indexed
+    //(unique = true)
     private String name;
     private String longName;
     private String backgroundColourHex;
@@ -35,6 +36,8 @@ public class NetworkLine {
     @RelatedTo(type = Links.VERSION_LINE, direction = Direction.BOTH)
     @Fetch
     private DataVersion version;
+
+
 
     /**
      * Constructor.
@@ -118,5 +121,13 @@ public class NetworkLine {
 
     public void setLinePath(Set<LinePath> linePath) {
         this.linePath = linePath;
+    }
+
+    public DataVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(DataVersion version) {
+        this.version = version;
     }
 }

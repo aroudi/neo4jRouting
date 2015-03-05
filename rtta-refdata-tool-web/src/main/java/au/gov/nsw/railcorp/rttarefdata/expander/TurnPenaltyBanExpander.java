@@ -2,6 +2,7 @@ package au.gov.nsw.railcorp.rttarefdata.expander;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.TurnPenaltyBan;
 import au.gov.nsw.railcorp.rttarefdata.repositories.TurnPenaltyBanRepository;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Path;
@@ -22,6 +23,7 @@ public class TurnPenaltyBanExpander  implements PathExpander {
     private final Logger logger = LoggerFactory.getLogger(TurnPenaltyBanExpander.class);
     private final Direction direction;
     private TurnPenaltyBanRepository turnPenaltyBanRepository;
+    private SessionState sessionState;
 
     /**
      * returning the reverse direction.
@@ -43,11 +45,13 @@ public class TurnPenaltyBanExpander  implements PathExpander {
      * @param relationshipType relationshipType
      * @param direction direction
      * @param turnPenaltyBanRepository turnPenaltyBanRepository
+     * @param sessionState sessionState
      */
-    public TurnPenaltyBanExpander(RelationshipType relationshipType, Direction direction, TurnPenaltyBanRepository turnPenaltyBanRepository) {
+    public TurnPenaltyBanExpander(RelationshipType relationshipType, Direction direction, TurnPenaltyBanRepository turnPenaltyBanRepository, SessionState sessionState) {
         this.relationshipType = relationshipType;
         this.direction = direction;
         this.turnPenaltyBanRepository = turnPenaltyBanRepository;
+        this.sessionState = sessionState;
     }
 
     @Override
@@ -77,7 +81,7 @@ public class TurnPenaltyBanExpander  implements PathExpander {
          final String fromNodeName = (String) node.getProperty("name");
          logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
 
-         final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(fromNodeName, viaNodeName, toNodeName);
+         final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
 
          if (turnPenaltyBan != null && "PT99999S".equals(turnPenaltyBan.getPenalty())) {
              logger.info("       PATH excluded");
@@ -140,5 +144,13 @@ public class TurnPenaltyBanExpander  implements PathExpander {
 
     public void setTurnPenaltyBanRepository(TurnPenaltyBanRepository turnPenaltyBanRepository) {
         this.turnPenaltyBanRepository = turnPenaltyBanRepository;
+    }
+
+    public SessionState getSessionState() {
+        return sessionState;
+    }
+
+    public void setSessionState(SessionState sessionState) {
+        this.sessionState = sessionState;
     }
 }

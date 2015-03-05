@@ -19,7 +19,8 @@ public class Network {
     @Indexed
     @GraphId private Long networkId;
 
-    @Indexed(unique = true)
+    @Indexed
+    //(unique = true)
     private String name;
     private String description;
     private String url;

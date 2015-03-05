@@ -53,6 +53,10 @@ function NetworkController($scope, generalService, SUCCESS, FAILURE, ALL_NETWORK
     /**
      * retreive network list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllNetworks();
+    }
+    );
     getAllNetworks();
     function getAllNetworks() {
         generalService.getAllRows(ALL_NETWORK_URI).then(function(response){

@@ -12,6 +12,7 @@ import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.
 import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.Nodes.Node.NodeTurnPenaltyBans.NodeTurnPenaltyBan;
 import au.gov.nsw.railcorp.rttarefdata.domain.NodeLink;
 import au.gov.nsw.railcorp.rttarefdata.manager.INodalGeographyManager;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,8 @@ public class NodalGeographyService {
     private final Logger logger = LoggerFactory.getLogger(NodalGeographyService.class);
     @Autowired
     private INodalGeographyManager nodalGeographyManager;
-
+    @Autowired
+    private SessionState sessionState;
     /**
      * import RailNet Geography.
      * @param cgGeography cgGeography
@@ -88,8 +90,8 @@ public class NodalGeographyService {
             return;
         }
         //remove All TurnPenaltyBans
-        nodalGeographyManager.emptyNodeTurnPenaltyBan();
-        nodalGeographyManager.emptyNodeNodeLinkages();
+        nodalGeographyManager.emptyNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName());
+        nodalGeographyManager.emptyNodeNodeLinkages(sessionState.getWorkingVersion().getName());
         String masterTimingPoint = "";
         String masterJunction = "";
         for (Node node: nodes.getNode()) {
@@ -156,7 +158,7 @@ public class NodalGeographyService {
      */
     @Transactional
     public void importSpeedBands(SpeedBands speedBands) {
-        nodalGeographyManager.emptySpeedBands();
+        nodalGeographyManager.emptySpeedBands(sessionState.getWorkingVersion().getName());
         if (speedBands == null) {
             return;
         }
@@ -174,7 +176,7 @@ public class NodalGeographyService {
      */
     @Transactional
     public void  importTrackSections(TrackSections trackSections) {
-        nodalGeographyManager.emptyTrackSections();
+        nodalGeographyManager.emptyTrackSections(sessionState.getWorkingVersion().getName());
         if (trackSections == null) {
             return;
         }
@@ -198,8 +200,8 @@ public class NodalGeographyService {
         }
 
         //empty the current links
-        nodalGeographyManager.emptyRunningTimes();
-        nodalGeographyManager.emptyNodeLinks();
+        nodalGeographyManager.emptyRunningTimes(sessionState.getWorkingVersion().getName());
+        nodalGeographyManager.emptyNodeLinks(sessionState.getWorkingVersion().getName());
 
         for (Link link : links.getLink()) {
             if (link == null) {
@@ -230,7 +232,7 @@ public class NodalGeographyService {
         if (links == null || links.getLink() == null) {
             return;
         }
-        nodalGeographyManager.emptyNodeNodeLinkages();
+        nodalGeographyManager.emptyNodeNodeLinkages(sessionState.getWorkingVersion().getName());
         for (Link link : links.getLink()) {
             if (link == null) {
                 continue;
@@ -250,7 +252,7 @@ public class NodalGeographyService {
     @Transactional
     public void importNodalHeader(CgGeography.Geov10RC geov10RC) {
         if (geov10RC != null) {
-            nodalGeographyManager.emptyTrackSections();
+            nodalGeographyManager.emptyNodalHeader(sessionState.getWorkingVersion().getName());
             nodalGeographyManager.createNodalHeader(geov10RC.getDescription(), geov10RC.getOwner(), geov10RC.getDate().toString());
         }
     }

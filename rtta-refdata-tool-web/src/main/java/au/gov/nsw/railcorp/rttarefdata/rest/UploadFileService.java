@@ -74,6 +74,7 @@ public class UploadFileService {
             stopService.importRttaStops(rttaStops);
             response.setStatus(IConstants.RESPONSE_SUCCESS);
         } catch (Exception e) {
+            logger.error("Exception in importing stops :" , e);
             response.setStatus(IConstants.RESPONSE_FAILURE);
             response.setMessage(e.getMessage());
         }

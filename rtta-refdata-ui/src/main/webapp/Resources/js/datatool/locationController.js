@@ -50,6 +50,9 @@ function LocationController($scope, generalService, SUCCESS, FAILURE, ALL_LOCATI
     /**
      * retreive location list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllLocations();
+    });
     getAllLocations();
     function getAllLocations() {
         generalService.getAllRows(ALL_LOCATION_URI).then(function(response){

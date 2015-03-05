@@ -17,7 +17,8 @@ public class Node {
     /**
      * Node Name.
      */
-    @Indexed(unique = true)
+    @Indexed
+    //(unique = true)
     protected String name;
     /**
      * Node Long Name.

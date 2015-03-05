@@ -13,9 +13,17 @@ import java.util.List;
 public interface SpeedBandRepository extends GraphRepository<SpeedBand> {
     /**
      * return all speed bands.
+     * @param version version
      * @return List of speedBands
      */
-    @Query("MATCH (speedBand:SpeedBand) RETURN speedBand")
-    List<SpeedBand> getAllSpeedBands();
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_SPEEDBAND]-(speedBand:SpeedBand) RETURN speedBand")
+    List<SpeedBand> getAllSpeedBands(String version);
+
+    /**
+     * delete all SpeedBands with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_SPEEDBAND]-(sb:SpeedBand) WHERE version.name={0} DELETE sb")
+    void deleteSpeedBandPerVersion(String version);
 
 }

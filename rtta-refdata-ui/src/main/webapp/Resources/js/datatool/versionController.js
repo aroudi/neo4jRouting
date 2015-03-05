@@ -148,7 +148,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                     dataVersionObject.active = addResponse.active;
                     $scope.gridOptions.data.push(angular.copy(dataVersionObject));
                     $scope.scrollTo($scope.gridOptions.data.length-1,0);
-
+                    $scope.$emit('versionListChange');
                 } else {
                     alert('Not able to add new data version. ' + addResponse.message);
                 }
@@ -193,6 +193,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                     selectedRow.commenceDate = dataVersionObject.commenceDate;
                     selectedRow.active =serviceResponse.active;
                     generalService.setRow(dataVersionObject);
+                    $scope.$emit('versionListChange');
                 } else {
                     alert('edit failed:'+serviceResponse.message);
                 }
@@ -216,6 +217,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                 if (rowIndex>-1) {
                     $scope.gridOptions.data.splice(rowIndex,1);
                     generalService.setRowSelected(false);
+                    $scope.$emit('versionListChange');
                 }
             } else {
                 alert('Not able to delete: '+serviceResponse.message);

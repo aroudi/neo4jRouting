@@ -3,7 +3,7 @@ package au.gov.nsw.railcorp.rttarefdata.manager;
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.*;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
-import com.google.common.collect.Lists;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,8 @@ public class TopologyManager implements ITopologyManager {
 
     @Autowired
     private PathStationRepository pathStationRepository;
-
+    @Autowired
+    private SessionState sessionState;
     /**
      * createNetwork.
      * @param name name
@@ -42,13 +43,14 @@ public class TopologyManager implements ITopologyManager {
      * @return Network
      */
     public Network createNetwork(String name, String description) {
-        Network network = networkRepository.findBySchemaPropertyValue("name", name);
+        Network network = networkRepository.getNetworkPerName(sessionState.getWorkingVersion().getName(), name);
         if (network == null) {
             network = new Network();
         }
         network.setName(name);
         network.setDescription(description);
-        return networkRepository.save(new Network(name, description, null, null, null, null, null));
+        network.setVersion(sessionState.getWorkingVersion());
+        return networkRepository.save(network);
     }
 
     /**
@@ -62,7 +64,7 @@ public class TopologyManager implements ITopologyManager {
      * @return NetworkLine
      */
     public NetworkLine createNetworkLine(String name, String longName, String backGroundColourHex, String textColourHex, String networkName, String serviceTypeName) {
-        NetworkLine networkLine = networkLineRepository.findBySchemaPropertyValue("name", name);
+        NetworkLine networkLine = networkLineRepository.getLinePerName(sessionState.getWorkingVersion().getName(), name);
         if (networkLine == null) {
             networkLine = new NetworkLine();
         }
@@ -74,10 +76,11 @@ public class TopologyManager implements ITopologyManager {
         if (serviceType != null) {
             networkLine.setServiceType(serviceType);
         }
-        final Network myNetwork = networkRepository.findBySchemaPropertyValue("name", networkName);
+        final Network myNetwork = networkRepository.getNetworkPerName(sessionState.getWorkingVersion().getName(), networkName);
         if (myNetwork != null) {
             networkLine.setNetwork(myNetwork);
         }
+        networkLine.setVersion(sessionState.getWorkingVersion());
         return networkLineRepository.save(networkLine);
     }
     /**
@@ -96,13 +99,13 @@ public class TopologyManager implements ITopologyManager {
     {
 
         Station station;
-        LinePath linePath = linePathRepository.findBySchemaPropertyValue("name", pathName);
+        LinePath linePath = linePathRepository.getLinePathPerName(sessionState.getWorkingVersion().getName(), pathName);
         if (linePath == null) {
             linePath = new LinePath();
         }
         linePath.setName(pathName);
         linePath.setLongName(longName);
-        final NetworkLine networkLine = networkLineRepository.findBySchemaPropertyValue("name", lineName);
+        final NetworkLine networkLine = networkLineRepository.getLinePerName(sessionState.getWorkingVersion().getName(), lineName);
         if (networkLine != null) {
             linePath.setNetworkLine(networkLine);
         }
@@ -116,7 +119,7 @@ public class TopologyManager implements ITopologyManager {
             int sequence = 0;
             for (String stationName : stationPath) {
                 sequence++;
-                station = stationRepository.findBySchemaPropertyValue("shortName", stationName);
+                station = stationRepository.getStationPerName(sessionState.getWorkingVersion().getName(), stationName);
                 if (station != null) {
                     boolean pathIsMatch = false;
                     for (String matchInclude : pathMatchInclude) {
@@ -132,6 +135,7 @@ public class TopologyManager implements ITopologyManager {
                 }
             }
         }
+        linePath.setVersion(sessionState.getWorkingVersion());
         linePathRepository.save(linePath);
         return linePath;
     }
@@ -142,7 +146,7 @@ public class TopologyManager implements ITopologyManager {
      */
     public List<Network> getAllNetworks() {
         try {
-            return Lists.newArrayList(networkRepository.findAll().iterator());
+            return networkRepository.getAllNetworkPerVersion(sessionState.getWorkingVersion().getName());
         } catch (Exception e) {
             logger.error("Exception in returning network list ", e);
             return null;
@@ -157,7 +161,7 @@ public class TopologyManager implements ITopologyManager {
         final List<INetworkLineData> lines;
         NetworkLineData networkLineData;
         try {
-            lines = networkLineRepository.getAllNetworkLines();
+            lines = networkLineRepository.getAllNetworkLines(sessionState.getWorkingVersion().getName());
             for (INetworkLineData line: lines) {
                 networkLineData = new NetworkLineData();
                 networkLineData.setLineId(line.getLineId());
@@ -187,7 +191,7 @@ public class TopologyManager implements ITopologyManager {
         LinePathData linePathData;
         LinePathStationData linePathStationData;
         try {
-            linePathList = linePathRepository.getAllLinePaths();
+            linePathList = linePathRepository.getAllLinePaths(sessionState.getWorkingVersion().getName());
             for (ILinePath linePath: linePathList) {
                 linePathData = new LinePathData();
                 linePathData.setPathId(linePath.getPathId());
@@ -197,7 +201,7 @@ public class TopologyManager implements ITopologyManager {
                 linePathData.setLineLongName(linePath.getLineLongName());
                 linePathData.setBackgroundColourHex(linePath.getBackgroundColourHex());
                 linePathData.setTextColourHex(linePath.getTextColourHex());
-                linePathStationList = pathStationRepository.getAllLinePathStations(linePath.getName());
+                linePathStationList = pathStationRepository.getAllLinePathStations(sessionState.getWorkingVersion().getName(), linePath.getName());
                 for (ILinePathStation pathStation: linePathStationList) {
                     linePathStationData = new LinePathStationData();
                     linePathStationData.setStationId(pathStation.getStationId());
@@ -231,7 +235,7 @@ public class TopologyManager implements ITopologyManager {
         LinePathData linePathData;
         LinePathStationData linePathStationData;
         try {
-            linePathList = linePathRepository.getAllLinePathsPerNetwork(networkName);
+            linePathList = linePathRepository.getAllLinePathsPerNetwork(sessionState.getWorkingVersion().getName(), networkName);
             for (ILinePath linePath: linePathList) {
                 linePathData = new LinePathData();
                 linePathData.setPathId(linePath.getPathId());
@@ -241,7 +245,7 @@ public class TopologyManager implements ITopologyManager {
                 linePathData.setLineLongName(linePath.getLineLongName());
                 linePathData.setBackgroundColourHex(linePath.getBackgroundColourHex());
                 linePathData.setTextColourHex(linePath.getTextColourHex());
-                linePathStationList = pathStationRepository.getAllLinePathStations(linePath.getName());
+                linePathStationList = pathStationRepository.getAllLinePathStations(sessionState.getWorkingVersion().getName(), linePath.getName());
                 for (ILinePathStation pathStation: linePathStationList) {
                     linePathStationData = new LinePathStationData();
                     linePathStationData.setStationId(pathStation.getStationId());
@@ -270,7 +274,7 @@ public class TopologyManager implements ITopologyManager {
      * @return ServiceType
      */
     public ServiceType getLineServiceType(String lineName) {
-        return networkLineRepository.getLineServiceType(lineName);
+        return networkLineRepository.getLineServiceType(sessionState.getWorkingVersion().getName(), lineName);
     }
 
     /**
@@ -279,6 +283,6 @@ public class TopologyManager implements ITopologyManager {
      * @return List of power type
      */
     public List<PowerType> getLinePathPowerTypes(String linePathName) {
-        return linePathRepository.getLinePathPowerType(linePathName);
+        return linePathRepository.getLinePathPowerType(sessionState.getWorkingVersion().getName(), linePathName);
     }
 }

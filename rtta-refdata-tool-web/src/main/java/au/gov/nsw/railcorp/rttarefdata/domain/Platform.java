@@ -22,9 +22,6 @@ public class Platform extends Node {
     @RelatedTo(type = Links.STATION_PLATFORM, direction = Direction.INCOMING)
     @Fetch
     private Station station;
-    @RelatedTo(type = Links.VERSION_PLATFORM, direction = Direction.BOTH)
-    @Fetch
-    private DataVersion version;
 
     /**
      * Constructor.
@@ -72,13 +69,4 @@ public class Platform extends Node {
         this.station = station;
     }
 
-    @Override
-    public DataVersion getVersion() {
-        return version;
-    }
-
-    @Override
-    public void setVersion(DataVersion version) {
-        this.version = version;
-    }
 }

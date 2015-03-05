@@ -9,6 +9,10 @@ function VisNetworkController($scope, generalService,drawNetworkService, SUCCESS
     /**
      * retreive network list from server
      */
+    $scope.$on('versionChange', function(event, data) {
+        getAllVisNetworks();
+    });
+
     getAllVisNetworks();
 
     function getAllVisNetworks() {

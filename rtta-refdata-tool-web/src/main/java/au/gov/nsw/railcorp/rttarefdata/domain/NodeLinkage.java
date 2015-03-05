@@ -35,6 +35,8 @@ public class NodeLinkage {
     @EndNode
     private Node toNode;
 
+    @Indexed
+    private String version;
     /**
      * Default Constructor.
      */
@@ -175,5 +177,13 @@ public class NodeLinkage {
 
     public void setDirection(String direction) {
         this.direction = direction;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -128,7 +128,7 @@ public class ServiceTest {
         final ServiceType serviceType = serviceTypeRepository.findBySchemaPropertyValue("name", serviceTypeName);
         networkLine.setServiceType(serviceType);
 
-        final Network myNetwork = networkRepository.findBySchemaPropertyValue("name", networkName);
+        final Network myNetwork = networkRepository.getNetworkPerName("", networkName);
         networkLine.setNetwork(myNetwork);
 
 
@@ -151,7 +151,7 @@ public class ServiceTest {
         Station station;
         final LinePath linePath = new LinePath(pathName, longName);
 
-        final NetworkLine networkLine = networkLineRepository.findBySchemaPropertyValue("name", lineName);
+        final NetworkLine networkLine = networkLineRepository.getLinePerName("", lineName);
         linePath.setNetworkLine(networkLine);
 
         for (String powertypeName : powerTypes) {
@@ -418,7 +418,7 @@ public class ServiceTest {
                            boolean isWorkingTimingPoint, boolean isPublicTimingPoint, boolean isEndOfLine, String dWellDuration, String upRecoveryDuration, String downRecoveryDuration, double length)
     {
         Node node;
-        node = nodeRepository.findBySchemaPropertyValue("name", name);
+        node = nodeRepository.getNodePerName("", name);
         if (node == null) {
             node = new Node();
         }
