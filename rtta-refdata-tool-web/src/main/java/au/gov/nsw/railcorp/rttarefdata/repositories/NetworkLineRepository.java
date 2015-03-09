@@ -53,7 +53,7 @@ public interface NetworkLineRepository extends GraphRepository<NetworkLine> {
      * @param version version
      * @return Service Type
      */
-    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_LINE]-(line:NetworkLine{name:{0}})<-[:LINE_SERVICE_TYPE]-(st:ServiceType) RETURN st")
+    @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_LINE]-(line:NetworkLine{name:{1}})<-[:LINE_SERVICE_TYPE]-(st:ServiceType) RETURN st")
     ServiceType getLineServiceType(String version, String lineName);
 
     /**
@@ -72,4 +72,11 @@ public interface NetworkLineRepository extends GraphRepository<NetworkLine> {
      */
     @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_LINE]-(line:NetworkLine) RETURN line")
     List<NetworkLine> getAllLinesPerVersion(String version);
+    /**
+     * delete all networkKines with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_LINE]-(line:NetworkLine) WHERE version.name={0} DELETE line")
+    void deleteNetworkLinesPerVersion(String version);
+
 }

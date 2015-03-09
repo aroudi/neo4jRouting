@@ -67,4 +67,11 @@ public interface StationRepository extends GraphRepository<Station> {
             "MATCH (version:DataVersion{name:{0}})-[:VERSION_STATION]-(s:Station) RETURN s "
     )
     List<Station> getAllStationsPerVersion(String version);
+    /**
+     * delete all Stations with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_STATION]-(s:Station) WHERE version.name={0} DELETE s")
+    void deleteStationsPerVersion(String version);
+
 }

@@ -53,4 +53,12 @@ public interface LinePathRepository extends GraphRepository<LinePath> {
      */
     @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_PATH]-(linePath:LinePath{name:{1}}) RETURN linePath")
     LinePath getLinePathPerName(String version, String linePath);
+
+    /**
+     * delete all linePaths with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_PATH]-(linePath:LinePath) WHERE version.name={0} DELETE linePath")
+    void deleteLinePathPerVersion(String version);
+
 }

@@ -62,6 +62,7 @@ public class LinePath {
      */
     public PathStation addStationToPath (Station station, int sequence, boolean pathMatchInclude) {
         final PathStation pathStation = new PathStation(this, station, sequence, pathMatchInclude);
+        pathStation.setVersion(station.getVersion().getName());
         if (pathStations == null) {
             pathStations = new HashSet<PathStation>();
         }

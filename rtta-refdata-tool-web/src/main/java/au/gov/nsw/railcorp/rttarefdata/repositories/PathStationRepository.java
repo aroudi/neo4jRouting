@@ -24,5 +24,11 @@ public interface PathStationRepository extends GraphRepository<PathStation> {
             + "lps.pathMatchInclude AS pathMatchInclude,  lps.sequence AS sequence order by sequence"
     )
     List<ILinePathStation> getAllLinePathStations(String version, String linePathName);
+    /**
+     * delete all PathSttions with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (ps:PathStation) WHERE ps.version={0} DELETE ps")
+    void deletePathStationPerVersion(String version);
 
 }

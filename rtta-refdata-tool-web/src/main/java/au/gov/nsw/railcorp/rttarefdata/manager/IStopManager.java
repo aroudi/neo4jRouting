@@ -89,5 +89,24 @@ public interface IStopManager {
      * @return RttaStops
      */
     RttaStops buildStopList();
+    /**
+     * remove all stations per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllStationsPerVersion (String versionName);
+
+    /**
+     * remove all platforms per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllPlatformsPerVersion (String versionName);
+    /**
+     * remove all triplets per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllTripletsPerVersion (String versionName);
 
 }

@@ -1,10 +1,7 @@
 // RailCorp 2014
 package au.gov.nsw.railcorp.rttarefdata.domain;
 
-import org.springframework.data.neo4j.annotation.EndNode;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.RelationshipEntity;
-import org.springframework.data.neo4j.annotation.StartNode;
+import org.springframework.data.neo4j.annotation.*;
 
 /**
  * Created by arash on 29/10/14.
@@ -20,6 +17,8 @@ public class PathStation {
 
     private int sequence;
     private boolean pathMatchInclude;
+    @Indexed
+    private String version;
 
     /**
      * Constructor.
@@ -79,5 +78,13 @@ public class PathStation {
 
     public void setPathMatchInclude(boolean pathMatchInclude) {
         this.pathMatchInclude = pathMatchInclude;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

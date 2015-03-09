@@ -293,6 +293,7 @@ public class StopManager implements IStopManager {
             RefStop refStop;
             final RefStops refStops = new RefStops();
             List<Station> stopList;
+            List<Platform> platformList;
             //fetch all stops from database;
             stopList = getAllStops();
             if (stopList == null) {
@@ -309,12 +310,11 @@ public class StopManager implements IStopManager {
                 refStop.setLatitude(station.getLatitude());
                 refStop.setLongitude(station.getLongtitude());
                 refStops.getStop().add(refStop);
-
-                if (station.getPlatforms() == null) {
+                platformList = platformRepository.getAllStationPlatforms(sessionState.getWorkingVersion().getName(), station.getShortName());
+                if (platformList == null || platformList.size() < 1) {
                     continue;
                 }
-                //ToDo fetch platform for station
-                for (Platform platform: station.getPlatforms()) {
+                for (Platform platform: platformList) {
                     refStop = new RefStop();
                     refStop.setStopId(StringUtil.intToStr(platform.getGtfsStopId()));
                     refStop.setName(platform.getName());
@@ -326,7 +326,6 @@ public class StopManager implements IStopManager {
                     refStop.setLongitude(platform.getLongitude());
                     refStops.getStop().add(refStop);
                 }
-
             }
             stopsV01.setStops(refStops);
             stopsV01.setStopLinks(buildStopLinks());
@@ -397,5 +396,48 @@ public class StopManager implements IStopManager {
         rttaStops.setReferenceHeader(referenceHeader);
         rttaStops.setStopsV01(buildStops());
         return rttaStops;
+    }
+    /**
+     * remove all stations per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllStationsPerVersion (String versionName) {
+        try {
+            stationRepository.deleteStationsPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing Stations:", e);
+            return false;
+        }
+    }
+
+    /**
+     * remove all platforms per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllPlatformsPerVersion (String versionName) {
+        try {
+            platformRepository.deletePlatformsPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing platforms:", e);
+            return false;
+        }
+    }
+    /**
+     * remove all triplets per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllTripletsPerVersion (String versionName) {
+        try {
+            stationTripletRepository.deleteStationTripletsPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing triplets:", e);
+            return false;
+        }
     }
 }

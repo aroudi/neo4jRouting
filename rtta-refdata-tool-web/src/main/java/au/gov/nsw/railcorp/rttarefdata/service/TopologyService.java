@@ -2,6 +2,7 @@ package au.gov.nsw.railcorp.rttarefdata.service;
 
 import au.gov.nsw.railcorp.rtta.refint.generated.gtfs.*;
 import au.gov.nsw.railcorp.rtta.refint.generated.reference.ReferenceHeader;
+import au.gov.nsw.railcorp.rttarefdata.domain.DataVersion;
 import au.gov.nsw.railcorp.rttarefdata.domain.Network;
 import au.gov.nsw.railcorp.rttarefdata.domain.PowerType;
 import au.gov.nsw.railcorp.rttarefdata.domain.ServiceType;
@@ -13,12 +14,14 @@ import au.gov.nsw.railcorp.rttarefdata.mapresult.NetworkLineData;
 import au.gov.nsw.railcorp.rttarefdata.request.EdgeModel;
 import au.gov.nsw.railcorp.rttarefdata.request.LineInfo;
 import au.gov.nsw.railcorp.rttarefdata.request.NetworkVisModel;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -42,7 +45,8 @@ public class TopologyService {
     private ITopologyManager topologyManager;
     @Autowired
     private IStopManager stopManager;
-
+    @Autowired
+    private SessionState sessionState;
     /**
      * import Rtta Gtfs Topology object.
      * @param rttaGtfsTopology rttaGtfsTopology
@@ -443,6 +447,7 @@ public class TopologyService {
             refGtfsNetworkLine.setLineColourHex(firstLinePath.getBackgroundColourHex());
             refGtfsNetworkLine.setTextColourHex(firstLinePath.getTextColourHex());
             serviceType = topologyManager.getLineServiceType(firstLinePath.getLineName());
+
             if (serviceType != null) {
                 refGtfsNetworkLine.setEServiceType(EGtfsServiceType.fromValue(serviceType.getName()));
             }
@@ -559,6 +564,33 @@ public class TopologyService {
             logger.error("Exception in writing RttaGtfsTopology into xml: ", e);
             return null;
         }
+    }
+    /**
+     * clone Topology.
+     * @param fromVersion fromVersion
+     * @param toVersion toVersion
+     * @return boolean
+     */
+    @Transactional
+    public boolean cloneTopology(DataVersion fromVersion, DataVersion toVersion) {
+        //temporary save the current version
+        final DataVersion currentWorkingVersion = sessionState.getWorkingVersion();
+        try {
+            if (fromVersion == null || toVersion == null) {
+                return false;
+            }
+            sessionState.setWorkingVersion(fromVersion);
+            //fetch all current stops
+            final RttaGtfsTopology gtfsTopology = buildGtfsTopology();
+            sessionState.setWorkingVersion(toVersion);
+            importRttaTopology(gtfsTopology);
+            sessionState.setWorkingVersion(currentWorkingVersion);
+        } catch (Exception e) {
+            logger.error("Exception in clonning stops : ", e);
+            sessionState.setWorkingVersion(toVersion);
+            return false;
+        }
+        return true;
     }
 
 }

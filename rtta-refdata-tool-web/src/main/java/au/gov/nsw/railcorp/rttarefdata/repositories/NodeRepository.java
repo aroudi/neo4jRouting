@@ -77,4 +77,16 @@ public interface NodeRepository extends GraphRepository<Node> {
     @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(node:Node{name:{1}}) RETURN node")
     Node getNodePerName(String version, String nodeName);
 
+    /**
+     * delete all Nodes with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_NODE]-(node:Node) WHERE version.name={0} DELETE node")
+    void deleteNodesPerVersion(String version);
+    /**
+     * delete all Node's master timing point with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_NODE]-(node:Node)-[mtp:MASTER_TIMING_POINT]->(:Node) WHERE version.name={0} DELETE mtp, node")
+    void deleteNodeMasterTimingPoint(String version);
 }

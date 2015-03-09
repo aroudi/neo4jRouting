@@ -2,13 +2,16 @@ package au.gov.nsw.railcorp.rttarefdata.service;
 
 import au.gov.nsw.railcorp.rtta.refint.generated.nodes.RefNode;
 import au.gov.nsw.railcorp.rtta.refint.generated.nodes.RttaNodes;
+import au.gov.nsw.railcorp.rttarefdata.domain.DataVersion;
 import au.gov.nsw.railcorp.rttarefdata.manager.INodeManager;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.NodeData;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -27,7 +30,8 @@ public class NodeService {
     private final Logger logger = LoggerFactory.getLogger(NodeService.class);
     @Autowired
     private INodeManager nodeManager;
-
+    @Autowired
+    private SessionState sessionState;
     /**
      * Import Rtta Nodes.
      * @param rttaNodes rttaNodes
@@ -113,6 +117,33 @@ public class NodeService {
             logger.error("Exception in writing RttaNodes into xml: ", e);
             return null;
         }
+    }
+    /**
+     * clone rtta Nodes.
+     * @param fromVersion fromVersion
+     * @param toVersion toVersion
+     * @return boolean
+     */
+    @Transactional
+    public boolean cloneNodes(DataVersion fromVersion, DataVersion toVersion) {
+        final DataVersion currentWorkingVersion = sessionState.getWorkingVersion();
+        try {
+            if (fromVersion == null || toVersion == null) {
+                return false;
+            }
+            //temporary save the current version
+            sessionState.setWorkingVersion(fromVersion);
+            //fetch all current stops
+            final RttaNodes rttaNodes = nodeManager.buildRttaNodes();
+            sessionState.setWorkingVersion(toVersion);
+            importRttaNodes(rttaNodes);
+            sessionState.setWorkingVersion(currentWorkingVersion);
+        } catch (Exception e) {
+            logger.error("Exception in clonning Nodes : ", e);
+            sessionState.setWorkingVersion(toVersion);
+            return false;
+        }
+        return true;
     }
 
 }

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -28,12 +29,21 @@ public class DataVersionService {
 
     @Autowired
     private SessionState sessionState;
+    @Autowired
+    private StopService stopService;
+    @Autowired
+    private TopologyService topologyService;
+    @Autowired
+    private NodeService nodeService;
+    @Autowired
+    private LocationService locationService;
 
     /**
      * Create new data version.
      * @param dataVersionModel dataVersionModel
      * @return Response;
      */
+    @Transactional
     public DataVersionResponse createDataVersion(DataVersionModel dataVersionModel) {
         final DataVersionResponse response = new DataVersionResponse();
         // check if input object is null
@@ -80,12 +90,24 @@ public class DataVersionService {
             response.setMessage("not able to save data version. check the log file");
             response.setStatus(IConstants.RESPONSE_FAILURE);
             return response;
-        } else {
-            response.setActive(dataVersionModel.isActive());
-            response.setStatus(IConstants.RESPONSE_SUCCESS);
-            response.setCreateDate(DateUtil.dateToString(dataVersion.getCreateDate()));
-            response.setMessage("Version created successfully");
         }
+        // clone all refrence data from base version to this version.
+        boolean clonSuccessfull = true;
+        if (dataVersion.getBaseVersion() != null) {
+            clonSuccessfull = clonSuccessfull && stopService.cloneStops(dataVersion.getBaseVersion(), dataVersion);
+            clonSuccessfull = clonSuccessfull && topologyService.cloneTopology(dataVersion.getBaseVersion(), dataVersion);
+            clonSuccessfull = clonSuccessfull && nodeService.cloneNodes(dataVersion.getBaseVersion(), dataVersion);
+            clonSuccessfull = clonSuccessfull && locationService.cloneLocation(dataVersion.getBaseVersion(), dataVersion);
+        }
+        if (!clonSuccessfull) {
+            response.setMessage("Not able to clone reference data. please refer the the log");
+            response.setStatus(IConstants.RESPONSE_FAILURE);
+            return response;
+        }
+        response.setActive(dataVersionModel.isActive());
+        response.setStatus(IConstants.RESPONSE_SUCCESS);
+        response.setCreateDate(DateUtil.dateToString(dataVersion.getCreateDate()));
+        response.setMessage("Version created successfully");
         return response;
     }
     /**
@@ -137,7 +159,7 @@ public class DataVersionService {
             response.setStatus(IConstants.RESPONSE_FAILURE);
             return response;
         }
-        if (!dataVersionManager.removeDataVersion(id)) {
+        if (!dataVersionManager.removeDataVersion(dataVersion)) {
             response.setMessage("not able to remove data version");
             response.setStatus(IConstants.RESPONSE_FAILURE);
             return response;
@@ -170,9 +192,7 @@ public class DataVersionService {
      */
     public void setWorkingVersion(long id) {
         try {
-            logger.info("setWorkingVersion id= " + id);
             final DataVersion dataVersion = dataVersionManager.getDataVersionById(id);
-            logger.info("dataVersion= " + dataVersion.getName());
             if (dataVersion != null) {
                 sessionState.setWorkingVersion(dataVersion);
             }

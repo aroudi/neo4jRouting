@@ -26,6 +26,16 @@ public interface PlatformRepository extends GraphRepository<Platform> {
     List<IStationPlatformData> getAllPlatforms(String version);
 
     /**
+     * Return all platforms of station.
+     * @param version version
+     * @param stationName stationName
+     * @return List of platforms
+     */
+    @Query(
+            "MATCH (version:DataVersion{name:{0}})-[:VERSION_STATION]-(s:Station{shortName:{1}})-[:STATION_PLATFORM]->(p:Platform) RETURN p "
+    )
+    List<Platform> getAllStationPlatforms(String version, String stationName);
+    /**
      * Return platform per name.
      * @param version version
      * @param name name
@@ -42,4 +52,12 @@ public interface PlatformRepository extends GraphRepository<Platform> {
      */
     @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NODE]-(platform:Platform{gtfsStopId:{1}}) RETURN platform")
     Platform getPlatformPerGtfsStopId(String version, int gtfsStopId);
+
+    /**
+     * delete all Platforms with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_NODE]-(platform:Platform) WHERE version.name={0} DELETE platform")
+    void deletePlatformsPerVersion(String version);
+
 }

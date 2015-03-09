@@ -4,15 +4,18 @@ import au.gov.nsw.railcorp.rtta.refint.generated.stops.RefStop;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RefStopLink;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RefStopLinks;
 import au.gov.nsw.railcorp.rtta.refint.generated.stops.RttaStops;
+import au.gov.nsw.railcorp.rttarefdata.domain.DataVersion;
 import au.gov.nsw.railcorp.rttarefdata.manager.IStopManager;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.StationData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.StationPlatformData;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -33,7 +36,8 @@ public class StopService {
 
     @Autowired
     private IStopManager stopManager;
-
+    @Autowired
+    private SessionState sessionState;
     /**
      * import rtta stops.
      * @param rttaStops rttaStops object resulted from xml file or from input stream.
@@ -253,6 +257,34 @@ public class StopService {
             logger.error("Exception in writing RttaStops into xml: ", e);
             return null;
         }
+    }
+
+    /**
+     * clone rtta stops.
+     * @param fromVersion fromVersion
+     * @param toVersion toVersion
+     * @return boolean
+     */
+    @Transactional
+    public boolean cloneStops(DataVersion fromVersion, DataVersion toVersion) {
+        final DataVersion currentWorkingVersion = sessionState.getWorkingVersion();
+        try {
+           if (fromVersion == null || toVersion == null) {
+                 return false;
+           }
+            //temporary save the current version
+            sessionState.setWorkingVersion(fromVersion);
+            //fetch all current stops
+            final RttaStops rttaStops = stopManager.buildStopList();
+            sessionState.setWorkingVersion(toVersion);
+            importRttaStops(rttaStops);
+            sessionState.setWorkingVersion(currentWorkingVersion);
+        } catch (Exception e) {
+            logger.error("Exception in clonning stops : ", e);
+            sessionState.setWorkingVersion(toVersion);
+            return false;
+        }
+        return true;
     }
 
 }

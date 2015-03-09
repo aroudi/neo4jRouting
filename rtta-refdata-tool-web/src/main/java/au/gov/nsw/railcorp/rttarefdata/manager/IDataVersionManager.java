@@ -60,10 +60,10 @@ public interface IDataVersionManager {
     DataVersion getDataVersionById(long id);
     /**
      * Remove DataVersion.
-     * @param id id
+     * @param dataVersion dataVersion
      * @return DataVersion
      */
-    boolean removeDataVersion(long id);
+    boolean removeDataVersion(DataVersion dataVersion);
 
     /**
      * return all data versions.

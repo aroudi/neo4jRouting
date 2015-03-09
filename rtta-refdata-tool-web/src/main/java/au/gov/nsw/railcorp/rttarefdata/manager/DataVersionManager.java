@@ -1,7 +1,7 @@
 package au.gov.nsw.railcorp.rttarefdata.manager;
 
 import au.gov.nsw.railcorp.rttarefdata.domain.DataVersion;
-import au.gov.nsw.railcorp.rttarefdata.repositories.DataVersionRepository;
+import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import au.gov.nsw.railcorp.rttarefdata.request.DataVersionModel;
 import au.gov.nsw.railcorp.rttarefdata.util.DateUtil;
 import com.google.common.collect.Lists;
@@ -19,11 +19,18 @@ import java.util.List;
 /**
  * Created by arash on 26/02/2015.
  */
-@Transactional
 @Component
 public class DataVersionManager implements IDataVersionManager {
 
     private final Logger logger = LoggerFactory.getLogger(DataVersionManager.class);
+    @Autowired
+    private IStopManager stopManager;
+    @Autowired
+    private ITopologyManager topologyManager;
+    @Autowired
+    private INodalGeographyManager nodalGeographyManager;
+    @Autowired
+    private ILocationManager locationManager;
     @Autowired
     private DataVersionRepository dataVersionRepository;
 
@@ -37,6 +44,7 @@ public class DataVersionManager implements IDataVersionManager {
      * @param baseVersion baseVersion
      * @return DataVersion object
      */
+    @Transactional
     public DataVersion addDataVersion(String name, String description, Date createDate, Date commenceDate, boolean isActive, String baseVersion) {
         try {
             final DataVersion dataVersion = new DataVersion();
@@ -63,6 +71,7 @@ public class DataVersionManager implements IDataVersionManager {
      * @param createDate createDate
      * @return DataVersion object
      */
+    @Transactional
     public DataVersion editDataVersion(long id, String name, String description, Date createDate) {
         try {
             final DataVersion dataVersion = dataVersionRepository.findOne(id);
@@ -85,6 +94,7 @@ public class DataVersionManager implements IDataVersionManager {
      * @param name name
      * @return DataVersion
      */
+    @Transactional
     public DataVersion searchDataVersionPerName(String name) {
         try {
             DataVersion dataVersion = null;
@@ -100,6 +110,7 @@ public class DataVersionManager implements IDataVersionManager {
      * get Active Data Version.
      * @return DataVersion
      */
+    @Transactional
     public DataVersion getActiveDataVersion () {
         try {
             final Date currentDate = new Date();
@@ -119,6 +130,7 @@ public class DataVersionManager implements IDataVersionManager {
      * @param commenceDate commenceDate
      * @return DataVersion
      */
+    @Transactional
     public DataVersion getDataVersionByCommenceDate(Date commenceDate) {
         try {
             final DataVersion dataVersion = dataVersionRepository.findBySchemaPropertyValue("commenceDate", commenceDate);
@@ -133,6 +145,7 @@ public class DataVersionManager implements IDataVersionManager {
      * @param id id
      * @return DataVersion
      */
+    @Transactional
     public DataVersion getDataVersionById(long id) {
         try {
             final DataVersion dataVersion = dataVersionRepository.findOne(id);
@@ -144,12 +157,54 @@ public class DataVersionManager implements IDataVersionManager {
     }
     /**
      * Remove DataVersion.
-     * @param id id
+     * @param dataVersion dataVersion
      * @return DataVersion
      */
-    public boolean removeDataVersion(long id) {
+    public boolean removeDataVersion(DataVersion dataVersion) {
         try {
-            dataVersionRepository.delete(id);
+            //delete all refdata related to this data version
+            //delete Network
+            /*
+            nodalGeographyManager.emptySpeedBands(dataVersion.getName());
+            logger.info("speedBand removed");
+            nodalGeographyManager.emptyRunningTimes(dataVersion.getName());
+            logger.info("runingTime removed");
+            nodalGeographyManager.emptyTrackSections(dataVersion.getName());
+            logger.info("trackSection removed");
+            nodalGeographyManager.emptyNodeLinks(dataVersion.getName());
+            logger.info("NodeLink removed");
+            nodalGeographyManager.emptyNodeTurnPenaltyBan(dataVersion.getName());
+            logger.info("TurnPenaltyBan removed");
+            nodalGeographyManager.emptyNodeNodeLinkages(dataVersion.getName());
+            logger.info("nodeLinkage removed");
+            locationManager.deleteAllLocationsPerVersion(dataVersion.getName());
+            logger.info("location removed");
+            nodalGeographyManager.deleteAllNodesPerVersion(dataVersion.getName());
+            logger.info("nodes removed");
+            stopManager.deleteAllPlatformsPerVersion(dataVersion.getName());
+            logger.info("platform removed");
+            stopManager.deleteAllTripletsPerVersion(dataVersion.getName());
+            topologyManager.deleteAllPathStationsPerVersion(dataVersion.getName());
+            logger.info("path station removed");
+            stopManager.deleteAllStationsPerVersion(dataVersion.getName());
+            logger.info("station removed");
+            topologyManager.deleteAllPathsPerVersion(dataVersion.getName());
+            logger.info("path removed");
+            topologyManager.deleteAllLinesPerVersion(dataVersion.getName());
+            logger.info("Line removed");
+            topologyManager.deleteAllNetworksPerVersion(dataVersion.getName());
+            logger.info("network removed");
+            nodalGeographyManager.emptyNodalHeader(dataVersion.getName());
+            logger.info("NodalHeader removed");
+            dataVersionRepository.delete(dataVersion.getId());
+            logger.info("dataVersion removed");
+            */
+            dataVersionRepository.deleteBiDirectionRelations(dataVersion.getName());
+            dataVersionRepository.deleteInDirectionRelations(dataVersion.getName());
+            dataVersionRepository.deleteOutDirectionRelations(dataVersion.getName());
+            dataVersionRepository.deleteAllNodesPerVersion(dataVersion.getName());
+            dataVersionRepository.delete(dataVersion.getId());
+            logger.info("dataVersion removed");
             return true;
         } catch (Exception e) {
             logger.error("Exception in deleting data version: ", e);
@@ -161,6 +216,7 @@ public class DataVersionManager implements IDataVersionManager {
      * return all data versions.
      * @return List of DataVersionModel
      */
+    @Transactional
     public List<DataVersionModel> getAllDataVersion() {
         try {
             final List<DataVersionModel> dataVersionModelList = new ArrayList<DataVersionModel>();

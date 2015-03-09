@@ -1167,6 +1167,21 @@ public class NodalGeographyManager implements INodalGeographyManager {
         }
         return true;
     }
+    /**
+     * remove all nodes per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllNodesPerVersion (String versionName) {
+        try {
+            nodeRepository.deleteNodesPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing nodes:", e);
+            return false;
+        }
+    }
+
 
     public boolean isMetEndNode() {
         return metEndNode;

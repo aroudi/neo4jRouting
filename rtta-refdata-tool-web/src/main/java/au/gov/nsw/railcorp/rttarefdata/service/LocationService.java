@@ -1,24 +1,24 @@
 package au.gov.nsw.railcorp.rttarefdata.service;
 
 import au.com.bytecode.opencsv.CSVReader;
+import au.gov.nsw.railcorp.rttarefdata.domain.DataVersion;
 import au.gov.nsw.railcorp.rttarefdata.domain.Location;
 import au.gov.nsw.railcorp.rttarefdata.manager.ILocationManager;
 import au.gov.nsw.railcorp.rttarefdata.manager.INodeManager;
 import au.gov.nsw.railcorp.rttarefdata.request.LocationModel;
 import au.gov.nsw.railcorp.rttarefdata.response.Response;
+import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -34,6 +34,8 @@ public class LocationService {
 
     @Autowired
     private INodeManager nodeManager;
+    @Autowired
+    private SessionState sessionState;
     /**
      * import location from csv file.
      * @param inputStream inputStream
@@ -192,22 +194,8 @@ public class LocationService {
             streamingOutput = new StreamingOutput() {
                 @Override
                 public void write(OutputStream output) throws IOException, WebApplicationException {
-                    final List<Location> locationList = locationManager.getAllLocations();
-                    if (locationList == null) {
-                        return;
-                    }
-                    String line = "LOCATION_NAME, SYSTEM_NAME, LONGITUDE, LATITUDE, NODE_NAME, EXCLUDE_FRINGE ";
-                    output.write(line.getBytes());
-                    output.write(System.getProperty("line.separator").getBytes());
-                    for (Location location : locationList) {
-                        line = location.getName() + ", " + location.getSystemName() + ", " + location.getLongtitude() + ", "
-                                + location.getLatitude() + ", " + location.getNodeName() + ", " + location.getExcludeFringe();
-                        output.write(line.getBytes());
-                        output.write(System.getProperty("line.separator").getBytes());
-                    }
-                    output.flush();
-                    output.close();
-                }
+                    writeLocationToOutputStream(output);
+               }
             };
             return streamingOutput;
         } catch (Exception e) {
@@ -215,5 +203,63 @@ public class LocationService {
             return null;
         }
     }
+    /**
+     * clone Location.
+     * @param fromVersion fromVersion
+     * @param toVersion toVersion
+     * @return boolean
+     */
+    @Transactional
+    public boolean cloneLocation(DataVersion fromVersion, DataVersion toVersion) {
+        //temporary save the current version
+        final DataVersion currentWorkingVersion = sessionState.getWorkingVersion();
+        try {
+            if (fromVersion == null || toVersion == null) {
+                return false;
+            }
+            sessionState.setWorkingVersion(fromVersion);
+            //fetch all current stops
+            final OutputStream outputStream = new ByteArrayOutputStream();
+            writeLocationToOutputStream(outputStream);
+            final ByteArrayInputStream bis = new ByteArrayInputStream(outputStream.toString().getBytes());
+            sessionState.setWorkingVersion(toVersion);
+            importLocationsFromInputStream(bis);
+            sessionState.setWorkingVersion(currentWorkingVersion);
+        } catch (Exception e) {
+            logger.error("Exception in clonning location : ", e);
+            sessionState.setWorkingVersion(toVersion);
+            return false;
+        }
+        return true;
+    }
 
+    /**
+     * write locations to output stream.
+     * @param output output
+     */
+    public void writeLocationToOutputStream (OutputStream output) {
+        try {
+            if (output == null) {
+                return;
+            }
+            final List<Location> locationList = locationManager.getAllLocations();
+            if (locationList == null) {
+                return;
+            }
+            String line = "LOCATION_NAME, SYSTEM_NAME, LONGITUDE, LATITUDE, NODE_NAME, EXCLUDE_FRINGE ";
+            output.write(line.getBytes());
+            output.write(System.getProperty("line.separator").getBytes());
+            for (Location location : locationList) {
+                line = location.getName() + ", " + location.getSystemName() + ", " + location.getLongtitude() + ", "
+                        + location.getLatitude() + ", " + location.getNodeName() + ", " + location.getExcludeFringe();
+                output.write(line.getBytes());
+                output.write(System.getProperty("line.separator").getBytes());
+            }
+            output.flush();
+            output.close();
+        } catch (Exception e) {
+            logger.error("Exception in writing locatios to output stream: ", e);
+            return;
+        }
+    }
 }

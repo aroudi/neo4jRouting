@@ -37,5 +37,12 @@ public interface NetworkRepository extends GraphRepository<Network> {
     @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_NETWORK]-(net:Network) RETURN net")
     List<Network> getAllNetworkPerVersion(String version);
 
+    /**
+     * delete all Networks with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_NETWORK]-(net:Network) WHERE version.name={0} DELETE net")
+    void deleteNetworksPerVersion(String version);
+
 }
 

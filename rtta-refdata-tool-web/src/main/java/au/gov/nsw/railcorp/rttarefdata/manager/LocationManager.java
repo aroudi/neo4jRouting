@@ -115,4 +115,19 @@ public class LocationManager implements ILocationManager {
             return -1;
         }
     }
+
+    /**
+     * remove all locations per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllLocationsPerVersion (String versionName) {
+        try {
+            locationRepository.deleteLocationsPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing locations:", e);
+            return false;
+        }
+    }
 }

@@ -66,4 +66,10 @@ public interface StationTripletRepository extends GraphRepository<StationTriplet
     )
     List<ITriplet> getAllTriplets(String version);
 
+    /**
+     * delete all Station Triplets with specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[:VERSION_TRIPLET]-(st:StationTriplet) WHERE version.name={0} DELETE st")
+    void deleteStationTripletsPerVersion(String version);
 }

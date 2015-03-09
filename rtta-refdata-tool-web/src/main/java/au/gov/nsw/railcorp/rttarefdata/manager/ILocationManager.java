@@ -41,5 +41,11 @@ public interface ILocationManager {
      */
     int deleteLocation (Long locationId);
 
+    /**
+     * remove all locations per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllLocationsPerVersion (String versionName);
 
 }

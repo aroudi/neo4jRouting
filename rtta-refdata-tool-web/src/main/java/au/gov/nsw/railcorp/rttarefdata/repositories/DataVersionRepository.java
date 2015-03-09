@@ -21,5 +21,32 @@ public interface DataVersionRepository extends GraphRepository<DataVersion> {
     @Query("MATCH (version:DataVersion) WHERE version.commenceDate <= {0} RETURN version ORDER BY version.commenceDate DESC ")
     List<DataVersion> getDataVersionWhitPastCommenceDate(Date currentDate);
 
+    /**
+     * delete all Bi-Directional Relationships for specific versioin.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[vn]-(n)-[r]-() WHERE r<>vn and NOT n:DataVersion and version.name={0} DELETE r")
+    void deleteBiDirectionRelations(String version);
+
+    /**
+     * delete all Outgoing Relationships from all nodes for specific versioin.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[vn]-(n)-[r]->() WHERE r<>vn and NOT n:DataVersion and version.name={0} DELETE r")
+    void deleteOutDirectionRelations(String version);
+
+    /**
+     * delete all Incomming Relationships from all nodes for specific versioin.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[vn]-(n)<-[r]-() WHERE r<>vn and NOT n:DataVersion and version.name={0} DELETE r")
+    void deleteInDirectionRelations(String version);
+
+    /**
+     * delete all nodes belongs to a specific version.
+     * @param version version;
+     */
+    @Query("MATCH (version:DataVersion)-[vn]-(n) WHERE NOT n:DataVersion and version.name={0} DELETE vn, n")
+    void deleteAllNodesPerVersion(String version);
 }
 

@@ -82,4 +82,28 @@ public interface ITopologyManager {
      * @return List of power type
      */
     List<PowerType> getLinePathPowerTypes(String linePathName);
+    /**
+     * remove all Networks per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllNetworksPerVersion (String versionName);
+    /**
+     * remove all lines per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+   boolean deleteAllLinesPerVersion (String versionName);
+    /**
+     * remove all paths per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllPathsPerVersion (String versionName);
+    /**
+     * remove all platforms per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllPathStationsPerVersion (String versionName);
 }

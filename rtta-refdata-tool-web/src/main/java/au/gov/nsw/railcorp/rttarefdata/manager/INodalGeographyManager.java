@@ -214,5 +214,11 @@ public interface INodalGeographyManager {
      * @param version version
      */
     void emptyNodeLinkages (String version);
+    /**
+     * remove all nodes per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    boolean deleteAllNodesPerVersion (String versionName);
 
 }

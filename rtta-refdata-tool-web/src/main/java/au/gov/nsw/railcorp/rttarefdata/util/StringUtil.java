@@ -41,7 +41,7 @@ public class StringUtil {
      */
     public static int strToInt(String str) {
         try {
-            return Integer.valueOf(str);
+            return Integer.valueOf(str.trim());
         } catch (Exception e) {
             COMMON_LOGGER.error("Can't convert string to int :", e);
             return -1;
@@ -69,7 +69,7 @@ public class StringUtil {
      */
     public static double strToDouble(String str) {
         try {
-            return Double.valueOf(str);
+            return Double.valueOf(str.trim());
         } catch (Exception e) {
             COMMON_LOGGER.error("Can't convert string to int :", e);
             return -1;

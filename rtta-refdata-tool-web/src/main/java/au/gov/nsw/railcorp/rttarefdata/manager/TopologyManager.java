@@ -122,13 +122,15 @@ public class TopologyManager implements ITopologyManager {
                 station = stationRepository.getStationPerName(sessionState.getWorkingVersion().getName(), stationName);
                 if (station != null) {
                     boolean pathIsMatch = false;
-                    for (String matchInclude : pathMatchInclude) {
-                        if (matchInclude == null) {
-                            continue;
-                        }
-                        if (matchInclude.equals(stationName)) {
-                            pathIsMatch = true;
-                            break;
+                    if (pathMatchInclude != null) {
+                        for (String matchInclude : pathMatchInclude) {
+                            if (matchInclude == null) {
+                                continue;
+                            }
+                            if (matchInclude.equals(stationName)) {
+                                pathIsMatch = true;
+                                break;
+                            }
                         }
                     }
                     linePath.addStationToPath(station, sequence, pathIsMatch);
@@ -284,5 +286,61 @@ public class TopologyManager implements ITopologyManager {
      */
     public List<PowerType> getLinePathPowerTypes(String linePathName) {
         return linePathRepository.getLinePathPowerType(sessionState.getWorkingVersion().getName(), linePathName);
+    }
+    /**
+     * remove all Networks per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllNetworksPerVersion (String versionName) {
+        try {
+            networkRepository.deleteNetworksPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing networks:", e);
+            return false;
+        }
+    }
+    /**
+     * remove all lines per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllLinesPerVersion (String versionName) {
+        try {
+            networkLineRepository.deleteNetworkLinesPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing lines:", e);
+            return false;
+        }
+    }
+    /**
+     * remove all paths per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllPathsPerVersion (String versionName) {
+        try {
+            linePathRepository.deleteLinePathPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing paths:", e);
+            return false;
+        }
+    }
+    /**
+     * remove all platforms per version.
+     * @param versionName versionName
+     * @return boolean
+     */
+    public boolean deleteAllPathStationsPerVersion (String versionName) {
+        try {
+            pathStationRepository.deletePathStationPerVersion(versionName);
+            return true;
+        } catch (Exception e) {
+            logger.error("Exception in removing pathStations:", e);
+            return false;
+        }
     }
 }
