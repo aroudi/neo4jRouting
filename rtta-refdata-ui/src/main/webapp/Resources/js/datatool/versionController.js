@@ -1,4 +1,4 @@
-function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, ALL_VERSION_URI, ADD_VERSION_URI, EDIT_VERSION_URI, DEL_VERSION_URI, uiGridConstants) {
+function VersionController($scope, $interval, generalService, drawNetworkService, SUCCESS, FAILURE, ALL_VERSION_URI, ADD_VERSION_URI, EDIT_VERSION_URI, DEL_VERSION_URI, uiGridConstants) {
 
     generalService.setChosenMenuItem('version');
     generalService.initBottons();
@@ -74,6 +74,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                     },
                 enableCellEdit:false};
             $scope.gridOptions.data = response.data;
+            displayNetwork($scope.gridOptions.data);
 
         })
     }, 30000);
@@ -87,6 +88,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
             $scope.gridOptions.data = angular.copy(response.data);
             $scope.baseVersionSet = response.data;
             $scope.baseVersion= generalService.populateActiveVersion($scope.baseVersionSet);
+            displayNetwork($scope.gridOptions.data);
 
         });
 
@@ -149,6 +151,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                     $scope.gridOptions.data.push(angular.copy(dataVersionObject));
                     $scope.scrollTo($scope.gridOptions.data.length-1,0);
                     $scope.$emit('versionListChange');
+                    displayNetwork($scope.gridOptions.data);
                 } else {
                     alert('Not able to add new data version. ' + addResponse.message);
                 }
@@ -194,6 +197,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                     selectedRow.active =serviceResponse.active;
                     generalService.setRow(dataVersionObject);
                     $scope.$emit('versionListChange');
+                    displayNetwork($scope.gridOptions.data);
                 } else {
                     alert('edit failed:'+serviceResponse.message);
                 }
@@ -219,6 +223,7 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
                     generalService.setRowSelected(false);
                     $scope.$emit('versionListChange');
                 }
+                displayNetwork($scope.gridOptions.data);
             } else {
                 alert('Not able to delete: '+serviceResponse.message);
             }
@@ -279,5 +284,12 @@ function VersionController($scope, $interval, generalService, SUCCESS, FAILURE, 
     {
         return generalService.getEditBottonLabel()=='Save' ? true : false;
     };
+    function displayNetwork(dataVersions) {
+        if ( dataVersions == undefined )
+            return;
+        drawNetworkService.drawVersions(dataVersions)
+        $scope.network_data = drawNetworkService.getNetworkData();
+        $scope.network_options = drawNetworkService.getNetworkOptions();
+    }
 }
 

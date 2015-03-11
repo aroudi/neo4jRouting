@@ -2,52 +2,59 @@
 <!--div ng-controller="StationController" style="height:80%; width: 80%"-->
 <div id="versions" ui-grid ="gridOptions" class="grid" ui-grid-edit ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:30%; width: 95%"></div>
 
-<form name="dataVersionForm">
-    <table>
+
+<table style="width: 95%">
         <tr>
-            <td>
-                <b>Base Version :</b>
-                <select name="baseVersion" data-ng-model="baseVersion"
-                        ng-options="configData.name for configData in  baseVersionSet" ng-disabled="formFieldDisabled() ||isInEditMode()" >
-                </select>
-            </td>
-            <td>
-                <b>Name :</b>
-                <input type="text" size="50" name="dataVersionName" data-ng-model="dataVersion.name" ng-disabled="formFieldDisabled()" required>
+            <td style="width: 40%">
+                <form name="dataVersionForm">
+                <table>
+                    <tr>
+                        <td >
+                            <b>Base Version :</b>
+                            <select name="baseVersion" data-ng-model="baseVersion"
+                                    ng-options="configData.name for configData in  baseVersionSet" ng-disabled="formFieldDisabled() ||isInEditMode()" >
+                            </select>
+                        </td>
+                        <td>
+                            <b>Name :</b>
+                            <input type="text" size="50" name="dataVersionName" data-ng-model="dataVersion.name" ng-disabled="formFieldDisabled()" required>
                 <span class="warnText" ng-show="dataVersionForm.dataVersionName.$error.required&&!formFieldDisabled()">
                     Required!
                 </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Description:</b>
+                            <textarea rows="5" maxlength="2000" name="description" data-ng-model="dataVersion.description" style="resize: none;"  ></textarea>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <b>Commence Date</b> <input type="text" id="commenceDate"  maxlength="25" size="25" data-ng-model="dataVersion.commenceDate" ng-disabled="true">
+                                <img src="Resources/images/cal.gif" onclick="javascript:NewCssCal('commenceDate','ddMMyyyy','dropdown',true,'12')" style="cursor:pointer"  />
+                            </div>
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <td>
+                            <button ng-click="addDataVersionRow(dataVersion)" ng-disabled="isAddBottonDisable() || (!formFieldDisabled() && !dataVersionForm.$valid)">{{addBottonLabel}}</button>
+                            <button ng-click="editDataVersionRow(dataVersion)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !dataVersionForm.$valid)">{{editBottonLabel}}</button>
+                            <button ng-click="deleteDataVersionRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
+                            <button ng-click="cancelDataVersionRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+                </form>
             </td>
-        </tr>
-        <tr>
-            <td>
-                <b>Description:</b>
-                <textarea rows="5" maxlength="2000" name="description" data-ng-model="dataVersion.description" style="resize: none;"  ng-disabled="formFieldDisabled() ||isInEditMode()"></textarea>
-                <span class="warnText" ng-show="dataVersionForm.description.$error.required&&!formFieldDisabled()">
-                    Required!
-                </span>
+            <td style="width: 60%">
+                <vis-network ng-model ="network_data" data="network_data" options="network_options" id ="previewNetwork" ></vis-network>
             </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>
-                <div>
-                    <b>Commence Date</b> <input type="text" id="commenceDate"  maxlength="25" size="25" data-ng-model="dataVersion.commenceDate" ng-disabled="true">
-                    <img src="Resources/images/cal.gif" onclick="javascript:NewCssCal('commenceDate','ddMMyyyy','dropdown',true,'12')" style="cursor:pointer"  />
-                </div>
-            </td>
-            <td></td>
         </tr>
     </table>
-    <table>
-        <tr>
-            <td>
-                <button ng-click="addDataVersionRow(dataVersion)" ng-disabled="isAddBottonDisable() || (!formFieldDisabled() && !dataVersionForm.$valid)">{{addBottonLabel}}</button>
-                <button ng-click="editDataVersionRow(dataVersion)" ng-disabled="isEditBottonDisable() || (!formFieldDisabled() && !dataVersionForm.$valid)">{{editBottonLabel}}</button>
-                <button ng-click="deleteDataVersionRow()" ng-disabled="isDeleteBottonDisable()">Delete</button>
-                <button ng-click="cancelDataVersionRow()" ng-disabled="isCancelBottonDisable()">Cancel</button>
-            </td>
-            <td></td>
-        </tr>
-    </table>
-</form>

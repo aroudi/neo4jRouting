@@ -445,6 +445,53 @@ myApp.service('drawNetworkService', function ($q, loadDisplay  ) {
                 ]);
             }
         },
+        drawVersions: function (versionModel) {
+
+            if (versionModel == undefined) {
+                return;
+            }
+            myNodes = new vis.DataSet();
+            myEdges = new vis.DataSet();
+            networkData = {
+                nodes: myNodes,
+                edges: myEdges
+            };
+            networkOptions = {
+                hierarchicalLoyout: {
+                    direction :"UD"
+                },
+                edges : {
+                    color: '#00205b',
+                    width :2,
+                    style:'arrow'
+                },
+                nodes : {
+                    color : {
+                        background : 'white',
+                        border : '#00205b',
+                        width :2,
+                        highlight : {
+                            background: '#a6192e',
+                            border : '#00205b',
+                            fontFill :'white'
+                        }
+                    },
+                    fontSize : 20,
+                    fontColor:'#00205b',
+                    radius: 14
+                }
+            };
+            nodes = versionModel;
+            for (var i = 0; i < nodes.length; i++) {
+                myTitle = "version: " + nodes[i].name + " commence Date: " + nodes[i].commenceDate;
+                myNodes.add([{id:nodes[i].name, label:nodes[i].name , title: myTitle} ])
+            }
+            for (var i = 0; i < nodes.length; i++) {
+                myEdges.add([
+                    {id:i, from:nodes[i].name, to:nodes[i].baseVersion}
+                ]);
+            }
+        },
 
         setNetworkData : function (nodeData, backgroundColour, textColour) {
             if (nodeData == undefined )
