@@ -108,6 +108,11 @@ public class DataVersionService {
         response.setStatus(IConstants.RESPONSE_SUCCESS);
         response.setCreateDate(DateUtil.dateToString(dataVersion.getCreateDate()));
         response.setMessage("Version created successfully");
+        //set the working version.
+        final List<DataVersionModel> dataVersionModelList = getAllDataVersions();
+        if (dataVersionModelList != null && dataVersionModelList.size() == 1) {
+            sessionState.setWorkingVersion(getDataVersionFromVersionModel(dataVersionModelList.get(0)));
+        }
         return response;
     }
     /**
@@ -166,6 +171,11 @@ public class DataVersionService {
         }
         response.setStatus(IConstants.RESPONSE_SUCCESS);
         response.setId(id);
+        //set the working version.
+        final List<DataVersionModel> dataVersionModelList = getAllDataVersions();
+        if (dataVersionModelList != null && dataVersionModelList.size() == 1) {
+            sessionState.setWorkingVersion(getDataVersionFromVersionModel(dataVersionModelList.get(0)));
+        }
         return response;
     }
 
@@ -199,5 +209,24 @@ public class DataVersionService {
         } catch (Exception e) {
             logger.error("Exception in setting working version: ", e);
         }
+    }
+
+    /**
+     * convert DataVersionModel to DataVersion.
+     * @param dataVersionModel dataVersionModel
+     * @return DataVersion
+     */
+    public DataVersion getDataVersionFromVersionModel (DataVersionModel dataVersionModel) {
+        if (dataVersionModel == null) {
+            return null;
+        }
+        final DataVersion dataVersion = new DataVersion();
+        dataVersion.setName(dataVersionModel.getName());
+        dataVersion.setId(dataVersionModel.getId());
+        dataVersion.setDescription(dataVersionModel.getDescription());
+        dataVersion.setCommenceDate(DateUtil.stringToDate(dataVersionModel.getCommenceDate()));
+        dataVersion.setCreateDate(DateUtil.stringToDate(dataVersionModel.getCreateDate()));
+        //dataVersion.setBaseVersion(dataVersionModel.getBaseVersion());
+        return dataVersion;
     }
 }

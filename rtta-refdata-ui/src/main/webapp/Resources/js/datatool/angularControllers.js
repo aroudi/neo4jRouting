@@ -1,4 +1,4 @@
-function MainController($scope, generalService, ALL_VERSION_URI, SET_WORKING_VERSION_URI) {
+function MainController($scope, $interval, generalService, ALL_VERSION_URI, SET_WORKING_VERSION_URI, ACTIVE_VERSION_URI) {
     $scope.menuItems = [
         { name: 'Manage Versions', path:'version'},
         { name: 'Display Network', path:'visNetwork'},
@@ -30,9 +30,19 @@ function MainController($scope, generalService, ALL_VERSION_URI, SET_WORKING_VER
     function getAllVersions() {
         generalService.getAllRows(ALL_VERSION_URI).then(function(response){
             $scope.versionSet = response.data;
-            $scope.activeVersion = generalService.populateActiveVersion($scope.versionSet);
-            $scope.workingVersion= $scope.activeVersion;
+            var activeVersion = generalService.populateActiveVersion($scope.versionSet);
+            $scope.workingVersion= activeVersion;
+            $scope.activeVersion = activeVersion;
 
+        });
+
+    };
+    $interval(function refresh() {
+        getActiveVersion();
+    }, 30000);
+    function getActiveVersion() {
+        generalService.refreshRows(ACTIVE_VERSION_URI).then(function(response){
+            $scope.activeVersion= response.data;
         });
 
     };

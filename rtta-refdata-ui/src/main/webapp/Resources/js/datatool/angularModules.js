@@ -58,6 +58,7 @@ var service_uri = {
     'ADD_VERSION_URI' : 'versions/add',
     'EDIT_VERSION_URI' : 'versions/edit',
     'DEL_VERSION_URI' : 'versions/delete',
+    'ACTIVE_VERSION_URI' : 'versions/activeVersion',
     'SET_WORKING_VERSION_URI' : 'versions/setWorkingVersion'
 }
 
