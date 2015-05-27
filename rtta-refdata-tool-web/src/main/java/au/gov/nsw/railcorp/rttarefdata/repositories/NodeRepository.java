@@ -89,4 +89,17 @@ public interface NodeRepository extends GraphRepository<Node> {
      */
     @Query("MATCH (version:DataVersion)-[:VERSION_NODE]-(node:Node)-[mtp:MASTER_TIMING_POINT]->(:Node) WHERE version.name={0} DELETE mtp, node")
     void deleteNodeMasterTimingPoint(String version);
+
+    /**
+     * Return all paths between 2 nodes.
+     * @param version version
+     * @param fromNode fromNode
+     * @param toNode toNode
+     * @return List of nodes
+     */
+    //ToDo add version to shortest path
+    @Query("MATCH p=(fromNode:Node{name:{1}})-[:NODE_LINKAGE*..15{version:{0}}]->(toNode:Node{name:{2}}) "
+            + "WHERE ALL (n in nodes(p) where length(filter (m in nodes(p) where m=n))=1) RETURN distinct extract(n IN nodes(p)| n) AS paths")
+    List<List<org.neo4j.graphdb.Node>> findAllPaths(String version, String fromNode, String toNode);
+
 }

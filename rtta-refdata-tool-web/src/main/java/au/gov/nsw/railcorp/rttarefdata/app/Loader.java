@@ -1,5 +1,6 @@
 package au.gov.nsw.railcorp.rttarefdata.app;
 
+import au.gov.nsw.railcorp.rttarefdata.manager.INodalGeographyManager;
 import au.gov.nsw.railcorp.rttarefdata.service.DataVersionService;
 import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
 import org.slf4j.Logger;
@@ -23,6 +24,8 @@ public class Loader implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private DataVersionService dataVersionService;
 
+    @Autowired
+    private INodalGeographyManager nodalGeographyManager;
     /**
      * set default version to active version on startup.
      * @param event event
@@ -35,5 +38,6 @@ public class Loader implements ApplicationListener<ContextRefreshedEvent> {
         sessionState.setWorkingVersion(dataVersionService.getActiveVersion());
         sessionState.setActiveVersion(dataVersionService.getActiveVersion());
         logger.info("Default version set to active version.");
+        nodalGeographyManager.loadTurnPenaltyBans();
     }
 }

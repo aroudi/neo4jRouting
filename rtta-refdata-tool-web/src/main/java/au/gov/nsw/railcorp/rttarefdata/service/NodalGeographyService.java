@@ -240,7 +240,7 @@ public class NodalGeographyService {
             nodalGeographyManager.createNodeLinkage(link.getFromNodeName(), link.getToNodeName(), link.getLength(),
                     link.isIsBusEnergy(), link.isIsACEnergy(), link.isIsDCEnergy(), link.isIsDieselEnergy(),
                     link.isIsBusGauge(), link.isIsNarrowGauge(), link.isIsStandardGauge(), link.isIsBroadGauge(),
-                    link.isIsSiding(), link.isIsCrossOver(), link.isIsRunningLine(), StringUtil.strToInt(link.getTrackSectionId()));
+                    link.isIsSiding(), link.isIsCrossOver(), link.isIsRunningLine(), link.getTrackSectionId());
         }
 
     }
@@ -304,6 +304,17 @@ public class NodalGeographyService {
 
     @Transactional
     public List findAllPaths(String fromNodeName, String toNodeName) {
-        return nodalGeographyManager.findAllShortestPaths(fromNodeName, toNodeName);
+        return nodalGeographyManager.findAllPaths(fromNodeName, toNodeName);
+    }
+
+    /**
+     * find shortest path between 2 nodes.
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of paths.
+     */
+    @Transactional
+    public List findShortestPath(String fromNodeName, String toNodeName) {
+        return nodalGeographyManager.findShortestPath(fromNodeName, toNodeName);
     }
 }

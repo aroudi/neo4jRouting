@@ -1,19 +1,17 @@
 package au.gov.nsw.railcorp.rttarefdata.expander;
 
-import au.gov.nsw.railcorp.rttarefdata.domain.TurnPenaltyBan;
 import au.gov.nsw.railcorp.rttarefdata.repositories.TurnPenaltyBanRepository;
 import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
-import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Path;
-import org.neo4j.graphdb.PathExpander;
-import org.neo4j.graphdb.RelationshipType;
+import au.gov.nsw.railcorp.rttarefdata.session.TurnPenaltyBanLoader;
+import com.google.common.collect.Lists;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.BranchState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by arash on 10/02/2015.
@@ -24,6 +22,7 @@ public class TurnPenaltyBanExpander  implements PathExpander {
     private final Direction direction;
     private TurnPenaltyBanRepository turnPenaltyBanRepository;
     private SessionState sessionState;
+    private TurnPenaltyBanLoader penaltyBanLoader;
 
     /**
      * returning the reverse direction.
@@ -46,49 +45,65 @@ public class TurnPenaltyBanExpander  implements PathExpander {
      * @param direction direction
      * @param turnPenaltyBanRepository turnPenaltyBanRepository
      * @param sessionState sessionState
+     * @param penalties penalties
      */
-    public TurnPenaltyBanExpander(RelationshipType relationshipType, Direction direction, TurnPenaltyBanRepository turnPenaltyBanRepository, SessionState sessionState) {
+    public TurnPenaltyBanExpander(RelationshipType relationshipType, Direction direction, TurnPenaltyBanRepository turnPenaltyBanRepository,
+                                  SessionState sessionState, TurnPenaltyBanLoader penalties)
+    {
         this.relationshipType = relationshipType;
         this.direction = direction;
         this.turnPenaltyBanRepository = turnPenaltyBanRepository;
         this.sessionState = sessionState;
+        this.penaltyBanLoader = penalties;
     }
 
     @Override
-     public Iterable<org.neo4j.graphdb.Relationship> expand(Path path, BranchState state) {
-        logger.info("path length = " + path.length());
-        if (path.length() < 2) {
+    public Iterable<org.neo4j.graphdb.Relationship> expand(Path path, BranchState state) {
+        try {
+
+            logger.info("path length = " + path.length());
+            if (path.length() < 2) {
+                try {
+                    return path.endNode().getRelationships(relationshipType, Direction.OUTGOING);
+                } catch (Exception e) {
+                    Collections.emptyList();
+                }
+            }
+            logPath(path);
+
+            /**
+             final String currentDirection = (String) path.lastRelationship().getProperty("direction");
+             logger.info("direction = " + currentDirection);
+             if (currentDirection.equals(IConstants.TRACK_DOWN_DIRECTION)) {
+             return Collections.emptyList();
+             }
+             **/
+            org.neo4j.graphdb.Node node;
+            final List<Node> nodes = Lists.newArrayList(path.nodes().iterator());
+            //final Iterator iterator = path.reverseNodes().iterator();
+            node = (org.neo4j.graphdb.Node) nodes.get(nodes.size() - 1);
+            final String toNodeName = (String) node.getProperty("name");
+            node = (org.neo4j.graphdb.Node) nodes.get(nodes.size() - 2);
+            final String viaNodeName = (String) node.getProperty("name");
+            node = (org.neo4j.graphdb.Node) nodes.get(nodes.size() - 3);
+            final String fromNodeName = (String) node.getProperty("name");
+            logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
+
+            //final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
+            final String key = sessionState.getWorkingVersion().getName() + fromNodeName + viaNodeName + toNodeName;
+
+            final String penalty = penaltyBanLoader.getPenalty(key);
+            logger.info("penalty = " + penalty);
+            if (penalty != null && "PT99999S".equals(penalty)) {
+                logger.info("       PATH excluded");
+                return Collections.emptyList();
+            }
             return path.endNode().getRelationships(relationshipType, Direction.OUTGOING);
+        } catch (Exception e) {
+            logger.error("Exception in expander :", e);
+            return Collections.emptyList();
         }
-         logPath(path);
-
-         logger.info("expand: path= " + path);
-         if (path == null || path.lastRelationship() == null) {
-             return Collections.emptyList();
-         }
-         final String currentDirection = (String) path.lastRelationship().getProperty("direction");
-         logger.info("direction = " + currentDirection);
-         if (currentDirection.equals(IConstants.TRACK_DOWN_DIRECTION)) {
-             return Collections.emptyList();
-         }
-         org.neo4j.graphdb.Node node;
-         final Iterator iterator = path.reverseNodes().iterator();
-         node = (org.neo4j.graphdb.Node) iterator.next();
-         final String toNodeName = (String) node.getProperty("name");
-         node = (org.neo4j.graphdb.Node) iterator.next();
-         final String viaNodeName = (String) node.getProperty("name");
-         node = (org.neo4j.graphdb.Node) iterator.next();
-         final String fromNodeName = (String) node.getProperty("name");
-         logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
-
-         final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
-
-         if (turnPenaltyBan != null && "PT99999S".equals(turnPenaltyBan.getPenalty())) {
-             logger.info("       PATH excluded");
-             return Collections.emptyList();
-         }
-         return path.endNode().getRelationships(relationshipType, Direction.OUTGOING);
-     }
+    }
 
     /**
      * Reverse.

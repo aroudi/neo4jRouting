@@ -16,13 +16,16 @@ import au.gov.nsw.railcorp.rtta.refint.generated.geography.CgGeography.Geov10RC.
 
 import au.gov.nsw.railcorp.rttarefdata.domain.*;
 import au.gov.nsw.railcorp.rttarefdata.domain.Node;
+import au.gov.nsw.railcorp.rttarefdata.evaluator.RouteCostEvaluator;
 import au.gov.nsw.railcorp.rttarefdata.expander.TurnPenaltyBanExpander;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeData;
 import au.gov.nsw.railcorp.rttarefdata.mapresult.INodeLinkRunTimeData;
+import au.gov.nsw.railcorp.rttarefdata.mapresult.ITurnPenaltyBanData;
 import au.gov.nsw.railcorp.rttarefdata.repositories.*;
 import au.gov.nsw.railcorp.rttarefdata.request.NodeModel;
 import au.gov.nsw.railcorp.rttarefdata.request.TraverseModel;
 import au.gov.nsw.railcorp.rttarefdata.session.SessionState;
+import au.gov.nsw.railcorp.rttarefdata.session.TurnPenaltyBanLoader;
 import au.gov.nsw.railcorp.rttarefdata.util.IConstants;
 import au.gov.nsw.railcorp.rttarefdata.util.StringUtil;
 import org.neo4j.graphalgo.GraphAlgoFactory;
@@ -86,6 +89,8 @@ public class NodalGeographyManager implements INodalGeographyManager {
     private boolean timedOut;
     @Autowired
     private SessionState sessionState;
+    @Autowired
+    private TurnPenaltyBanLoader turnPenaltyBanLoader;
     /**
      * Create SpeedBand Record.
      * @param id id
@@ -208,7 +213,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
     public NodeLinkage createNodeLinkage(String fromNodeName, String toNodeName, long length, boolean isBusEnergy,
                                          boolean isACEnergy, boolean isDCEnergy, boolean isDieselEnergyk, boolean isBusGauge,
                                          boolean isNarrowGauge, boolean isStandardGauge,
-                                         boolean isBroadGauge, boolean isSiding, boolean isCrossOver, boolean isRunningLine, int trackSectionId)
+                                         boolean isBroadGauge, boolean isSiding, boolean isCrossOver, boolean isRunningLine, String trackSectionId)
     {
         final Node fromNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), fromNodeName);
         final Node toNode = nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), toNodeName);
@@ -242,7 +247,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         nodeLinkage.setSiding(isSiding);
         nodeLinkage.setCrossOver(isCrossOver);
         nodeLinkage.setRunningLine(isRunningLine);
-        nodeLinkage.setTrackSectionId(trackSectionId);
+        nodeLinkage.setTrackSectionId(StringUtil.strToInt(trackSectionId));
         nodeLinkage.setVersion(sessionState.getWorkingVersion().getName());
         if (trackSection != null) {
             nodeLinkage.setDirection(trackSection.isUpDirection() ? IConstants.TRACK_UP_DIRECTION : IConstants.TRACK_DOWN_DIRECTION);
@@ -355,8 +360,6 @@ public class NodalGeographyManager implements INodalGeographyManager {
         turnPenaltyBan.setFromNode(fromNode);
         turnPenaltyBan.setToNode(toNode);
         turnPenaltyBan.setPenalty(penaltyBan);
-        turnPenaltyBan.setFromNodeName(fromNodeName);
-        turnPenaltyBan.setToNodeName(toNodeName);
         turnPenaltyBan.setVersion(sessionState.getWorkingVersion().getName());
         turnPenaltyBanRepository.save(turnPenaltyBan);
         return turnPenaltyBan;
@@ -596,7 +599,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
 
     /**
      * build Geov10RC for export.
-      * @return Geov10RC
+     * @return Geov10RC
      */
     @Transactional
     public Geov10RC exportNodalHeader() {
@@ -713,7 +716,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         final long startTime = System.currentTimeMillis();
         fromNode = graphDatabaseService.getNodeById(nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), fromNodeName).getNodeId());
         toNode = graphDatabaseService.getNodeById(
-                    nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), toNodeName).getNodeId());
+                nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), toNodeName).getNodeId());
         Evaluator penaltyBanEvaluator = new Evaluator() {
             @Override
             public Evaluation evaluate(Path path) {
@@ -731,9 +734,10 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 final String fromNodeName = (String) node.getProperty("name");
                 logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
 
-                final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
-
-                if (turnPenaltyBan != null && "PT99999S".equals(turnPenaltyBan.getPenalty())) {
+                //final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
+                final String key = sessionState.getWorkingVersion().getName() + fromNodeName + viaNodeName + toNodeName;
+                final String penalty = turnPenaltyBanLoader.getPenalty(key);
+                if (penalty != null && "PT99999S".equals(penalty)) {
                     logger.info("       PATH excluded");
                     return Evaluation.EXCLUDE_AND_PRUNE;
                 }
@@ -812,7 +816,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         */
         final TraversalDescription traversalDescription = graphDatabaseService.traversalDescription().uniqueness(Uniqueness.NODE_PATH).breadthFirst()
-                .relationships(relationshipType, Direction.OUTGOING).evaluator(Evaluators.toDepth(toDepth)).evaluator(isReachEndNode).evaluator(isTimedOut)
+                .relationships(relationshipType, Direction.OUTGOING).evaluator(Evaluators.toDepth(toDepth)).evaluator(isReachEndNode)
                 .evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         //.evaluator(linkDirectionUpEvaluator).
         final Traverser traverser = traversalDescription.traverse(fromNode);
@@ -916,7 +920,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
         logger.info("Path :" + pathStr.toString());
     }
     /**
-     * find all path between 2 nodes by algorithemns.
+     * find all path(with Dijkestra Algorithm between 2 nodes by algorithemns.
      * @param startNodeName startNodeName
      * @param endNodeName endNodeName
      * @return List
@@ -928,9 +932,11 @@ public class NodalGeographyManager implements INodalGeographyManager {
         final org.neo4j.graphdb.Node toNode;
 
         fromNode = graphDatabaseService.getNodeById(nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), startNodeName).getNodeId());
+        logger.info("fromNode =" + fromNode);
         toNode = graphDatabaseService.getNodeById(
                 nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), endNodeName).getNodeId());
 
+        logger.info("toNode =" + toNode);
         final RelationshipType relationshipType = DynamicRelationshipType.withName("NODE_LINKAGE");
 
         /*
@@ -938,8 +944,10 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 .evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         */
 
-        final TurnPenaltyBanExpander expander = new TurnPenaltyBanExpander(relationshipType, Direction.OUTGOING, turnPenaltyBanRepository, sessionState);
-        final PathFinder<Path> finder = GraphAlgoFactory.shortestPath(expander, 100);
+        final TurnPenaltyBanExpander expander = new TurnPenaltyBanExpander(relationshipType, Direction.OUTGOING, turnPenaltyBanRepository, sessionState, turnPenaltyBanLoader);
+        final RouteCostEvaluator costEvaluator = new RouteCostEvaluator();
+
+        final PathFinder finder = GraphAlgoFactory.dijkstra(expander, costEvaluator);
         final Iterable<Path> pathIterator = finder.findAllPaths(fromNode, toNode);
         Path path;
         org.neo4j.graphdb.Node foundNode;
@@ -977,6 +985,68 @@ public class NodalGeographyManager implements INodalGeographyManager {
         }
         return result;
     }
+
+
+    /**
+     * find shortest path between 2 nodes by Dijkstra Algorithm.
+     * @param startNodeName startNodeName
+     * @param endNodeName endNodeName
+     * @return List
+     */
+    public List findShortestPath(String startNodeName, String endNodeName) {
+
+        List result = null;
+        org.neo4j.graphdb.Node fromNode;
+        final org.neo4j.graphdb.Node toNode;
+
+        fromNode = graphDatabaseService.getNodeById(nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), startNodeName).getNodeId());
+        logger.info("fromNode =" + fromNode);
+        toNode = graphDatabaseService.getNodeById(
+                nodeRepository.getNodePerName(sessionState.getWorkingVersion().getName(), endNodeName).getNodeId());
+
+        logger.info("toNode =" + toNode);
+        final RelationshipType relationshipType = DynamicRelationshipType.withName("NODE_LINKAGE");
+
+        final TurnPenaltyBanExpander expander = new TurnPenaltyBanExpander(relationshipType, Direction.OUTGOING, turnPenaltyBanRepository, sessionState, turnPenaltyBanLoader);
+        final RouteCostEvaluator costEvaluator = new RouteCostEvaluator();
+
+        final PathFinder finder = GraphAlgoFactory.dijkstra(expander, costEvaluator);
+        final Path weightedPath = finder.findSinglePath(fromNode, toNode);
+        //final PathFinder<Path> finder = GraphAlgoFactory.
+        //final Iterable<Path> pathIterator = finder.findAllPaths(fromNode, toNode);
+        //Path path;
+        if (weightedPath == null || weightedPath.nodes() == null) {
+            return null;
+        }
+        org.neo4j.graphdb.Node foundNode;
+        Iterator nodeIterator;
+        result = new ArrayList();
+        TraverseModel traverseModel;
+        NodeModel nodeModel;
+        int i = 1;
+        nodeIterator = weightedPath.nodes().iterator();
+        traverseModel = new TraverseModel();
+        traverseModel.setPathName("PATH" + String.valueOf(i));
+        i++;
+        while (nodeIterator.hasNext()) {
+            nodeModel = new NodeModel();
+            foundNode = (org.neo4j.graphdb.Node) nodeIterator.next();
+            nodeModel.setName((String) foundNode.getProperty("name"));
+            nodeModel.setNodeId(foundNode.getId());
+            try {
+                nodeModel.setLatitude((Double) foundNode.getProperty("latitude"));
+                nodeModel.setLongtitude((Double) foundNode.getProperty("longitude"));
+            } catch (NotFoundException nfe) {
+                nodeModel.setLatitude(0.00);
+                nodeModel.setLongtitude(0.00);
+            }
+            nodeModel.setLongName((String) foundNode.getProperty("longName"));
+            traverseModel.addNode(nodeModel);
+        }
+        result.add(traverseModel);
+        return result;
+    }
+
 
     /**
      * find all shortest path between 2 nodes.
@@ -1026,7 +1096,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
             org.neo4j.graphdb.Node currentNode = null;
             while (index < path.size()) {
                 currentNode = path.get(index);
-            //for (org.neo4j.graphdb.Node currentNode: path) {
+                //for (org.neo4j.graphdb.Node currentNode: path) {
                 index = index + 1;
                 if (isNodePlatform(currentNode)) {
                     logger.info("node " + (String) currentNode.getProperty("name") + " is platform");
@@ -1065,6 +1135,50 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 logPath2(traverseModel.getNodes());
                 result.add(traverseModel);
             }
+        }
+        return result;
+    }
+    //TODO: get the path depth as input
+    /**
+     * find all valid path between 2 nodes up to maximum distance(currently 15).
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of valid path
+     */
+
+    @Transactional
+    public List findAllPaths(String fromNodeName, final String toNodeName) {
+        //check if both nodes are platform.
+        Node node1;
+        node1 = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), fromNodeName);
+        if (node1 == null) {
+            return  null;
+        }
+        node1 = platformRepository.getPlatformPerName(sessionState.getWorkingVersion().getName(), toNodeName);
+        if (node1 == null) {
+            return null;
+        }
+        logger.info("findAllPath: version= " + sessionState.getWorkingVersion().getName() + " - fromNode =" + fromNodeName + " toNode =" + toNodeName);
+        final List<List<org.neo4j.graphdb.Node>> shortestPaths = filterPathsForPenaltyBans(nodeRepository.findAllPaths(sessionState.getWorkingVersion().getName(), fromNodeName, toNodeName));
+        List<TraverseModel> result;
+        TraverseModel traverseModel = null;
+        if (shortestPaths == null || shortestPaths.isEmpty()) {
+            return null;
+        }
+        result = new ArrayList<TraverseModel>();
+        int pathId = 1;
+        for (List<org.neo4j.graphdb.Node> path : shortestPaths) {
+            if (path == null || path.isEmpty()) {
+                continue;
+            }
+            logPath(path);
+            traverseModel = new TraverseModel();
+            traverseModel.setPathName("PATH " + pathId);
+            pathId++;
+            for (org.neo4j.graphdb.Node node: path) {
+                buildTraversModel(traverseModel, node);
+            }
+            result.add(traverseModel);
         }
         return result;
     }
@@ -1167,6 +1281,56 @@ public class NodalGeographyManager implements INodalGeographyManager {
         }
         return true;
     }
+
+    private List<List<org.neo4j.graphdb.Node>> filterPathsForPenaltyBans(List<List<org.neo4j.graphdb.Node>> paths) {
+        try {
+            org.neo4j.graphdb.Node node;
+            boolean pathValid;
+            if (paths == null || paths.size() < 1) {
+                return paths;
+            }
+            final List<List<org.neo4j.graphdb.Node>> filteredPaths = new ArrayList<List<org.neo4j.graphdb.Node>>();
+            for (List<org.neo4j.graphdb.Node> path : paths) {
+                if (path == null) {
+                    continue;
+                }
+                if (path.size() < 3) {
+                    filteredPaths.add(path);
+                }
+                pathValid = true;
+                for (int item = 0; item <= path.size() - 3; item++) {
+                    //for each 3 consequent node check if there is a penalty ban between them.
+                    //final Iterator iterator = path.reverseNodes().iterator();
+                    node = (org.neo4j.graphdb.Node) path.get(item);
+                    final String fromNodeName = (String) node.getProperty("name");
+                    node = (org.neo4j.graphdb.Node) path.get(item + 1);
+                    final String viaNodeName = (String) node.getProperty("name");
+                    node = (org.neo4j.graphdb.Node) path.get(item + 2);
+                    final String toNodeName = (String) node.getProperty("name");
+                    logger.info("checking :" + fromNodeName + "-->" + viaNodeName + "-->" + toNodeName);
+
+                    //final TurnPenaltyBan turnPenaltyBan = turnPenaltyBanRepository.getNodeTurnPenaltyBan(sessionState.getWorkingVersion().getName(), fromNodeName, viaNodeName, toNodeName);
+                    final String key = sessionState.getWorkingVersion().getName() + fromNodeName + viaNodeName + toNodeName;
+
+                    final String penalty = turnPenaltyBanLoader.getPenalty(key);
+                    logger.info("penalty = " + penalty);
+                    if (penalty != null && "PT99999S".equals(penalty)) {
+                        logger.info("  PATH excluded");
+                        pathValid = false;
+                        break;
+                    }
+                }
+                if (pathValid) {
+                    filteredPaths.add(path);
+                }
+            }
+            return filteredPaths;
+        } catch (Exception e) {
+            logger.error("Exception in filtering paths based on turning penalty bans");
+            return paths;
+        }
+
+    }
     /**
      * remove all nodes per version.
      * @param versionName versionName
@@ -1182,7 +1346,25 @@ public class NodalGeographyManager implements INodalGeographyManager {
         }
     }
 
+    /**
+     * load all turn penalty bans into memory.
+     */
 
+    public void loadTurnPenaltyBans () {
+        try {
+            logger.info("loading turn penalty bans");
+            String key;
+            final List<ITurnPenaltyBanData> turnPenaltyBanList = turnPenaltyBanRepository.getAllTurnPenaltyBan();
+            if (turnPenaltyBanList != null) {
+                for (ITurnPenaltyBanData turnPenaltyBan: turnPenaltyBanList) {
+                    key = turnPenaltyBan.getVersion() + turnPenaltyBan.getFromNode() + turnPenaltyBan.getViaNode() + turnPenaltyBan.getToNode();
+                    turnPenaltyBanLoader.addEntry(key, turnPenaltyBan.getPenalty());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception in loading turning penalty bans :", e);
+        }
+    }
     public boolean isMetEndNode() {
         return metEndNode;
     }

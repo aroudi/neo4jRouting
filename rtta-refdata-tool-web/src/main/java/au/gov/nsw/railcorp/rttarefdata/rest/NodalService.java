@@ -207,11 +207,28 @@ public class NodalService {
     @Produces(MediaType.APPLICATION_JSON)
     public List<NodeModel> traverse (@PathParam("fromNode") String fromNode, @PathParam("toNode") String toNode) {
         try {
-            return nodalGeographyService.findAllPaths(fromNode, toNode);
+            return nodalGeographyService.findShortestPath(fromNode, toNode);
         } catch (Exception e) {
             logger.error("Error in traversing the graph: ", e);
             return null;
         }
     }
 
+    /**
+     * find all path between 2 nodes.
+     * @param  fromNode fromNode
+     * @param toNode toNode
+     * @return List of paths
+     */
+    @GET
+    @Path("/findAllPaths/{fromNode}/{toNode}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<NodeModel> findAllPaths (@PathParam("fromNode") String fromNode, @PathParam("toNode") String toNode) {
+        try {
+            return nodalGeographyService.findAllPaths(fromNode, toNode);
+        } catch (Exception e) {
+            logger.error("Error in traversing the graph: ", e);
+            return null;
+        }
+    }
 }

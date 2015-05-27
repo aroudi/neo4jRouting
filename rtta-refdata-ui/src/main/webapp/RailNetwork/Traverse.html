@@ -23,12 +23,15 @@
 <table>
     <tr>
         <td>
-            <button ng-click="traverse(traverse)">Find All Paths</button>
+            <button ng-click="traverse(traverse)">Find Shortest Paths</button>
+        </td>
+        <td>
+            <button ng-click="findAllPaths(traverse)">Find All Paths</button>
         </td>
     </tr>
 </table>
 </form>
-<div id="traverseResult" ui-grid ="gridOptions" class="grid"  ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:10%; width: 30%"></div>
+<div id="traverseResult" ui-grid ="gridOptions" class="grid"  ui-grid-selection ui-grid-auto-resize ui-grid-cellNav style="height:30%; width: 30%"></div>
 
 <vis-network ng-model ="network_data" data="network_data" options="network_options" id ="previewNetwork" style="height:70%; width: 80%"></vis-network>
 

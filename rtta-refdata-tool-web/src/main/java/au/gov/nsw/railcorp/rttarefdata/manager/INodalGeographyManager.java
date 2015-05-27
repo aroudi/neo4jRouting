@@ -59,8 +59,8 @@ public interface INodalGeographyManager {
      * @return NodeLink nodeLink
      */
     NodeLink createNodeLink(String fromNodeName, String toNodeName, long length, boolean isSliding, boolean isCrossOver,
-                                   boolean isRuningLine, String trackSectionNumber, boolean isBusEnergy, boolean isAcEnergy,
-                                   boolean isDcEnergy, boolean isDieselEnergy, boolean isBusGauge, boolean isNarrowGauge, boolean  isStandardGauge, boolean isBroadGauge);
+                            boolean isRuningLine, String trackSectionNumber, boolean isBusEnergy, boolean isAcEnergy,
+                            boolean isDcEnergy, boolean isDieselEnergy, boolean isBusGauge, boolean isNarrowGauge, boolean  isStandardGauge, boolean isBroadGauge);
     /**
      * Create a Node. if node exists then modify it otherwise create it.
      * @param name name
@@ -80,8 +80,8 @@ public interface INodalGeographyManager {
      * @return Node node
      */
     Node createNode(String name, String longName, String platformName, boolean isDummy, boolean isJunction,
-                           boolean isWorkingTimingPoint, boolean isPublicTimingPoint, boolean isEndOfLine, String dWellDuration,
-                           String upRecoveryDuration, String downRecoveryDuration, double length, String masterTimingPoint, String masterJunction);
+                    boolean isWorkingTimingPoint, boolean isPublicTimingPoint, boolean isEndOfLine, String dWellDuration,
+                    String upRecoveryDuration, String downRecoveryDuration, double length, String masterTimingPoint, String masterJunction);
     /**
      * define master timing point for specific node.
      * @param nodeName nodeName
@@ -126,9 +126,9 @@ public interface INodalGeographyManager {
      * @return NodeLinkage
      */
     NodeLinkage createNodeLinkage(String fromNodeName, String toNodeName, long length, boolean isBusEnergy,
-                                         boolean isACEnergy, boolean isDCEnergy, boolean isDieselEnergyk, boolean isBusGauge,
-                                         boolean isNarrowGauge, boolean isStandardGauge,
-                                         boolean isBroadGauge, boolean isSiding, boolean isCrossOver, boolean isRunningLine, int trackSectionId);
+                                  boolean isACEnergy, boolean isDCEnergy, boolean isDieselEnergyk, boolean isBusGauge,
+                                  boolean isNarrowGauge, boolean isStandardGauge,
+                                  boolean isBroadGauge, boolean isSiding, boolean isCrossOver, boolean isRunningLine, String trackSectionId);
 
 
     /**
@@ -221,4 +221,23 @@ public interface INodalGeographyManager {
      */
     boolean deleteAllNodesPerVersion (String versionName);
 
+    /**
+     * load all turn penalty bans into memory.
+     */
+    void loadTurnPenaltyBans ();
+
+    /**
+     * find shortest path between 2 nodes by Dijkstra Algorithm.
+     * @param startNodeName startNodeName
+     * @param endNodeName endNodeName
+     * @return List
+     */
+    List findShortestPath(String startNodeName, String endNodeName);
+    /**
+     * find all valid path between 2 nodes up to maximum distance(currently 15).
+     * @param fromNodeName fromNodeName
+     * @param toNodeName toNodeName
+     * @return List of valid path
+     */
+    List findAllPaths(String fromNodeName, final String toNodeName);
 }

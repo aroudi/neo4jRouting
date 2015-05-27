@@ -1,4 +1,4 @@
-function TraversalController($scope, generalService, drawNetworkService, SUCCESS, FAILURE, TRAVERSAL_URI) {
+function TraversalController($scope, generalService, drawNetworkService, SUCCESS, FAILURE, TRAVERSAL_URI, ALLPATH_URI) {
 
     generalService.setChosenMenuItem('traversal');
     /**
@@ -40,6 +40,19 @@ function TraversalController($scope, generalService, drawNetworkService, SUCCESS
         });
 
     }
+
+    /**
+     * find all valid path between 2 nodes
+     */
+    $scope.findAllPaths = function(traverseForm) {
+        var servicePath = ALLPATH_URI + '/' + traverseForm.fromNode + '/' + traverseForm.toNode;
+        generalService.getAllRows(servicePath).then(function(response){
+            $scope.gridOptions.data = angular.copy(response.data);
+            displayNetwork($scope.gridOptions.data[0]);
+        });
+
+    }
+
 
     function displayNetwork(row) {
         if ( row == undefined )

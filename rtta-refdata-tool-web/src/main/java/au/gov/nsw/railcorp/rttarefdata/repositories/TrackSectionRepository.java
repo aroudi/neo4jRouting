@@ -33,6 +33,6 @@ public interface TrackSectionRepository extends GraphRepository<TrackSection> {
      * @return trackSection
      */
     @Query("MATCH (version:DataVersion{name:{0}})-[:VERSION_TRACK_SECTION]-(ts:TrackSection{id:{1}}) RETURN ts")
-    TrackSection getTrackSectionPerId(String version, int id);
+    TrackSection getTrackSectionPerId(String version, String id);
 
 }
