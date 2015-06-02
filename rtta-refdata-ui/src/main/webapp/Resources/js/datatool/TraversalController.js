@@ -7,7 +7,9 @@ function TraversalController($scope, generalService, drawNetworkService, SUCCESS
     $scope.gridOptions = {
         columnDefs: [
             //default
-            {field:'pathName', enableCellEdit:false}
+            {field:'pathName', enableCellEdit:false, width:'10%'},
+            {name:'nodes', displayName:'Nodes', type:'object', cellFilter:'nodesList',enableCellEdit:false, width:'80%'}
+
         ]
     }
     $scope.gridOptions.enableRowSelection = true;

@@ -1,4 +1,4 @@
-var myApp = angular.module('rttaRefDataUi', ["stationFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload","ngVis"]);
+var myApp = angular.module('rttaRefDataUi', ["stationFormatter", "nodeFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload","ngVis"]);
 var config_data = {
     'SERVER' : 'localhost',
     'PORT'   : '8082',
@@ -634,6 +634,20 @@ angular.module('stationFormatter',[]).filter('linePathStationList', function() {
         var arrayContent = '';
         for (var j = 0; j < arr.length-1; j++) {
             arrayContent = arrayContent + arr[j].name +' -> ';
+        }
+        if (arr.length>0) {
+            arrayContent = arrayContent + arr[arr.length - 1].name;
+        }
+        return arrayContent;
+
+    };
+});
+angular.module('nodeFormatter',[]).filter('nodesList', function() {
+    return function (nodes) {
+        var arr = nodes;
+        var arrayContent = '';
+        for (var j = 0; j < arr.length-1; j++) {
+            arrayContent = arrayContent + arr[j].name +', ';
         }
         if (arr.length>0) {
             arrayContent = arrayContent + arr[arr.length - 1].name;
