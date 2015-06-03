@@ -1,7 +1,7 @@
 var myApp = angular.module('rttaRefDataUi', ["stationFormatter", "nodeFormatter","ngAnimate","ui.grid","ui.grid.selection","ui.grid.cellNav","ui.grid.autoResize","ui.grid.edit","ui.grid.resizeColumns","ngRoute","loadDisplay","angularFileUpload","ngVis"]);
 var config_data = {
     'SERVER' : 'localhost',
-    'PORT'   : '8082',
+    'PORT'   : '8080',
     'WEBAPP' :'rtta-refdata-tool'
 }
 
