@@ -48,4 +48,5 @@ myApp.config([ '$routeProvider', function ($routeProvider, $scope) {
             templateUrl: 'RailNetwork/DataVersion.html',
             controller: VersionController
         });
+    
     } ]);
