@@ -304,7 +304,7 @@ public class NodalGeographyService {
 
     @Transactional
     public List findAllPaths(String fromNodeName, String toNodeName) {
-        return nodalGeographyManager.findAllPaths(fromNodeName, toNodeName);
+        return nodalGeographyManager.findAllPaths(fromNodeName, toNodeName, 40);
     }
 
     /**

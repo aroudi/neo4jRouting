@@ -816,7 +816,7 @@ public class NodalGeographyManager implements INodalGeographyManager {
                 evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         */
         final TraversalDescription traversalDescription = graphDatabaseService.traversalDescription().uniqueness(Uniqueness.NODE_PATH).breadthFirst()
-                .relationships(relationshipType, Direction.OUTGOING).evaluator(Evaluators.toDepth(toDepth)).evaluator(isReachEndNode)
+                .relationships(relationshipType, Direction.OUTGOING).evaluator(Evaluators.toDepth(toDepth))
                 .evaluator(penaltyBanEvaluator).evaluator(Evaluators.returnWhereEndNodeIs(toNode));
         //.evaluator(linkDirectionUpEvaluator).
         final Traverser traverser = traversalDescription.traverse(fromNode);
